@@ -89,7 +89,6 @@
             padding: 15px 6vw;
             position: sticky;
             top: 0;
-            background: rgba(20, 15, 43, 0.85); /* var(--ink) con opacidad */
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             z-index: 9999;
@@ -352,7 +351,7 @@
 
         /* Supernova (Dorada) */
         .bubble.golden { 
-            background: radial-gradient(circle at 30% 30%, #ffffff, #ff00ff); 
+            background: radial-gradient(circle at 30% 30%, #ffffff, #ffd900); 
             box-shadow: 0 0 25px rgba(255, 0, 255, 0.8), inset 0 0 10px #fff; 
         }
         /* Bomba Estelar (Bomba) */
@@ -437,18 +436,20 @@
 </head>
 <body>
 
-    <nav>
-        <a href="#" class="brand">
-        <span class="brand-dot"></span>Alber.Games
-        </a>
-        
-        <div class="nav-links-container">
-        <a href="https://albersoftworks.github.io/alber.games/bubble-clicker" class="nav-link">Bubble Clicker</a>
-        <a href="https://albersoftworks.github.io/alber.games/tech-startup" class="nav-link">Tech Startup</a>
-        <a href="https://albersoftworks.github.io/alber.games/hop-hop" class="nav-link">Hop Hop</a>
-        <a href="https://albersoftworks.github.io" target="_blank" rel="noopener" class="nav-cta">Contacto</a>
-        </div>
-    </nav>
+    <div style="margin-bottom: 20px;">
+        <nav>
+            <a href="https://albersoftworks.github.io/alber.games" class="brand">
+            <span class="brand-dot"></span>Alber.Games
+            </a>
+            
+            <div class="nav-links-container">
+            <a href="https://albersoftworks.github.io/alber.games/bubble-clicker" class="nav-link">Bubble Clicker</a>
+            <a href="https://albersoftworks.github.io/alber.games/tech-startup" class="nav-link">Tech Startup</a>
+            <a href="https://albersoftworks.github.io/alber.games/hop-hop" class="nav-link">Hop Hop</a>
+            <a href="https://albersoftworks.github.io" target="_blank" rel="noopener" class="nav-cta">Contacto</a>
+            </div>
+        </nav>
+    </div>
 
     <h1>🫧 Bubble Clicker</h1>
     <p class="subtitle">Haz clic, mejora, trasciende la espuma</p>
@@ -669,14 +670,14 @@
                 { pops: 10, done: false, apply: () => { toast('🎉 ¡10 burbujas! Probabilidad de críticos añadida (x3 puntos).'); } },
                 { pops: 50, done: false, apply: () => { state.goldenUnlocked = true; toast('🌟 ¡50 burbujas! Aparecen burbujas doradas (x5 puntos).'); } },
                 { pops: 100, done: false, apply: () => { state.bombUnlocked = true; toast('💥 ¡100 burbujas! Aparecen burbujas bomba (reacción en cadena)'); } },
-                { pops: 250, done: false, apply: () => { state.frenzyUnlocked = true; toast('🔥 ¡250 burbujas! Modo frenesí: doble aparición activa'); } },
+                { pops: 150, done: false, apply: () => { state.frenzyUnlocked = true; toast('🔥 ¡150 burbujas! Modo frenesí: doble aparición activa'); } },
+                { pops: 200, done: false, apply: () => { state.frenzyUnlocked = true; toast('🔥 ¡200 burbujas! Modo frenesí: doble aparición activa'); } },
+                { pops: 300, done: false, apply: () => { state.frenzyUnlocked = true; toast('🔥 ¡300 burbujas! Modo frenesí: doble aparición activa'); } },
+                { pops: 400, done: false, apply: () => { state.frenzyUnlocked = true; toast('🔥 ¡400 burbujas! Modo frenesí: doble aparición activa'); } },
+                { pops: 500, done: false, apply: () => { state.frenzyUnlocked = true; toast('🔥 ¡500 burbujas! Modo frenesí: doble aparición activa'); } },
                 { pops: 1000, done: false, apply: () => { state.frenzyUnlocked = true; toast('🔥 ¡1000 burbujas! Modo frenesí: doble aparición activa'); } },
-                { pops: 2000, done: false, apply: () => { state.frenzyUnlocked = true; toast('🔥 ¡2000 burbujas! Modo frenesí: doble aparición activa'); } },
-                { pops: 5000, done: false, apply: () => { state.frenzyUnlocked = true; toast('🔥 ¡5000 burbujas! Modo frenesí: doble aparición activa'); } },
-                { pops: 10000, done: false, apply: () => { state.frenzyUnlocked = true; toast('🔥 ¡10000 burbujas! Modo frenesí: doble aparición activa'); } },
-                { pops: 100000, done: false, apply: () => { state.frenzyUnlocked = true; toast('🔥 ¡100000 burbujas! Modo frenesí: doble aparición activa'); } },
-                { pops: 500000, done: false, apply: () => { state.frenzyUnlocked = true; toast('🔥 ¡500000 burbujas! Modo frenesí: doble aparición activa'); } },
-                { pops: 1000000, done: false, apply: () => { state.frenzyUnlocked = true; toast('🔥 ¡1.000.000 burbujas, QUE LOCO! Modo frenesí: doble aparición activa'); } }
+                { pops: 1500, done: false, apply: () => { state.frenzyUnlocked = true; toast('🔥 ¡1500 burbujas! Modo frenesí: doble aparición activa'); } },
+                { pops: 2500, done: false, apply: () => { state.frenzyUnlocked = true; toast('🔥 ¡2500 burbujas, QUE LOCO! Modo frenesí: doble aparición activa (te mereces un descanso)'); } }
             ];
         }
 
