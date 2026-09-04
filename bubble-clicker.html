@@ -667,7 +667,7 @@
         function initMilestones() {
             return [
                 { pops: 10, done: false, apply: () => { toast('🎉 ¡10 burbujas! Probabilidad de críticos añadida (x3 puntos).'); } },
-                { pops: 50, done: false, apply: () => { state.goldenUnlocked = true; state.spawnInterval = Math.max(10, state.minSpawnInterval * 0.9); restartSpawnLoop(); toast('✨ ¡50 burbujas! Aparecen burbujas doradas (x15 puntos)'); } },
+                { pops: 50, done: false, apply: () => { state.goldenUnlocked = true; toast('🌟 ¡50 burbujas! Aparecen burbujas doradas (x5 puntos).'); } },
                 { pops: 100, done: false, apply: () => { state.bombUnlocked = true; toast('💥 ¡100 burbujas! Aparecen burbujas bomba (reacción en cadena)'); } },
                 { pops: 250, done: false, apply: () => { state.frenzyUnlocked = true; toast('🔥 ¡250 burbujas! Modo frenesí: doble aparición activa'); } },
                 { pops: 1000, done: false, apply: () => { state.frenzyUnlocked = true; toast('🔥 ¡1000 burbujas! Modo frenesí: doble aparición activa'); } },
