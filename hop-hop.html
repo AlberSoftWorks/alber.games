@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Plataformas Infinitas</title>
+    <style>
+        * { box-sizing: border-box; }
+        html, body { overscroll-behavior: none; }
+        body {
+            margin: 0;
+            padding: 16px;
+            background-color: #2c3e50;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        #game-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border-radius: 8px;
+            overflow: hidden;
+            outline: none;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            background: linear-gradient(to bottom, #87CEEB, #E0F6FF);
+            touch-action: none;
+        }
+
+        .ui-layer {
+            position: absolute;
+            top: 4%;
+            left: 3%;
+            right: 3%;
+            display: flex;
+            justify-content: space-between;
+            font-size: clamp(14px, 3vw, 24px);
+            font-weight: bold;
+            color: #333;
+            text-shadow: 2px 2px 0px white;
+            pointer-events: none;
+        }
+
+        #start-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.55);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            cursor: pointer;
+            z-index: 5;
+        }
+
+        #start-overlay p {
+            font-size: clamp(16px, 4vw, 22px);
+            font-weight: bold;
+            max-width: 80%;
+        }
+
+        #game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.85);
+            padding: 30px 40px;
+            border-radius: 15px;
+            text-align: center;
+            display: none;
+            color: white;
+            border: 2px solid #e74c3c;
+            z-index: 6;
+            width: 80%;
+            max-width: 320px;
+        }
+
+        #game-over h2 {
+            margin: 0 0 20px 0;
+            color: #e74c3c;
+            font-size: clamp(24px, 6vw, 36px);
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+            touch-action: manipulation;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .controls-info {
+            margin-top: 16px;
+            color: #bdc3c7;
+            font-size: 13px;
+            text-align: center;
+            max-width: 800px;
+            padding: 0 10px;
+        }
+
+        /* CONTROLES TÁCTILES: solo en pantallas táctiles sin ratón */
+        #touch-controls {
+            display: none;
+            position: absolute;
+            bottom: 4%;
+            left: 3%;
+            right: 3%;
+            justify-content: space-between;
+            align-items: flex-end;
+            z-index: 4;
+            pointer-events: none;
+        }
+
+        .touch-btn {
+            pointer-events: auto;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.25);
+            border: 2px solid rgba(255,255,255,0.6);
+            color: white;
+            font-size: 26px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+            touch-action: none;
+        }
+
+        .touch-btn:active { background: rgba(255,255,255,0.45); }
+
+        .move-group { display: flex; gap: 12px; }
+
+        @media (hover: none) and (pointer: coarse) {
+            #touch-controls { display: flex; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container" tabindex="0">
+        <canvas id="gameCanvas" width="800" height="500"></canvas>
+        <div class="ui-layer">
+            <div>Puntos: <span id="scoreDisplay">0</span></div>
+            <div>Récord: <span id="highScoreDisplay">0</span></div>
+        </div>
+
+        <div id="touch-controls">
+            <div class="move-group">
+                <div class="touch-btn" id="btn-left">◀</div>
+                <div class="touch-btn" id="btn-right">▶</div>
+            </div>
+            <div class="touch-btn" id="btn-jump">⤒</div>
+        </div>
+
+        <div id="start-overlay">
+            <p>Toca o haz clic para empezar</p>
+        </div>
+
+        <div id="game-over">
+            <h2>¡Te caíste!</h2>
+            <p>Puntuación: <span id="finalScore">0</span></p>
+            <button onclick="reiniciarJuego()">Volver a Jugar</button>
+        </div>
+    </div>
+    
+    <div class="controls-info">
+        Moverse: <b>A / D</b> (o Flechas) &nbsp;|&nbsp; Saltar: <b>W</b> o <b>ESPACIO</b> &nbsp;|&nbsp; En móvil, usa los botones en pantalla<br>
+        Esquiva los bloques rojos y no te caigas por los agujeros.
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const highScoreDisplay = document.getElementById('highScoreDisplay');
+        const gameOverScreen = document.getElementById('game-over');
+        const finalScore = document.getElementById('finalScore');
+        const gameContainer = document.getElementById('game-container');
+        const startOverlay = document.getElementById('start-overlay');
+
+        // ---------- ALMACENAMIENTO SEGURO ----------
+        // En Google Sites el código se ejecuta dentro de un iframe aislado, y en algunos
+        // navegadores/configuraciones localStorage lanza un error ahí dentro. Si eso no
+        // se controla, el script se detiene por completo y el juego no llega a cargar.
+        function leerRecord() {
+            try {
+                return parseInt(localStorage.getItem('plataformasHighScore'), 10) || 0;
+            } catch (e) {
+                return 0;
+            }
+        }
+        function guardarRecord(valor) {
+            try {
+                localStorage.setItem('plataformasHighScore', valor);
+            } catch (e) {
+                // Almacenamiento no disponible en este contexto: el récord no persistirá,
+                // pero el juego sigue funcionando con normalidad.
+            }
+        }
+
+        // Configuración y variables globales
+        let frames = 0;
+        let score = 0;
+        let highScore = leerRecord();
+        highScoreDisplay.innerText = highScore;
+        let gameSpeed = 4;
+        let isGameOver = false;
+        let hasStarted = false;
+        let animationId;
+
+        // Entradas del teclado
+        const keys = { w: false, a: false, s: false, d: false, space: false };
+        const teclasDeJuego = ['a', 'd', 'w', 'arrowleft', 'arrowright', 'arrowup', ' '];
+
+        document.addEventListener('keydown', (e) => {
+            const key = e.key.toLowerCase();
+            // Evita que espacio/flechas desplacen la página en la que está incrustado el juego
+            if (teclasDeJuego.includes(key)) e.preventDefault();
+
+            if (key === 'a' || key === 'arrowleft') keys.a = true;
+            if (key === 'd' || key === 'arrowright') keys.d = true;
+            if (key === 'w' || key === 'arrowup') keys.w = true;
+            if (key === ' ') keys.space = true;
+
+            iniciarSiHaceFalta();
+        });
+
+        document.addEventListener('keyup', (e) => {
+            const key = e.key.toLowerCase();
+            if (key === 'a' || key === 'arrowleft') keys.a = false;
+            if (key === 'd' || key === 'arrowright') keys.d = false;
+            if (key === 'w' || key === 'arrowup') keys.w = false;
+            if (key === ' ') keys.space = false;
+        });
+
+        // ---------- CONTROLES TÁCTILES ----------
+        function ligarBotonTactil(id, tecla) {
+            const btn = document.getElementById(id);
+            const activar = (e) => { e.preventDefault(); keys[tecla] = true; iniciarSiHaceFalta(); };
+            const desactivar = (e) => { e.preventDefault(); keys[tecla] = false; };
+            btn.addEventListener('pointerdown', activar);
+            btn.addEventListener('pointerup', desactivar);
+            btn.addEventListener('pointerleave', desactivar);
+            btn.addEventListener('pointercancel', desactivar);
+        }
+        ligarBotonTactil('btn-left', 'a');
+        ligarBotonTactil('btn-right', 'd');
+        ligarBotonTactil('btn-jump', 'w');
+
+        // ---------- FOCO ----------
+        // Al insertarse en un iframe (Google Sites), el teclado solo responde tras un
+        // primer clic/toque dentro del propio juego.
+        function iniciarSiHaceFalta() {
+            if (!hasStarted) {
+                hasStarted = true;
+                startOverlay.style.display = 'none';
+            }
+        }
+        startOverlay.addEventListener('click', () => {
+            iniciarSiHaceFalta();
+            gameContainer.focus();
+        });
+        gameContainer.addEventListener('click', () => gameContainer.focus());
+
+        // Objeto Jugador
+        const player = {
+            x: 100,
+            y: 200,
+            width: 30,
+            height: 30,
+            vy: 0,
+            vx: 0,
+            speed: 5,
+            jumpPower: -15,
+            gravity: 0.6,
+            grounded: false,
+            color: '#f1c40f',
+            
+            update() {
+                // Movimiento horizontal (WASD)
+                if (keys.a) this.vx = -this.speed;
+                else if (keys.d) this.vx = this.speed;
+                else this.vx = 0;
+
+                // Salto (W o Espacio)
+                if ((keys.w || keys.space) && this.grounded) {
+                    this.vy = this.jumpPower;
+                    this.grounded = false;
+                }
+
+                // Aplicar física
+                this.vy += this.gravity;
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // Límites de la pantalla (paredes invisibles)
+                if (this.x < 0) this.x = 0;
+                if (this.x + this.width > canvas.width) this.x = canvas.width - this.width;
+
+                // Comprobar muerte por caída
+                if (this.y > canvas.height) {
+                    terminarJuego();
+                }
+            },
+            
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.fillRect(this.x, this.y, this.width, this.height);
+                
+                // Detalles del personaje (ojos)
+                ctx.fillStyle = '#333';
+                ctx.fillRect(this.x + 20, this.y + 5, 5, 5);
+                ctx.fillRect(this.x + 10, this.y + 5, 5, 5);
+            }
+        };
+
+        // Arrays para almacenar el entorno
+        let platforms = [];
+        let obstacles = [];
+
+        class Platform {
+            constructor(x, y, width) {
+                this.x = x;
+                this.y = y;
+                this.width = width;
+                this.height = 20;
+                this.color = '#27ae60';
+            }
+            update() {
+                this.x -= gameSpeed;
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.fillRect(this.x, this.y, this.width, this.height);
+                // Césped decorativo
+                ctx.fillStyle = '#2ecc71';
+                ctx.fillRect(this.x, this.y, this.width, 5);
+            }
+        }
+
+        class Obstacle {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.width = 30;
+                this.height = 30;
+                this.color = '#e74c3c';
+            }
+            update() {
+                this.x -= gameSpeed;
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.fillRect(this.x, this.y, this.width, this.height);
+                
+                // Efecto de pinchos
+                ctx.fillStyle = '#c0392b';
+                ctx.beginPath();
+                ctx.moveTo(this.x, this.y);
+                ctx.lineTo(this.x + 15, this.y - 15);
+                ctx.lineTo(this.x + 30, this.y);
+                ctx.fill();
+            }
+        }
+
+        function generarEntorno() {
+            // Plataforma inicial. Se comprueba por cantidad de plataformas existentes,
+            // no por número de frame: "frames === 0" nunca se cumplía al reiniciar tras
+            // perder (frames ya valía 1 en el momento de esta comprobación), por eso no
+            // volvían a aparecer plataformas después de la primera partida.
+            if (platforms.length === 0) {
+                platforms.push(new Platform(0, 400, 800));
+            }
+
+            // Generar nuevas plataformas
+            if (frames % 90 === 0) {
+                const gapX = Math.random() * 150 + 50; // Hueco horizontal entre plataformas
+                const lastPlatform = platforms[platforms.length - 1];
+                let startX = lastPlatform ? lastPlatform.x + lastPlatform.width + gapX : canvas.width;
+                
+                if (startX < canvas.width) startX = canvas.width;
+
+                const y = Math.random() * 150 + 250; // Altura aleatoria
+                const width = Math.random() * 300 + 150; // Ancho aleatorio
+                
+                platforms.push(new Platform(startX, y, width));
+
+                // Probabilidad de generar un obstáculo rojo encima de la nueva plataforma
+                if (Math.random() < 0.4) {
+                    const obsX = startX + Math.random() * (width - 40) + 20;
+                    obstacles.push(new Obstacle(obsX, y - 30));
+                }
+            }
+
+            // Limpiar memoria de elementos que ya salieron de la pantalla
+            platforms = platforms.filter(p => p.x + p.width > 0);
+            obstacles = obstacles.filter(o => o.x + o.width > 0);
+        }
+
+        function detectarColisiones() {
+            player.grounded = false;
+
+            // Colisiones con plataformas
+            for (let i = 0; i < platforms.length; i++) {
+                let p = platforms[i];
+                
+                // Detección Axis-Aligned Bounding Box (AABB)
+                if (player.x < p.x + p.width && 
+                    player.x + player.width > p.x && 
+                    player.y + player.height > p.y && 
+                    player.y < p.y + p.height) {
+                    
+                    // Colisión por arriba (el jugador cae sobre la plataforma)
+                    // Permitimos cierto margen de velocidad para no atravesarlas si cae muy rápido
+                    if (player.vy >= 0 && (player.y + player.height - player.vy) <= p.y + 5) {
+                        player.y = p.y - player.height;
+                        player.vy = 0;
+                        player.grounded = true;
+                    } 
+                    // Colisión lateral o inferior
+                    else {
+                        // Choca por la izquierda
+                        if (player.vx > 0 && player.x + player.width - player.vx <= p.x) {
+                            player.x = p.x - player.width;
+                            player.vx = 0;
+                        }
+                        // Choca por la derecha
+                        else if (player.vx < 0 && player.x - player.vx >= p.x + p.width) {
+                            player.x = p.x + p.width;
+                            player.vx = 0;
+                        }
+                        // Choca por debajo (golpea la cabeza)
+                        else if (player.vy < 0 && player.y - player.vy >= p.y + p.height) {
+                            player.y = p.y + p.height;
+                            player.vy *= -0.5; // Rebote leve
+                        }
+                    }
+                }
+            }
+
+            // Colisiones con obstáculos mortales
+            for (let i = 0; i < obstacles.length; i++) {
+                let o = obstacles[i];
+                // Hitbox ligeramente más pequeña para ser justos con el jugador
+                const margin = 5; 
+                if (player.x + margin < o.x + o.width && 
+                    player.x + player.width - margin > o.x && 
+                    player.y + margin < o.y + o.height && 
+                    player.y + player.height - margin > o.y - 10) { // -10 por los pinchos
+                    terminarJuego();
+                }
+            }
+        }
+
+        function terminarJuego() {
+            if (isGameOver) return;
+            isGameOver = true;
+            cancelAnimationFrame(animationId);
+            gameOverScreen.style.display = 'block';
+            finalScore.innerText = score;
+
+            // Registrar récord en almacenamiento local (si el navegador lo permite)
+            if (score > highScore) {
+                highScore = score;
+                guardarRecord(highScore);
+                highScoreDisplay.innerText = highScore;
+            }
+        }
+
+        function reiniciarJuego() {
+            isGameOver = false;
+            gameOverScreen.style.display = 'none';
+            player.x = 100;
+            player.y = 200;
+            player.vy = 0;
+            platforms = [];
+            obstacles = [];
+            frames = 0;
+            score = 0;
+            gameSpeed = 4;
+            scoreDisplay.innerText = score;
+            loop();
+        }
+
+        function loop() {
+            if (isGameOver) return;
+
+            // Limpiar lienzo
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (hasStarted) {
+                // Aumentar dificultad progresivamente
+                frames++;
+                if (frames % 60 === 0) {
+                    score++;
+                    scoreDisplay.innerText = score;
+                    // Cada 100 puntos aumenta la velocidad del juego para hacerlo más difícil
+                    if (score % 100 === 0 && gameSpeed < 10) {
+                        gameSpeed += 0.5;
+                    }
+                }
+
+                generarEntorno();
+
+                // Actualizar y dibujar entorno
+                platforms.forEach(p => { p.update(); p.draw(); });
+                obstacles.forEach(o => { o.update(); o.draw(); });
+
+                player.update();
+                detectarColisiones();
+            } else {
+                // Antes del primer toque/clic, la plataforma inicial ya se muestra
+                // pero el juego permanece en pausa para no penalizar al jugador
+                if (platforms.length === 0) platforms.push(new Platform(0, 400, 800));
+                platforms.forEach(p => p.draw());
+            }
+
+            player.draw();
+
+            animationId = requestAnimationFrame(loop);
+        }
+
+        // Iniciar
+        reiniciarJuego();
+    </script>
+</body>
+</html>

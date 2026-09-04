@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alber.fun — Tech Startup</title>
+    <style>
+        /* 1. ESTILOS BASE Y FRENESÍ */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+            transition: background-color 0.5s;
+            overflow: hidden;
+        }
+
+        body.frenesi { background-color: #ffeaa7; }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            max-width: 550px;
+            width: 90%;
+            transition: transform 0.2s ease;
+            position: relative;
+            z-index: 2;
+            max-height: 95vh;
+            overflow-y: auto; /* Por si la pantalla es muy pequeña */
+        }
+
+        /* Ocultar barra de scroll para mantener el estilo limpio */
+        .container::-webkit-scrollbar { display: none; }
+        
+        h1 { margin-top: 0; color: #2c3e50; font-size: 26px; margin-bottom: 5px;}
+
+        #score-display {
+            font-size: 48px;
+            font-weight: bold;
+            color: #27ae60;
+            margin: 5px 0;
+            user-select: none;
+            transition: transform 0.1s;
+        }
+
+        /* Botón principal */
+        #click-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.05s, background-color 0.2s, box-shadow 0.2s;
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+            user-select: none;
+            margin-bottom: 15px;
+            width: 100%;
+        }
+
+        #click-btn:active {
+            transform: scale(0.96);
+            box-shadow: 0 2px 10px rgba(52, 152, 219, 0.4);
+        }
+
+        /* ZONA DE PRESTIGIO */
+        .prestige-zone {
+            background: linear-gradient(135deg, #f39c12, #d35400);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            color: white;
+            box-shadow: 0 4px 15px rgba(211, 84, 0, 0.3);
+        }
+
+        #btn-prestige {
+            background-color: white;
+            color: #d35400;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: transform 0.2s;
+        }
+
+        #btn-prestige:hover:not(:disabled) { transform: scale(1.02); }
+        #btn-prestige:disabled { background-color: #f1c40f; color: #fff; cursor: not-allowed; opacity: 0.7;}
+
+        /* Sección de mejoras (Grid de 2 columnas) */
+        .upgrades {
+            border-top: 2px dashed #ecf0f1;
+            padding-top: 15px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .upgrade-btn {
+            color: white;
+            border: none;
+            padding: 12px 10px;
+            font-size: 13px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .upgrade-btn:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.1); }
+        .upgrade-btn:disabled { background-color: #bdc3c7 !important; cursor: not-allowed; transform: none; filter: none; }
+        .cost-span { font-size: 11px; margin-top: 4px; background: rgba(0,0,0,0.2); padding: 2px 6px; border-radius: 4px;}
+
+        /* Colores por tipo de mejora */
+        #btn-teclado { background-color: #e67e22; }
+        #btn-junior { background-color: #9b59b6; }
+        #btn-senior { background-color: #34495e; } 
+        #btn-lead { background-color: #e74c3c; } 
+        #btn-ia { background-color: #1abc9c; } 
+        #btn-quantum { background-color: #8e44ad; } 
+
+        /* Estadísticas */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            font-size: 13px;
+            color: #7f8c8d;
+            margin-top: 15px;
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 10px;
+        }
+
+        /* ANIMACIONES Y CAFÉ (Mantenido igual) */
+        .floating-text {
+            position: absolute; pointer-events: none;
+            animation: floatUp 1s ease-out forwards; font-weight: bold; z-index: 10;
+        }
+        .normal-click { color: #3498db; font-size: 20px; }
+        .crit-click { color: #e74c3c; font-size: 32px; text-shadow: 0 2px 5px rgba(231, 76, 60, 0.5); }
+        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-60px) scale(1.2); } }
+
+        #cafe-buff {
+            position: absolute; font-size: 50px; cursor: pointer; user-select: none; display: none; z-index: 5;
+            animation: pulse 1s infinite, floatAround 3s ease-in-out infinite alternate; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.2));
+        }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+    </style>
+</head>
+<body>
+
+    <div id="cafe-buff">☕</div>
+
+    <div class="container">
+        <h1>🚀 Tech Startup</h1>
+        <p id="status-text" style="margin:0 0 10px 0;">Haz clic para escribir código.</p>
+        
+        <div id="score-display">0</div>
+        <p style="margin-top: -5px; margin-bottom: 15px; color: #7f8c8d; font-weight: bold;">LÍNEAS DE CÓDIGO</p>
+        
+        <button id="click-btn">💻 Escribir Código</button>
+
+        <!-- NUEVA ZONA: PRESTIGIO -->
+        <div class="prestige-zone">
+            <div style="font-size: 14px;">Tokens de Prestigio: <span id="stat-tokens" style="font-weight: bold; font-size: 18px;">0</span></div>
+            <div style="font-size: 12px; margin-bottom: 5px;">Bonus Global Pasivo: <span id="stat-bonus">+0%</span></div>
+            <button id="btn-prestige" disabled>
+                🔄 Refactorizar Sistema<br>
+                <span style="font-size: 11px; font-weight: normal;">(Requiere 10.000 líneas. Da +50% global por Token)</span>
+            </button>
+        </div>
+        
+        <div class="upgrades">
+            <button id="btn-teclado" class="upgrade-btn" disabled>
+                ⌨️ Teclado (+1/clic) <span id="cost-teclado" class="cost-span">Coste: 20</span>
+            </button>
+            <button id="btn-junior" class="upgrade-btn" disabled>
+                👶 Junior (+1 líns/seg) <span id="cost-junior" class="cost-span">Coste: 15</span>
+            </button>
+            <button id="btn-senior" class="upgrade-btn" disabled>
+                🧙‍♂️ Senior (+5 líns/seg) <span id="cost-senior" class="cost-span">Coste: 150</span>
+            </button>
+            <button id="btn-lead" class="upgrade-btn" disabled>
+                👑 Tech Lead (+50/seg) <span id="cost-lead" class="cost-span">Coste: 1.500</span>
+            </button>
+            <button id="btn-ia" class="upgrade-btn" disabled>
+                🤖 IA Generativa (+500/seg) <span id="cost-ia" class="cost-span">Coste: 15.000</span>
+            </button>
+            <button id="btn-quantum" class="upgrade-btn" disabled>
+                🌌 S. Cuántico (+5.000/seg) <span id="cost-quantum" class="cost-span">Coste: 200.000</span>
+            </button>
+        </div>
+        
+        <div class="stats-grid">
+            <div>Poder x Clic: <span id="stat-click" style="font-weight: bold; color: #333;">1</span></div>
+            <div>Líneas / Seg: <span id="stat-lps" style="font-weight: bold; color: #27ae60;">0</span></div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. ESTADO DEL JUEGO ---
+        let lineasDeCodigo = 0;
+        let poderBaseClick = 1; 
+        
+        // Empleados/Mejoras (Cantidades)
+        let c_teclados = 0; let c_juniors = 0; let c_seniors = 0;
+        let c_leads = 0; let c_ias = 0; let c_quantums = 0;
+        
+        // Costes iniciales
+        let costes = {
+            teclado: 20, junior: 15, senior: 150, lead: 1500, ia: 15000, quantum: 200000
+        };
+
+        // Sistema de Prestigio
+        let tokensPrestigio = 0;
+        const PRECIO_TOKEN = 10000; // Cada 10k líneas ganas 1 token al reiniciar
+
+        // Buffs
+        const probCritico = 0.10; 
+        const multCritico = 5;
+        let buffCafeActivo = false;
+
+        // --- 2. CONEXIÓN CON EL DOM ---
+        const scoreDisplay = document.getElementById('score-display');
+        const clickBtn = document.getElementById('click-btn');
+        const statusText = document.getElementById('status-text');
+        const cafeBuff = document.getElementById('cafe-buff');
+
+        // Textos de Stats y Prestigio
+        const statTokens = document.getElementById('stat-tokens');
+        const statBonus = document.getElementById('stat-bonus');
+        const statClick = document.getElementById('stat-click');
+        const statLps = document.getElementById('stat-lps');
+        const btnPrestige = document.getElementById('btn-prestige');
+
+        // Mapeo de botones de mejora para facilitar acceso
+        const mejoras = {
+            teclado: { btn: document.getElementById('btn-teclado'), costTxt: document.getElementById('cost-teclado'), baseCost: 20, mult: 2.0 },
+            junior:  { btn: document.getElementById('btn-junior'),  costTxt: document.getElementById('cost-junior'),  baseCost: 15, mult: 1.25 },
+            senior:  { btn: document.getElementById('btn-senior'),  costTxt: document.getElementById('cost-senior'),  baseCost: 150, mult: 1.3 },
+            lead:    { btn: document.getElementById('btn-lead'),    costTxt: document.getElementById('cost-lead'),    baseCost: 1500, mult: 1.35 },
+            ia:      { btn: document.getElementById('btn-ia'),      costTxt: document.getElementById('cost-ia'),      baseCost: 15000, mult: 1.4 },
+            quantum: { btn: document.getElementById('btn-quantum'), costTxt: document.getElementById('cost-quantum'), baseCost: 200000, mult: 1.5 }
+        };
+
+        // --- 3. LÓGICA PRINCIPAL ---
+        function obtenerMultiplicadorGlobal() {
+            // Cada token de prestigio da un +50% (0.5). Café da un x3 a todo.
+            let multPrestigio = 1 + (tokensPrestigio * 0.5);
+            let multCafe = buffCafeActivo ? 3 : 1;
+            return multPrestigio * multCafe;
+        }
+
+        function actualizarPantalla() {
+            scoreDisplay.innerText = Math.floor(lineasDeCodigo);
+            
+            let multGlobal = obtenerMultiplicadorGlobal();
+            
+            // Cálculos base
+            let poderClicTotal = poderBaseClick * multGlobal;
+            let lineasPorSegundo = ((c_juniors * 1) + (c_seniors * 5) + (c_leads * 50) + (c_ias * 500) + (c_quantums * 5000)) * multGlobal;
+            
+            statClick.innerText = Math.floor(poderClicTotal);
+            statLps.innerText = Math.floor(lineasPorSegundo);
+            statTokens.innerText = tokensPrestigio;
+            statBonus.innerText = "+" + (tokensPrestigio * 50) + "%";
+
+            // Botón de prestigio (habilitar si tiene suficientes líneas para ganar al menos 1 token)
+            let tokensGanables = Math.floor(lineasDeCodigo / PRECIO_TOKEN);
+            if (tokensGanables >= 1) {
+                btnPrestige.disabled = false;
+                btnPrestige.innerHTML = `🔄 Refactorizar Sistema<br><span style="font-size: 11px;">(Reinicias y ganas +${tokensGanables} Tokens)</span>`;
+            } else {
+                btnPrestige.disabled = true;
+                btnPrestige.innerHTML = `🔄 Refactorizar Sistema<br><span style="font-size: 11px;">(Requiere 10.000 líneas para 1 Token)</span>`;
+            }
+
+            // Actualizar botones de mejora
+            for (let key in mejoras) {
+                let m = mejoras[key];
+                m.costTxt.innerText = `Coste: ${Math.floor(costes[key])}`;
+                m.btn.disabled = lineasDeCodigo < costes[key];
+            }
+        }
+
+        function mostrarNumeroFlotante(cantidad, x, y, esCritico) {
+            const flotante = document.createElement('div');
+            flotante.classList.add('floating-text');
+            flotante.innerText = `+${Math.floor(cantidad)}`;
+            
+            if (esCritico) {
+                flotante.classList.add('crit-click');
+                flotante.innerText += ' ¡CRIT!';
+            } else {
+                flotante.classList.add('normal-click');
+            }
+
+            flotante.style.left = `${x}px`; flotante.style.top = `${y}px`;
+            document.body.appendChild(flotante);
+            setTimeout(() => flotante.remove(), 1000);
+        }
+
+        // --- 4. EVENTOS DE CLIC ---
+        clickBtn.addEventListener('click', (e) => {
+            let multGlobal = obtenerMultiplicadorGlobal();
+            let ganancia = poderBaseClick * multGlobal;
+            let esCritico = Math.random() < probCritico;
+
+            if (esCritico) ganancia *= multCritico;
+            
+            lineasDeCodigo += ganancia;
+            
+            const rect = clickBtn.getBoundingClientRect();
+            const x = (e.clientX || rect.left + rect.width / 2) - 10 + (Math.random() * 20);
+            const y = (e.clientY || rect.top + rect.height / 2) - 20;
+
+            mostrarNumeroFlotante(ganancia, x, y, esCritico);
+            
+            scoreDisplay.style.transform = 'scale(1.05)';
+            setTimeout(() => scoreDisplay.style.transform = 'scale(1)', 50);
+
+            actualizarPantalla();
+        });
+
+        // Funciones de compra
+        function comprarMejora(tipo) {
+            if (lineasDeCodigo >= costes[tipo]) {
+                lineasDeCodigo -= costes[tipo];
+                costes[tipo] *= mejoras[tipo].mult; // Aumentar precio
+                return true;
+            }
+            return false;
+        }
+
+        mejoras.teclado.btn.addEventListener('click', () => { if(comprarMejora('teclado')) { poderBaseClick += 1; c_teclados++; actualizarPantalla(); }});
+        mejoras.junior.btn.addEventListener('click', () => { if(comprarMejora('junior')) { c_juniors++; actualizarPantalla(); }});
+        mejoras.senior.btn.addEventListener('click', () => { if(comprarMejora('senior')) { c_seniors++; actualizarPantalla(); }});
+        mejoras.lead.btn.addEventListener('click', () => { if(comprarMejora('lead')) { c_leads++; actualizarPantalla(); }});
+        mejoras.ia.btn.addEventListener('click', () => { if(comprarMejora('ia')) { c_ias++; actualizarPantalla(); }});
+        mejoras.quantum.btn.addEventListener('click', () => { if(comprarMejora('quantum')) { c_quantums++; actualizarPantalla(); }});
+
+        // --- 5. SISTEMA DE PRESTIGIO (REINICIO) ---
+        btnPrestige.addEventListener('click', () => {
+            let tokensGanables = Math.floor(lineasDeCodigo / PRECIO_TOKEN);
+            if (tokensGanables >= 1) {
+                let confirmar = confirm(`¿Estás seguro de que quieres refactorizar tu código?\n\nPERDERÁS: Todas tus líneas, teclados y empleados.\nGANARÁS: ${tokensGanables} Tokens de Prestigio (Bonus permanente de +${tokensGanables*50}% a todo).\n\n¡Es el único camino para alcanzar el Servidor Cuántico!`);
+                
+                if (confirmar) {
+                    // Dar tokens
+                    tokensPrestigio += tokensGanables;
+                    
+                    // Resetear progreso
+                    lineasDeCodigo = 0;
+                    poderBaseClick = 1;
+                    c_teclados = 0; c_juniors = 0; c_seniors = 0;
+                    c_leads = 0; c_ias = 0; c_quantums = 0;
+                    
+                    // Resetear costes
+                    for (let key in costes) {
+                        costes[key] = mejoras[key].baseCost;
+                    }
+
+                    // Efecto visual
+                    document.body.style.backgroundColor = "#fff";
+                    setTimeout(() => document.body.style.backgroundColor = "", 200);
+
+                    actualizarPantalla();
+                }
+            }
+        });
+
+        // --- 6. BUCLE PRINCIPAL Y EVENTOS ALEATORIOS ---
+        setInterval(() => {
+            let multGlobal = obtenerMultiplicadorGlobal();
+            let lineasPorSegundo = ((c_juniors * 1) + (c_seniors * 5) + (c_leads * 50) + (c_ias * 500) + (c_quantums * 5000)) * multGlobal;
+            
+            if (lineasPorSegundo > 0) {
+                lineasDeCodigo += lineasPorSegundo;
+                actualizarPantalla();
+            }
+        }, 1000);
+
+        setInterval(() => {
+            if (Math.random() < 0.15 && !buffCafeActivo) {
+                cafeBuff.style.display = 'block';
+                const maxX = window.innerWidth - 100;
+                const maxY = window.innerHeight - 100;
+                cafeBuff.style.left = `${Math.random() * maxX + 20}px`;
+                cafeBuff.style.top = `${Math.random() * maxY + 20}px`;
+
+                setTimeout(() => {
+                    if (cafeBuff.style.display === 'block') cafeBuff.style.display = 'none';
+                }, 4000); // 4 segundos para pillarlo
+            }
+        }, 10000);
+
+        cafeBuff.addEventListener('click', () => {
+            cafeBuff.style.display = 'none';
+            buffCafeActivo = true;
+            
+            document.body.classList.add('frenesi');
+            statusText.innerText = "¡CAFEÍNA AL MÁXIMO! x3 EN TODO";
+            statusText.style.color = "#d35400"; statusText.style.fontWeight = "bold";
+            actualizarPantalla();
+
+            setTimeout(() => {
+                buffCafeActivo = false;
+                document.body.classList.remove('frenesi');
+                statusText.innerText = "Haz clic para escribir código.";
+                statusText.style.color = "#7f8c8d"; statusText.style.fontWeight = "normal";
+                actualizarPantalla();
+            }, 10000);
+        });
+
+        // Iniciar
+        actualizarPantalla();
+    </script>
+
+</body>
+</html>
