@@ -3,8 +3,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alber.fun — Tech Startup</title>
+    <title>Alber.Games — Tech Startup</title>
     <style>
+          /* ---------- NAV ESTÉTICO Y ANIMADO ---------- */
+
+        nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 6vw;
+            position: sticky;
+            top: 0;
+            background: rgba(20, 15, 43, 0.85); /* var(--ink) con opacidad */
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            z-index: 9999;
+            border-bottom: 1px solid var(--panel-edge);
+            transition: all 0.4s ease;
+        }
+
+        .brand {
+            font-family: var(--font-display);
+            font-weight: 800;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            letter-spacing: 0.5px;
+            text-decoration: none;
+            color: var(--text);
+            transition: transform 0.3s ease;
+        }
+
+        .brand:hover {
+            transform: scale(1.05) rotate(-2deg);
+        }
+
+        .brand-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--sky);
+            box-shadow: 0 0 12px var(--sky);
+            transition: all 0.3s ease;
+        }
+
+        /* Animación loca para el punto del logo al hacer hover */
+        .brand:hover .brand-dot {
+            animation: crazyBounce 0.4s infinite alternate cubic-bezier(0.5, 0.05, 1, 0.5);
+        }
+
+        @keyframes crazyBounce {
+            0% { transform: translateY(0) scale(1); background: var(--sky); box-shadow: 0 0 12px var(--sky); }
+            100% { transform: translateY(-10px) scale(1.3); background: var(--coral); box-shadow: 0 0 20px var(--coral); }
+        }
+
+        .nav-links-container {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--muted);
+            font-family: var(--font-display);
+            font-size: 1.05rem;
+            font-weight: 600;
+            padding: 8px 20px;
+            border-radius: 50px;
+            background: var(--panel);
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* Efecto de brillo que atraviesa el botón */
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(111, 231, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .nav-link:hover {
+            transform: translateY(-5px) scale(1.05) rotate(3deg);
+            box-shadow: 0 8px 15px rgba(111, 231, 255, 0.2);
+            border-color: var(--sky);
+            color: var(--sky);
+            background: var(--ink);
+        }
+
+        .nav-link:hover::before {
+            left: 100%;
+        }
+
+        /* Botón de Llamada a la Acción (CTA) del menú */
+        .nav-cta {
+            text-decoration: none;
+            color: #1A1330;
+            background: var(--gold);
+            font-family: var(--font-display);
+            font-size: 1.05rem;
+            font-weight: 800;
+            padding: 10px 24px;
+            border-radius: 50px;
+            box-shadow: 0 5px 0 #C99A20;
+            animation: pulseNav 2s infinite;
+            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+            margin-left: 10px;
+        }
+
+        .nav-cta:hover {
+            transform: translateY(-3px) scale(1.1) rotate(-3deg);
+            box-shadow: 0 2px 0 #C99A20, 0 10px 25px rgba(255, 201, 60, 0.5);
+            animation-play-state: paused;
+            background: #ffdb6e;
+        }
+
+        .nav-cta:active {
+            transform: translateY(2px) scale(0.95);
+            box-shadow: 0 0 0 #C99A20;
+        }
+
+        @keyframes pulseNav {
+            0% { box-shadow: 0 5px 0 #C99A20, 0 0 0 0 rgba(255, 201, 60, 0.5); }
+            70% { box-shadow: 0 5px 0 #C99A20, 0 0 0 15px rgba(255, 201, 60, 0); }
+            100% { box-shadow: 0 5px 0 #C99A20, 0 0 0 0 rgba(255, 201, 60, 0); }
+        }
+
+        /* Adaptación para móviles del menú */
+        @media (max-width: 720px) {
+            .nav-links-container {
+            display: none; /* Aquí podrías añadir un menú hamburguesa más adelante si crecen los links */
+            }
+        }
+
+        /* --------- FIN NAV ESTÉTICO Y ANIMADO --------- */
+
         /* 1. ESTILOS BASE Y FRENESÍ */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -165,6 +305,18 @@
     </style>
 </head>
 <body>
+    <nav>
+        <a href="#" class="brand">
+        <span class="brand-dot"></span>Alber.Games
+        </a>
+        
+        <div class="nav-links-container">
+        <a href="https://albersoftworks.github.io/alber.games/bubble-clicker" class="nav-link">Bubble Clicker</a>
+        <a href="https://albersoftworks.github.io/alber.games/tech-startup" class="nav-link">Tech Startup</a>
+        <a href="https://albersoftworks.github.io/alber.games/hop-hop" class="nav-link">Hop Hop</a>
+        <a href="https://albersoftworks.github.io" target="_blank" rel="noopener" class="nav-cta">Contacto</a>
+        </div>
+    </nav>
 
     <div id="cafe-buff">☕</div>
 
