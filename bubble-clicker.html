@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bubble Clicker - Edición Ascensión</title>
+    <style>
+        * { box-sizing: border-box; }
+        html, body { overscroll-behavior: none; }
+        
+        body {
+            margin: 0;
+            min-height: 100vh;
+            /* Fondo espacial profundo */
+            background: radial-gradient(circle at top right, #1e1c24, #39405f 70%);
+            font-family: 'Trebuchet MS', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+            color: #c5c6c7;
+        }
+
+        h1 {
+            font-size: clamp(1.4rem, 5vw, 2.2rem);
+            color: #66fcf1;
+            margin: 0 0 4px 0;
+            text-shadow: 0 0 15px rgba(102, 252, 241, 0.4);
+            text-align: center;
+            letter-spacing: 2px;
+        }
+
+        .subtitle { 
+            color: #8c92ac; 
+            margin: 0 0 16px 0; 
+            font-size: 0.95rem; 
+            text-align: center; 
+        }
+
+        #score {
+            font-size: clamp(1.3rem, 4.5vw, 1.8rem);
+            font-weight: bold;
+            margin-bottom: 6px;
+            background: rgba(31, 40, 51, 0.8);
+            color: #ffffff;
+            padding: 10px 26px;
+            border-radius: 999px;
+            border: 1px solid #45a29e;
+            box-shadow: 0 0 20px rgba(69, 162, 158, 0.3);
+            transition: transform 0.1s;
+        }
+
+        #stats {
+            font-size: 0.85rem;
+            color: #45a29e;
+            margin-bottom: 16px;
+            text-align: center;
+            max-width: 800px;
+            padding: 0 10px;
+        }
+
+        .layout {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        #gameArea {
+            position: relative;
+            flex: 1;
+            height: 550px;
+            background: radial-gradient(circle at center, rgba(102,252,241,0.05) 0%, rgba(11,12,16,0.6) 100%);
+            border-radius: 18px;
+            border: 1px solid rgba(102, 252, 241, 0.1);
+            overflow: hidden;
+            cursor: crosshair;
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.8);
+            touch-action: none;
+        }
+
+        /* TIENDA Y SCROLL */
+        #shop {
+            width: 280px;
+            flex-shrink: 0;
+            background: rgba(11, 12, 16, 0.85);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(102, 252, 241, 0.2);
+            border-radius: 18px;
+            padding: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            height: 550px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        #shop::-webkit-scrollbar { width: 6px; }
+        #shop::-webkit-scrollbar-thumb { background: #45a29e; border-radius: 10px; }
+
+        #shop h2 { 
+            margin-top: 0; 
+            font-size: 1.2rem; 
+            color: #66fcf1; 
+            border-bottom: 1px solid rgba(102,252,241,0.2);
+            padding-bottom: 10px;
+        }
+
+        /* ANIMACIÓN LATIDO PARA BOTONES */
+        @keyframes pulseButton {
+            0% { box-shadow: 0 0 0 0 rgba(102, 252, 241, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(102, 252, 241, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(102, 252, 241, 0); }
+        }
+
+        /* PRESTIGIO - EFECTO AGUJERO NEGRO/QUASAR */
+        .prestige-zone {
+            background: linear-gradient(135deg, #240b36, #c31432);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(195, 20, 50, 0.4);
+            color: white;
+            border: 1px solid #ff4b2b;
+        }
+
+        .prestige-zone p { margin: 0 0 10px 0; font-size: 0.9rem; font-weight: bold; }
+        .prestige-zone span { font-size: 1.2rem; color: #ffeb3b; text-shadow: 0 0 10px #ffeb3b; }
+        #prestige-bonus-desc { font-size: 0.8rem; font-weight: normal; margin-bottom: 12px; color: #ffcccb; }
+
+        #btn-prestige {
+            background-color: #ffffff;
+            color: #c31432;
+            border: none;
+            padding: 12px 10px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.2s;
+            touch-action: manipulation;
+        }
+
+        #btn-prestige:not(:disabled) {
+            animation: pulseButton 2s infinite;
+        }
+        #btn-prestige:hover:not(:disabled) { transform: scale(1.05); }
+        #btn-prestige:disabled { opacity: 0.5; cursor: not-allowed; animation: none; background: #555; color: #999;}
+
+        /* MEJORAS */
+        .upgrade {
+            background: rgba(31, 40, 51, 0.6);
+            border: 1px solid #45a29e;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 12px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .upgrade:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 5px 15px rgba(102, 252, 241, 0.15);
+        }
+        
+        .upgrade.tier-high { border-color: #b82601; background: rgba(184, 38, 1, 0.1); }
+        .upgrade.tier-ultra { border-color: #9900ff; background: rgba(153, 0, 255, 0.1); }
+        .upgrade.tier-maximo { border-color: #ffcc00; background: rgba(255, 204, 0, 0.1); box-shadow: inset 0 0 10px rgba(255,204,0,0.1); }
+
+        .upgrade h3 { margin: 0 0 4px 0; font-size: 0.95rem; color: #ffffff; }
+        .upgrade p { margin: 0 0 12px 0; font-size: 0.78rem; color: #8c92ac; }
+        
+        .upgrade button {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            background: #1f2833;
+            color: #66fcf1;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: background 0.15s, color 0.15s;
+            border: 1px solid #45a29e;
+            touch-action: manipulation;
+        }
+
+        .upgrade.tier-high button { color: #ff6b6b; border-color: #b82601; }
+        .upgrade.tier-ultra button { color: #d473d4; border-color: #9900ff; }
+        .upgrade.tier-maximo button { color: #ffeb3b; border-color: #ffcc00; }
+
+        .upgrade button:disabled { background: #1a1a1a !important; color: #555 !important; border-color: #333 !important; cursor: not-allowed; }
+        .upgrade button:not(:disabled):hover { background: #45a29e; color: #0b0c10; }
+        .upgrade.tier-high button:not(:disabled):hover { background: #b82601; color: #fff; }
+        .upgrade.tier-ultra button:not(:disabled):hover { background: #9900ff; color: #fff; }
+        .upgrade.tier-maximo button:not(:disabled):hover { background: #ffcc00; color: #000; }
+
+        /* BURBUJAS CÓSMICAS */
+        .bubble {
+            position: absolute;
+            border-radius: 50%;
+            /* Núcleo de estrella normal */
+            background: radial-gradient(circle at 30% 30%, #ffffff59, #6cfff5);
+            box-shadow: 0 0 20px rgba(102, 252, 242, 0.281);
+            transition: transform 0.15s ease;
+            animation: float 4s ease-in-out infinite;
+            touch-action: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        /* Supernova (Dorada) */
+        .bubble.golden { 
+            background: radial-gradient(circle at 30% 30%, #ffffff, #ff00ff); 
+            box-shadow: 0 0 25px rgba(255, 0, 255, 0.8), inset 0 0 10px #fff; 
+        }
+        /* Bomba Estelar (Bomba) */
+        .bubble.bomb { 
+            background: radial-gradient(circle at 30% 30%, #ffeb3b, #ff4b2b); 
+            box-shadow: 0 0 25px rgba(255, 75, 43, 0.8); 
+        }
+
+        .bubble:hover { transform: scale(1.2); }
+        @keyframes float { 0%, 100% { margin-top: 0px; } 50% { margin-top: -15px; } }
+
+        .pop { animation: popAnim 0.25s forwards !important; }
+        @keyframes popAnim { 
+            40% { filter: brightness(2); }
+            to { transform: scale(2); opacity: 0; filter: blur(4px); } 
+        }
+
+        .floatText {
+            position: absolute;
+            font-weight: bold;
+            color: #66fcf1;
+            text-shadow: 0 0 5px #0b0c10;
+            pointer-events: none;
+            animation: floatUp 0.8s forwards;
+            font-size: 1rem;
+            z-index: 10;
+        }
+        .floatText.crit { color: #ff4b2b; font-size: 1.4rem; text-shadow: 0 0 10px rgba(255, 75, 43, 0.8); }
+
+        @keyframes floatUp { to { transform: translateY(-40px) scale(1.2); opacity: 0; } }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            background: rgba(31, 40, 51, 0.95);
+            color: #66fcf1;
+            border: 1px solid #45a29e;
+            box-shadow: 0 0 20px rgba(69, 162, 158, 0.3);
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            opacity: 0;
+            transition: all 0.4s ease;
+            z-index: 100;
+            text-align: center;
+            max-width: 90vw;
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0px); }
+
+        @media (max-width: 750px) {
+            .layout { flex-direction: column; }
+            #shop { width: 100%; height: auto; max-height: 350px; }
+            #gameArea { height: 420px; }
+        }
+
+        @media (max-width: 480px) {
+            body { padding: 12px; }
+            #gameArea { height: 340px; }
+            #stats { font-size: 0.72rem; }
+        }
+
+        /* BOTÓN DE MÚSICA */
+        .music-btn {
+            background-color: rgba(31, 40, 51, 0.8);
+            color: #66fcf1;
+            border: 1px solid #45a29e;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            margin-bottom: 15px;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        .music-btn:hover {
+            background-color: #45a29e;
+            color: #0b0c10;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🫧 Bubble Clicker</h1>
+    <p class="subtitle">Haz clic, mejora, trasciende la espuma</p>
+    <button id="bgm-toggle" class="music-btn">🎵 Activar Música</button>
+    <audio id="bgm-audio" src="https://cdn.pixabay.com/download/audio/2022/02/22/audio_d1718ab41b.mp3" loop></audio>
+    <div id="score">Puntos: 0</div>
+    <div id="stats">Total reventadas: 0 · Valor base: 1 · Bonus global: x1</div>
+
+    <div class="layout">
+        <div id="gameArea"></div>
+
+        <div id="shop">
+            <h2>🛒 Mejoras</h2>
+
+            <!-- ZONA DE PRESTIGIO -->
+            <div class="prestige-zone">
+                <p>Esencia de Jabón: <span id="token-display">0</span></p>
+                <p id="prestige-bonus-desc">Bonus actual: +0% de puntos a todo</p>
+                <button id="btn-prestige" disabled>✨ Ascender (Requiere 20.000 pts)</button>
+            </div>
+
+            <div class="upgrade">
+                <h3>👆 Dedos rápidos</h3>
+                <p id="desc-click">+1 punto base por burbuja</p>
+                <button id="buy-click">Comprar (10 pts)</button>
+            </div>
+
+            <div class="upgrade">
+                <h3>🌀 Fábrica de burbujas</h3>
+                <p id="desc-spawn">Aparecen más burbujas</p>
+                <button id="buy-spawn">Comprar (15 pts)</button>
+            </div>
+
+            <div class="upgrade">
+                <h3>🤖 Auto-Pop</h3>
+                <p id="desc-autopop">Revienta burbujas automáticamente</p>
+                <button id="buy-autopop">Comprar (60 pts)</button>
+            </div>
+
+            <!-- MEJORAS DE TIERS HIGH -->
+            <div class="upgrade tier-high">
+                <h3>🧪 Jabón Concentrado</h3>
+                <p id="desc-jabon">+15 puntos base por burbuja</p>
+                <button id="buy-jabon">Comprar (800 pts)</button>
+            </div>
+
+            <div class="upgrade tier-high">
+                <h3>⚙️ Compresor Industrial</h3>
+                <p id="desc-maquina">+5 auto-pops por segundo</p>
+                <button id="buy-maquina">Comprar (3.500 pts)</button>
+            </div>
+
+            <div class="upgrade tier-high">
+                <h3>🌌 Espuma Termonuclear</h3>
+                <p id="desc-termonuclear">+200 puntos base por burbuja</p>
+                <button id="buy-termonuclear">Comprar (40.000 pts)</button>
+            </div>
+
+            <!-- MEJORAS DE TIERS ULTRA -->
+            <div class="upgrade tier-ultra">
+                <h3>🌌 Espuma Solar</h3>
+                <p id="desc-solar">+500 puntos base por burbuja</p>
+                <button id="buy-solar">Comprar (100.000 pts)</button>
+            </div>
+
+            <div class="upgrade tier-ultra">
+                <h3>🌌 Espuma Cuántica</h3>
+                <p id="desc-cuantica">+800 puntos base por burbuja</p>
+                <button id="buy-cuantica">Comprar (500.000 pts)</button>
+            </div>
+
+            <div class="upgrade tier-ultra">
+                <h3>🌌 Espuma Multiversal</h3>
+                <p id="desc-multiversal">+1200 puntos base por burbuja</p>
+                <button id="buy-multiversal">Comprar (1.000.000 pts)</button>
+            </div>
+
+            <!-- MEJORAS DE TIERS MÁXIMO -->
+            <div class="upgrade tier-maximo">
+                <h3>🌌 Espuma Primigenia</h3>
+                <p id="desc-primigenia">+5000 puntos base por burbuja</p>
+                <button id="buy-primigenia">Comprar (5.000.000 pts)</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ---------------- //
+        // ESTADO DEL JUEGO //
+        // ---------------  //
+        const PRESTIGE_COST = 20000;
+
+        function fmt(n) { return Math.floor(n).toLocaleString('es-ES'); }
+
+        const baseState = {
+            points: 0,
+            totalPops: 0,
+            clickValue: 10000,
+            spawnInterval: 700,
+            minSpawnInterval: 1,
+            goldenUnlocked: false,
+            bombUnlocked: false,
+            frenzyUnlocked: false,
+            autopopRate: 0, 
+            upgrades: {
+                click: { level: 0, cost: 10, mult: 1.5, element: 'buy-click', desc: 'desc-click', label: '+1 punto base' },
+                spawn: { level: 0, cost: 15, mult: 1.4, element: 'buy-spawn', desc: 'desc-spawn', label: 'Mayor aparición' },
+                autopop: { level: 0, cost: 60, mult: 1.7, element: 'buy-autopop', desc: 'desc-autopop', label: '+0.5 auto-pops/seg' },
+                jabon: { level: 0, cost: 800, mult: 1.6, element: 'buy-jabon', desc: 'desc-jabon', label: '+15 puntos base' },
+                maquina: { level: 0, cost: 3500, mult: 1.6, element: 'buy-maquina', desc: 'desc-maquina', label: '+5 auto-pops/seg' },
+                termonuclear: { level: 0, cost: 40000, mult: 1.8, element: 'buy-termonuclear', desc: 'desc-termonuclear', label: '+200 puntos base' },
+                solar: { level: 0, cost: 100000, mult: 2.0, element: 'buy-solar', desc: 'desc-solar', label: '+500 puntos base' },
+                cuantica: { level: 0, cost: 500000, mult: 1.6, element: 'buy-cuantica', desc: 'desc-cuantica', label: '+800 puntos base' },
+                multiversal: { level: 0, cost: 1000000, mult: 1.6, element: 'buy-multiversal', desc: 'desc-multiversal', label: '+1200 puntos base' },
+                primigenia: { level: 0, cost: 5000000, mult: 1.6, element: 'buy-primigenia', desc: 'desc-primigenia', label: '+5000 puntos base' }
+            }
+        };
+
+        let state = JSON.parse(JSON.stringify(baseState));
+        state.prestigeTokens = 0; // Persiste tras el reseteo
+
+        const gameArea = document.getElementById('gameArea');
+        const scoreEl = document.getElementById('score');
+        const statsEl = document.getElementById('stats');
+        const tokenDisplay = document.getElementById('token-display');
+        const prestigeBonusDesc = document.getElementById('prestige-bonus-desc');
+        const btnPrestige = document.getElementById('btn-prestige');
+
+        // -------------- //
+        // MUSICA Y AUDIO //
+        // -------------- //
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        // Sonido para clics en burbujas (Pop dinámico con pitch aleatorio)
+        function playPopSound(isCrit = false) {
+            initAudio();
+            if (!audioCtx) return;
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+
+            osc.type = 'sine';
+            
+            // Tono base variable para que no suene monótono
+            const baseFreq = isCrit ? 600 : (300 + Math.random() * 150);
+            osc.frequency.setValueAtTime(baseFreq, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.8, audioCtx.currentTime + 0.08);
+
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.08);
+        }
+
+        // Sonido para compras de mejoras (Tono metálico/electrónico ascendente)
+        function playUpgradeSound() {
+            initAudio();
+            if (!audioCtx) return;
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(440, audioCtx.currentTime); // Nota La
+            osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.15); // Sube una octava
+
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.15);
+        }
+
+        // Control de Música de Fondo
+        const bgmAudio = document.getElementById('bgm-audio');
+        const bgmToggle = document.getElementById('bgm-toggle');
+        let isMusicPlaying = false;
+
+        bgmToggle.addEventListener('click', () => {
+            initAudio(); // Desbloquea el contexto de audio general
+            if (isMusicPlaying) {
+                bgmAudio.pause();
+                bgmToggle.textContent = '🎵 Música: OFF';
+                bgmToggle.style.backgroundColor = 'rgba(31, 40, 51, 0.8)';
+            } else {
+                bgmAudio.play();
+                bgmToggle.textContent = '🎶 Música: ON';
+                bgmToggle.style.backgroundColor = '#45a29e';
+                bgmToggle.style.color = '#0b0c10';
+            }
+            isMusicPlaying = !isMusicPlaying;
+        });
+        // --------------------- //
+        // FIN DE MUSICA Y AUDIO //
+        // --------------------- //
+
+        // ---------- HITOS AUTOMÁTICOS ----------
+        let milestones = initMilestones();
+
+        function initMilestones() {
+            return [
+                { pops: 10, done: false, apply: () => { toast('🎉 ¡10 burbujas! Probabilidad de críticos añadida (x3 puntos).'); } },
+                { pops: 50, done: false, apply: () => { state.goldenUnlocked = true; state.spawnInterval = Math.max(10, state.minSpawnInterval * 0.9); restartSpawnLoop(); toast('✨ ¡50 burbujas! Aparecen burbujas doradas (x15 puntos)'); } },
+                { pops: 100, done: false, apply: () => { state.bombUnlocked = true; toast('💥 ¡100 burbujas! Aparecen burbujas bomba (reacción en cadena)'); } },
+                { pops: 250, done: false, apply: () => { state.frenzyUnlocked = true; toast('🔥 ¡250 burbujas! Modo frenesí: doble aparición activa'); } },
+                { pops: 1000, done: false, apply: () => { state.frenzyUnlocked = true; toast('🔥 ¡1000 burbujas! Modo frenesí: doble aparición activa'); } },
+                { pops: 2000, done: false, apply: () => { state.frenzyUnlocked = true; toast('🔥 ¡2000 burbujas! Modo frenesí: doble aparición activa'); } },
+                { pops: 5000, done: false, apply: () => { state.frenzyUnlocked = true; toast('🔥 ¡5000 burbujas! Modo frenesí: doble aparición activa'); } },
+                { pops: 10000, done: false, apply: () => { state.frenzyUnlocked = true; toast('🔥 ¡10000 burbujas! Modo frenesí: doble aparición activa'); } },
+                { pops: 100000, done: false, apply: () => { state.frenzyUnlocked = true; toast('🔥 ¡100000 burbujas! Modo frenesí: doble aparición activa'); } },
+                { pops: 500000, done: false, apply: () => { state.frenzyUnlocked = true; toast('🔥 ¡500000 burbujas! Modo frenesí: doble aparición activa'); } },
+                { pops: 1000000, done: false, apply: () => { state.frenzyUnlocked = true; toast('🔥 ¡1.000.000 burbujas, QUE LOCO! Modo frenesí: doble aparición activa'); } }
+            ];
+        }
+
+        function checkMilestones() {
+            milestones.forEach(m => {
+                if (!m.done && state.totalPops >= m.pops) {
+                    m.done = true;
+                    m.apply();
+                }
+            });
+        }
+
+        // ---------- TOASTS ----------
+        let toastTimeout;
+        function toast(msg) {
+            let el = document.querySelector('.toast');
+            if (!el) {
+                el = document.createElement('div');
+                el.className = 'toast';
+                document.body.appendChild(el);
+            }
+            el.textContent = msg;
+            requestAnimationFrame(() => el.classList.add('show'));
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => el.classList.remove('show'), 3000);
+        }
+
+        // ---------- BURBUJAS ----------
+        function randomBetween(min, max) { return Math.random() * (max - min) + min; }
+
+        function createBubble() {
+            const r = Math.random();
+            let type = 'normal';
+            if (state.bombUnlocked && r < 0.05) type = 'bomb';
+            else if (state.goldenUnlocked && r < 0.15) type = 'golden';
+
+            const bubble = document.createElement('div');
+            bubble.classList.add('bubble');
+            if (type !== 'normal') bubble.classList.add(type);
+            bubble.dataset.type = type;
+
+            const size = type === 'golden' ? randomBetween(40, 60) :
+                         type === 'bomb' ? randomBetween(45, 65) : randomBetween(35, 75);
+
+            bubble.style.width = size + 'px';
+            bubble.style.height = size + 'px';
+            const areaW = gameArea.clientWidth - size;
+            const areaH = gameArea.clientHeight - size;
+            bubble.style.left = randomBetween(0, Math.max(areaW, 0)) + 'px';
+            bubble.style.top = randomBetween(0, Math.max(areaH, 0)) + 'px';
+
+            // pointerdown funciona igual para ratón, dedo y lápiz óptico
+            bubble.addEventListener('pointerdown', (e) => {
+                e.preventDefault();
+                popBubble(bubble);
+            });
+            gameArea.appendChild(bubble);
+
+            setTimeout(() => {
+                if (gameArea.contains(bubble) && !bubble.classList.contains('pop')) {
+                    bubble.style.transition = 'opacity 0.6s';
+                    bubble.style.opacity = '0';
+                    setTimeout(() => bubble.remove(), 600);
+                }
+            }, type === 'golden' ? 3000 : 4500); // Doradas desaparecen antes
+        }
+
+        function showFloatingText(bubble, text, isCrit) {
+            const ft = document.createElement('div');
+            ft.className = `floatText ${isCrit ? 'crit' : ''}`;
+            ft.textContent = text;
+            ft.style.left = bubble.style.left;
+            ft.style.top = bubble.style.top;
+            gameArea.appendChild(ft);
+            setTimeout(() => ft.remove(), 800);
+        }
+
+        function popBubble(bubble, silent = false) {
+            if (!gameArea.contains(bubble) || bubble.classList.contains('pop')) return;
+            bubble.classList.add('pop');
+
+            const type = bubble.dataset.type;
+            const globalMult = 1 + state.prestigeTokens; // Multiplicador de prestigio
+            
+            // Probabilidad de crítico si tienes más de 10 pops
+            const isCrit = milestones[0].done && Math.random() < 0.1;
+            const critMult = isCrit ? 3 : 1;
+
+            let baseVal = state.clickValue;
+            if (type === 'golden') baseVal *= 15;
+            if (type === 'bomb') baseVal *= 3;
+
+            const finalValue = Math.round(baseVal * globalMult * critMult);
+
+            state.points += finalValue;
+            if (!silent) {
+                state.totalPops++;
+                playPopSound(isCrit);
+            }
+
+            showFloatingText(bubble, '+' + fmt(finalValue), isCrit);
+            
+            // Animación del marcador
+            scoreEl.style.transform = 'scale(1.1)';
+            setTimeout(() => scoreEl.style.transform = 'scale(1)', 100);
+
+            updateUI();
+            setTimeout(() => bubble.remove(), 250);
+
+            if (type === 'bomb' && !silent) chainPop(bubble);
+            if (!silent) checkMilestones();
+        }
+
+        function chainPop(sourceBubble) {
+            const others = Array.from(gameArea.querySelectorAll('.bubble:not(.pop)'));
+            others.sort(() => Math.random() - 0.5);
+            others.slice(0, 4).forEach((b, i) => {
+                setTimeout(() => popBubble(b, true), 80 * (i + 1));
+            });
+        }
+
+        // ---------- BUCLES ----------
+        let spawnLoopId = null;
+        function restartSpawnLoop() {
+            if (spawnLoopId) clearInterval(spawnLoopId);
+            spawnLoopId = setInterval(() => {
+                createBubble();
+                if (state.frenzyUnlocked && Math.random() < 0.5) createBubble();
+            }, state.spawnInterval);
+        }
+        restartSpawnLoop();
+
+        // Auto-Pop
+        setInterval(() => {
+            if (state.autopopRate <= 0) return;
+            const count = Math.floor(state.autopopRate);
+            const remainder = state.autopopRate - count;
+            
+            let popsToDo = count;
+            if (Math.random() < remainder) popsToDo++;
+
+            const bubbles = Array.from(gameArea.querySelectorAll('.bubble:not(.pop)'));
+            bubbles.sort(() => Math.random() - 0.5);
+            bubbles.slice(0, popsToDo).forEach(b => popBubble(b, true)); // Auto pops count silently para hitos
+        }, 1000);
+
+        // ---------- COMPRAS ----------
+        function setupShop() {
+            for (const key in state.upgrades) {
+                const u = state.upgrades[key];
+                document.getElementById(u.element).addEventListener('click', () => {
+                    if (state.points < u.cost) return; // Si no hay dinero, no hace nada
+                    
+                    playUpgradeSound(); // <--- AQUÍ DISPARAS EL SONIDO DE MEJORA
+                    
+                    state.points -= u.cost;
+                    u.level++;
+                    u.cost = Math.round(u.cost * u.mult);
+
+                    // Aplicar mejoras
+                    if (key === 'click') state.clickValue += 1;
+                    if (key === 'jabon') state.clickValue += 15;
+                    if (key === 'termonuclear') state.clickValue += 200;
+                    if (key === 'solar') state.clickValue += 500;
+                    if (key === 'cuantica') state.clickValue += 800;
+                    if (key === 'multiversal') state.clickValue += 1200;
+                    if (key === 'primigenia') state.clickValue += 5000;
+                    if (key === 'spawn') {
+                        state.spawnInterval = Math.max(state.minSpawnInterval, state.spawnInterval - 60);
+                        restartSpawnLoop();
+                    }
+                    if (key === 'autopop') state.autopopRate += 0.5;
+                    if (key === 'maquina') state.autopopRate += 5;
+
+                    updateUI();
+                });
+            }
+        }
+        setupShop();
+
+        // ---------- PRESTIGIO ----------
+        btnPrestige.addEventListener('click', () => {
+            const tokensToGain = Math.floor(state.points / PRESTIGE_COST);
+            if (tokensToGain > 0) {
+                const confirmMsg = `¿Deseas ascender?\n\nPerderás tus puntos y mejoras actuales, pero ganarás ${tokensToGain} Esencia(s) de Jabón.\nCada Esencia añade permanentemente un +100% al multiplicador global de puntos.`;
+                if (confirm(confirmMsg)) {
+                    // Mantener tokens
+                    const savedTokens = state.prestigeTokens + tokensToGain;
+                    
+                    // Resetear estado SIN reemplazar el objeto "state" ni sus mejoras,
+                    // para que los botones (que guardan referencia directa a cada mejora)
+                    // sigan apuntando a los datos correctos tras ascender.
+                    state.points = 0;
+                    state.totalPops = 0;
+                    state.clickValue = baseState.clickValue;
+                    state.spawnInterval = baseState.spawnInterval;
+                    state.goldenUnlocked = false;
+                    state.bombUnlocked = false;
+                    state.frenzyUnlocked = false;
+                    state.autopopRate = 0;
+                    for (const key in state.upgrades) {
+                        state.upgrades[key].level = baseState.upgrades[key].level;
+                        state.upgrades[key].cost = baseState.upgrades[key].cost;
+                    }
+                    state.prestigeTokens = savedTokens;
+                    milestones = initMilestones();
+                    
+                    // Limpiar pantalla
+                    gameArea.innerHTML = '';
+                    restartSpawnLoop();
+                    
+                    toast(`✨ ¡Has ascendido! Tienes ${savedTokens} Esencias.`);
+                    updateUI();
+                }
+            }
+        });
+
+        // ---------- ACTUALIZAR INTERFAZ ----------
+        function updateUI() {
+            scoreEl.textContent = 'Puntos: ' + fmt(state.points);
+            
+            const globalMult = 1 + state.prestigeTokens;
+            statsEl.textContent = `Total reventadas: ${state.totalPops} · Valor base: ${state.clickValue} · Bonus Global: x${globalMult}` +
+                (state.autopopRate > 0 ? ` · Auto-Pop: ${state.autopopRate.toFixed(1)}/s` : '');
+
+            // Actualizar Prestigio
+            tokenDisplay.textContent = state.prestigeTokens;
+            prestigeBonusDesc.textContent = `Bonus actual: +${state.prestigeTokens * 100}% de puntos a todo`;
+            
+            const tokensGanables = Math.floor(state.points / PRESTIGE_COST);
+            btnPrestige.textContent = tokensGanables > 0 ? `✨ Ascender (+${tokensGanables} Esencias)` : `✨ Ascender (Requiere ${fmt(PRESTIGE_COST)} pts)`;
+            btnPrestige.disabled = state.points < PRESTIGE_COST;
+
+            // Actualizar Botones de Mejora
+            for (const key in state.upgrades) {
+                const u = state.upgrades[key];
+                const btn = document.getElementById(u.element);
+                const desc = document.getElementById(u.desc);
+                
+                desc.textContent = `${u.label} (Nv. ${u.level})`;
+                btn.textContent = `Comprar (${fmt(u.cost)} pts)`;
+                
+                let limitReached = false;
+                if (key === 'spawn' && state.spawnInterval <= state.minSpawnInterval) {
+                    limitReached = true;
+                    btn.textContent = 'Máximo';
+                }
+                
+                btn.disabled = state.points < u.cost || limitReached;
+            }
+        }
+
+        updateUI();
+    </script>
+</body>
+</html>
