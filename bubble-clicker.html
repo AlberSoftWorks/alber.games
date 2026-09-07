@@ -86,21 +86,27 @@
             </div>
 
             <div class="upgrade tier-ultra">
+                <h3>🪐 Espuma Infernal</h3>
+                <p id="desc-infernal">+800 puntos base por burbuja</p>
+                <button id="buy-infernal">Comprar (500.000 pts)</button>
+            </div>
+
+            <div class="upgrade tier-ultra">
                 <h3>🧬 Espuma Cuántica</h3>
-                <p id="desc-cuantica">+800 puntos base por burbuja</p>
-                <button id="buy-cuantica">Comprar (500.000 pts)</button>
+                <p id="desc-cuantica">+1200 puntos base por burbuja</p>
+                <button id="buy-cuantica">Comprar (2.000.000 pts)</button>
             </div>
 
             <div class="upgrade tier-ultra">
                 <h3>🪐 Espuma Multiversal</h3>
-                <p id="desc-multiversal">+1200 puntos base por burbuja</p>
-                <button id="buy-multiversal">Comprar (1.000.000 pts)</button>
+                <p id="desc-multiversal">+5000 puntos base por burbuja</p>
+                <button id="buy-multiversal">Comprar (20.000.000 pts)</button>
             </div>
 
             <!-- MEJORAS DE TIERS MÁXIMO -->
             <div class="upgrade tier-maximo">
                 <h3>👁️ Espuma Primigenia</h3>
-                <p id="desc-primigenia">+5000 puntos base por burbuja</p>
+                <p id="desc-primigenia">+20000 puntos base por burbuja</p>
                 <button id="buy-primigenia">Comprar (5.000.000 pts)</button>
             </div>
         </div>
@@ -119,22 +125,23 @@
             totalPops: 0,
             clickValue: 1,
             spawnInterval: 700,
-            minSpawnInterval: 1,
+            minSpawnInterval: 20,
             goldenUnlocked: false,
             bombUnlocked: false,
             frenzyUnlocked: false,
-            autopopRate: 0, 
+            autopopRate: 0,
             upgrades: {
                 click: { level: 0, cost: 10, mult: 1.5, element: 'buy-click', desc: 'desc-click', label: '+1 punto base' },
                 spawn: { level: 0, cost: 15, mult: 1.4, element: 'buy-spawn', desc: 'desc-spawn', label: 'Mayor aparición' },
-                autopop: { level: 0, cost: 60, mult: 1.7, element: 'buy-autopop', desc: 'desc-autopop', label: '+0.5 auto-pops/seg' },
+                autopop: { level: 0, cost: 60, mult: 1.8, element: 'buy-autopop', desc: 'desc-autopop', label: '+0.5 auto-pops/seg' },
                 jabon: { level: 0, cost: 800, mult: 1.6, element: 'buy-jabon', desc: 'desc-jabon', label: '+15 puntos base' },
                 maquina: { level: 0, cost: 3500, mult: 1.6, element: 'buy-maquina', desc: 'desc-maquina', label: '+5 auto-pops/seg' },
                 termonuclear: { level: 0, cost: 40000, mult: 1.8, element: 'buy-termonuclear', desc: 'desc-termonuclear', label: '+200 puntos base' },
                 solar: { level: 0, cost: 100000, mult: 2.0, element: 'buy-solar', desc: 'desc-solar', label: '+500 puntos base' },
-                cuantica: { level: 0, cost: 500000, mult: 1.6, element: 'buy-cuantica', desc: 'desc-cuantica', label: '+800 puntos base' },
-                multiversal: { level: 0, cost: 1000000, mult: 1.6, element: 'buy-multiversal', desc: 'desc-multiversal', label: '+1200 puntos base' },
-                primigenia: { level: 0, cost: 5000000, mult: 1.6, element: 'buy-primigenia', desc: 'desc-primigenia', label: '+5000 puntos base' }
+                infernal: { level: 0, cost: 500000, mult: 1.6, element: 'buy-infernal', desc: 'desc-infernal', label: '+800 puntos base' },
+                cuantica: { level: 0, cost: 2000000, mult: 1.6, element: 'buy-cuantica', desc: 'desc-cuantica', label: '+1200 puntos base' },
+                multiversal: { level: 0, cost: 10000000, mult: 1.6, element: 'buy-multiversal', desc: 'desc-multiversal', label: '+5000 puntos base' },
+                primigenia: { level: 0, cost: 50000000, mult: 1.6, element: 'buy-primigenia', desc: 'desc-primigenia', label: '+20000 puntos base' }
             }
         };
 
@@ -279,6 +286,8 @@
         function randomBetween(min, max) { return Math.random() * (max - min) + min; }
 
         function createBubble() {
+            const MAX_BUBBLES = 40;
+            if (gameArea.querySelectorAll('.bubble:not(.pop)').length >= MAX_BUBBLES) return;
             const r = Math.random();
             let type = 'normal';
             if (state.bombUnlocked && r < 0.05) type = 'bomb';
@@ -412,11 +421,12 @@
                     if (key === 'jabon') state.clickValue += 15;
                     if (key === 'termonuclear') state.clickValue += 200;
                     if (key === 'solar') state.clickValue += 500;
-                    if (key === 'cuantica') state.clickValue += 800;
-                    if (key === 'multiversal') state.clickValue += 1200;
-                    if (key === 'primigenia') state.clickValue += 5000;
+                    if (key === 'infernal') state.clickValue += 800;
+                    if (key === 'cuantica') state.clickValue += 1200;
+                    if (key === 'multiversal') state.clickValue += 5000;
+                    if (key === 'primigenia') state.clickValue += 20000;
                     if (key === 'spawn') {
-                        state.spawnInterval = Math.max(state.minSpawnInterval, state.spawnInterval - 60);
+                        state.spawnInterval = Math.max(state.minSpawnInterval, Math.round(state.spawnInterval * 0.87));
                         restartSpawnLoop();
                     }
                     if (key === 'autopop') state.autopopRate += 0.5;
