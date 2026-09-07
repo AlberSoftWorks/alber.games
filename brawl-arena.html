@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alber.Games - Arena Brawl</title>
+<link rel="stylesheet" href="../style.css">
+<style>
+  /* ============================================================
+     ARENA BRAWL — variables y estilos propios del juego
+     (sigue el mismo patrón que Bubble Clicker: prefijo propio
+     "--ab-" para no chocar con otros juegos ni con la marca)
+     ============================================================ */
+  :root {
+    --ab-bg-a: #0d1321;
+    --ab-bg-b: #1d2b53;
+    --ab-floor-1: #2b3a67;
+    --ab-floor-2: #253361;
+    --ab-grid-line: rgba(255,255,255,0.06);
+    --ab-player: #6FE7FF;
+    --ab-player-dark: #2fa9c2;
+    --ab-enemy: #FF6B5B;
+    --ab-enemy-dark: #b6473b;
+    --ab-bullet-player: #FFC93C;
+    --ab-bullet-enemy: #ff4b4b;
+    --ab-rock: #4a5578;
+    --ab-hud-bg: rgba(13, 19, 33, 0.85);
+    --ab-hp-good: #4CD964;
+    --ab-hp-bad: #ff4b4b;
+  }
+
+  body.arena-brawl {
+    min-height: 100vh;
+    margin: 0;
+    background: radial-gradient(circle at top, var(--ab-bg-b), var(--ab-bg-a) 75%);
+    font-family: var(--font-body, sans-serif);
+    color: #eef1ff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+
+  .arena-brawl h1 {
+    font-family: var(--font-display, sans-serif);
+    color: var(--ab-player);
+    text-shadow: 0 0 15px rgba(111, 231, 255, 0.35);
+    margin: 4px 0 2px 0;
+    text-align: center;
+  }
+
+  .arena-brawl .subtitle {
+    color: #9aa4c7;
+    margin: 0 0 14px 0;
+    text-align: center;
+    font-size: 0.95rem;
+  }
+
+  #gameWrap {
+    position: relative;
+    width: 900px;
+    max-width: 100%;
+  }
+
+  #gameCanvas {
+    display: block;
+    width: 100%;
+    max-width: 900px;
+    aspect-ratio: 900 / 600;
+    background: var(--ab-bg-a);
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+    cursor: crosshair;
+    touch-action: none;
+  }
+
+  #hud {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    right: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    pointer-events: none;
+    font-family: var(--font-display, sans-serif);
+  }
+
+  #hpBarOuter {
+    width: 220px;
+    height: 20px;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+
+  #hpBarInner {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, var(--ab-hp-good), #8effa3);
+    transition: width 0.15s ease, background 0.3s ease;
+  }
+
+  #scoreBadge {
+    background: var(--ab-hud-bg);
+    border: 1px solid rgba(255,255,255,0.15);
+    padding: 6px 16px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+
+  #controlsHint {
+    margin-top: 10px;
+    color: #7d87ac;
+    font-size: 0.82rem;
+    text-align: center;
+  }
+
+  #gameOverOverlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 12, 24, 0.82);
+    border-radius: 16px;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    text-align: center;
+  }
+
+  #gameOverOverlay.show { display: flex; }
+
+  #gameOverOverlay h2 {
+    font-family: var(--font-display, sans-serif);
+    color: var(--ab-enemy);
+    margin: 0;
+    font-size: 1.8rem;
+  }
+
+  #gameOverOverlay p { margin: 0; color: #cfd6f5; }
+
+  #restartBtn {
+    background: var(--ab-player);
+    color: #0d1321;
+    border: none;
+    font-weight: 700;
+    padding: 10px 26px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    box-shadow: 0 6px 0 var(--ab-player-dark);
+    transition: transform 0.1s;
+  }
+  #restartBtn:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--ab-player-dark); }
+</style>
+</head>
+<body class="arena-brawl">
+
+  <nav>
+    <a href="https://albersoftworks.github.io/alber.games" class="brand">
+      <span class="brand-dot"></span>Alber.Games
+    </a>
+    <div class="nav-links-container">
+      <a href="https://albersoftworks.github.io/alber.games/bubble-clicker" class="nav-link">Bubble Clicker</a>
+      <a href="https://albersoftworks.github.io/alber.games/tech-startup" class="nav-link">Tech Startup</a>
+      <a href="https://albersoftworks.github.io/alber.games/hop-hop" class="nav-link">Hop Hop</a>
+      <a href="https://albersoftworks.github.io/alber.games/arena-brawl" class="nav-link">Arena Brawl</a>
+      <a href="https://albersoftworks.github.io" target="_blank" rel="noopener" class="nav-cta">Contacto</a>
+    </div>
+  </nav>
+
+  <h1>⚔️ Arena Brawl</h1>
+  <p class="subtitle">WASD para moverte, ratón para apuntar, clic para disparar</p>
+
+  <div id="gameWrap">
+    <canvas id="gameCanvas" width="900" height="600"></canvas>
+
+    <div id="hud">
+      <div id="hpBarOuter"><div id="hpBarInner"></div></div>
+      <div id="scoreBadge">Puntos: 0</div>
+    </div>
+
+    <div id="gameOverOverlay">
+      <h2>💀 Has caído</h2>
+      <p id="finalScore">Puntuación final: 0</p>
+      <button id="restartBtn">Reintentar</button>
+    </div>
+  </div>
+
+  <p id="controlsHint">Consejo: mantén pulsado el clic para disparar en ráfaga.</p>
+
+  <script>
+  // ============================================================
+  // ARENA BRAWL — motor del juego
+  // ------------------------------------------------------------
+  // ÍNDICE DEL SCRIPT
+  // 1. Configuración y proyección isométrica
+  // 2. Estado del juego (jugador, enemigos, balas, obstáculos)
+  // 3. Entrada (teclado y ratón)
+  // 4. Lógica de disparo y daño
+  // 5. IA enemiga y spawn
+  // 6. Bucle principal (update + render)
+  // 7. Fin de partida / reinicio
+  // ============================================================
+
+  // ---------- 1. CONFIGURACIÓN Y PROYECCIÓN ISOMÉTRICA ----------
+  const canvas = document.getElementById('gameCanvas');
+  const ctx = canvas.getContext('2d');
+
+  const GRID = 12;          // tamaño de la rejilla (12x12 casillas)
+  const TILE_W = 70;        // ancho de una casilla isométrica en px
+  const TILE_H = 35;        // alto de una casilla isométrica en px
+  const ORIGIN_X = canvas.width / 2;
+  const ORIGIN_Y = 50;
+
+  // Convierte coordenadas de mundo (x,y en casillas) a coordenadas de pantalla.
+  // Esta es la proyección isométrica clásica 2:1.
+  function worldToScreen(x, y) {
+    return {
+      sx: ORIGIN_X + (x - y) * (TILE_W / 2),
+      sy: ORIGIN_Y + (x + y) * (TILE_H / 2)
+    };
+  }
+
+  // ---------- 2. ESTADO DEL JUEGO ----------
+  function freshState() {
+    return {
+      player: {
+        x: GRID / 2, y: GRID / 2,
+        hp: 100, maxHp: 100,
+        speed: 4.2,          // casillas por segundo
+        radius: 16,          // radio visual en pantalla (px)
+        fireCooldown: 0,
+        fireRate: 0.22       // segundos entre disparos
+      },
+      enemies: [],
+      bullets: [],
+      obstacles: buildObstacles(),
+      score: 0,
+      spawnTimer: 1.5,
+      maxEnemies: 5,
+      gameOver: false
+    };
+  }
+
+  // Rocas decorativas fijas (sin colisión en esta primera versión)
+  function buildObstacles() {
+    return [
+      { x: 2, y: 2 }, { x: 9, y: 2 }, { x: 2, y: 9 }, { x: 9, y: 9 },
+      { x: 6, y: 1 }, { x: 1, y: 6 }, { x: 10, y: 6 }, { x: 6, y: 10 }
+    ];
+  }
+
+  let state = freshState();
+
+  // ---------- 3. ENTRADA (TECLADO Y RATÓN) ----------
+  const keys = { w: false, a: false, s: false, d: false };
+  const mouse = { sx: 0, sy: 0, down: false };
+
+  window.addEventListener('keydown', (e) => {
+    const k = e.key.toLowerCase();
+    if (k in keys) keys[k] = true;
+  });
+  window.addEventListener('keyup', (e) => {
+    const k = e.key.toLowerCase();
+    if (k in keys) keys[k] = false;
+  });
+
+  function updateMousePos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    mouse.sx = (e.clientX - rect.left) * scaleX;
+    mouse.sy = (e.clientY - rect.top) * scaleY;
+  }
+
+  canvas.addEventListener('mousemove', updateMousePos);
+  canvas.addEventListener('mousedown', (e) => { updateMousePos(e); mouse.down = true; });
+  window.addEventListener('mouseup', () => { mouse.down = false; });
+
+  // Soporte táctil básico: tocar para moverse hacia ahí no está incluido
+  // a propósito (el juego está pensado para ratón + teclado, como Brawl
+  // Stars de PC). Se puede añadir un joystick táctil más adelante.
+
+  // ---------- 4. LÓGICA DE DISPARO Y DAÑO ----------
+  function shoot(fromScreen, towardScreen, owner) {
+    const dx = towardScreen.sx - fromScreen.sx;
+    const dy = towardScreen.sy - fromScreen.sy;
+    const dist = Math.hypot(dx, dy) || 1;
+    const speed = owner === 'player' ? 620 : 380; // px/seg
+    state.bullets.push({
+      sx: fromScreen.sx, sy: fromScreen.sy,
+      vx: (dx / dist) * speed, vy: (dy / dist) * speed,
+      owner,
+      radius: owner === 'player' ? 5 : 6,
+      life: 1.4 // segundos antes de autodestruirse
+    });
+  }
+
+  function damagePlayer(amount) {
+    state.player.hp = Math.max(0, state.player.hp - amount);
+    updateHUD();
+    if (state.player.hp <= 0 && !state.gameOver) endGame();
+  }
+
+  // ---------- 5. IA ENEMIGA Y SPAWN ----------
+  function spawnEnemy() {
+    // Aparece en un borde aleatorio de la rejilla
+    const edge = Math.floor(Math.random() * 4);
+    let x, y;
+    if (edge === 0) { x = Math.random() * GRID; y = 0.5; }
+    else if (edge === 1) { x = Math.random() * GRID; y = GRID - 0.5; }
+    else if (edge === 2) { x = 0.5; y = Math.random() * GRID; }
+    else { x = GRID - 0.5; y = Math.random() * GRID; }
+
+    state.enemies.push({
+      x, y, hp: 30, maxHp: 30,
+      speed: 1.6 + Math.random() * 0.6,
+      radius: 15,
+      shootTimer: 1 + Math.random()
+    });
+  }
+
+  function updateEnemies(dt) {
+    const p = state.player;
+    state.enemies.forEach(en => {
+      const dx = p.x - en.x, dy = p.y - en.y;
+      const dist = Math.hypot(dx, dy) || 1;
+
+      // Persigue al jugador pero mantiene algo de distancia (no se pega encima)
+      if (dist > 2.2) {
+        en.x += (dx / dist) * en.speed * dt;
+        en.y += (dy / dist) * en.speed * dt;
+      }
+
+      // Dispara periódicamente hacia el jugador
+      en.shootTimer -= dt;
+      if (en.shootTimer <= 0) {
+        en.shootTimer = 1.4 + Math.random() * 1.2;
+        const from = worldToScreen(en.x, en.y);
+        const to = worldToScreen(p.x, p.y);
+        shoot(from, to, 'enemy');
+      }
+    });
+  }
+
+  // ---------- 6. BUCLE PRINCIPAL ----------
+  let lastTime = performance.now();
+
+  function update(dt) {
+    if (state.gameOver) return;
+    const p = state.player;
+
+    // Movimiento del jugador (espacio de mundo -> se ve isométrico en pantalla)
+    let mx = 0, my = 0;
+    if (keys.w) my -= 1;
+    if (keys.s) my += 1;
+    if (keys.a) mx -= 1;
+    if (keys.d) mx += 1;
+    if (mx !== 0 || my !== 0) {
+      const len = Math.hypot(mx, my);
+      p.x = Math.min(GRID - 0.3, Math.max(0.3, p.x + (mx / len) * p.speed * dt));
+      p.y = Math.min(GRID - 0.3, Math.max(0.3, p.y + (my / len) * p.speed * dt));
+    }
+
+    // Disparo del jugador (mantener pulsado = ráfaga)
+    p.fireCooldown -= dt;
+    if (mouse.down && p.fireCooldown <= 0) {
+      p.fireCooldown = p.fireRate;
+      const from = worldToScreen(p.x, p.y);
+      shoot(from, { sx: mouse.sx, sy: mouse.sy }, 'player');
+    }
+
+    // Balas
+    state.bullets.forEach(b => {
+      b.sx += b.vx * dt;
+      b.sy += b.vy * dt;
+      b.life -= dt;
+    });
+
+    // Colisión balas de jugador -> enemigos (en espacio de pantalla)
+    const playerScreen = worldToScreen(p.x, p.y);
+    state.bullets.forEach(b => {
+      if (b.owner === 'player') {
+        state.enemies.forEach(en => {
+          const es = worldToScreen(en.x, en.y);
+          const d = Math.hypot(b.sx - es.sx, b.sy - es.sy);
+          if (d < b.radius + en.radius) {
+            en.hp -= 10;
+            b.life = 0;
+          }
+        });
+      } else {
+        const d = Math.hypot(b.sx - playerScreen.sx, b.sy - playerScreen.sy);
+        if (d < b.radius + p.radius) {
+          damagePlayer(6);
+          b.life = 0;
+        }
+      }
+    });
+
+    // Limpiar balas muertas y enemigos derrotados
+    state.bullets = state.bullets.filter(b => b.life > 0);
+    const before = state.enemies.length;
+    state.enemies = state.enemies.filter(en => en.hp > 0);
+    const killed = before - state.enemies.length;
+    if (killed > 0) {
+      state.score += killed * 10;
+      updateHUD();
+    }
+
+    // Spawns
+    updateEnemies(dt);
+    state.spawnTimer -= dt;
+    if (state.spawnTimer <= 0 && state.enemies.length < state.maxEnemies) {
+      state.spawnTimer = 2.2;
+      spawnEnemy();
+    }
+  }
+
+  function render() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // --- Suelo: rejilla de rombos ---
+    for (let y = 0; y < GRID; y++) {
+      for (let x = 0; x < GRID; x++) {
+        const top = worldToScreen(x, y);
+        const right = worldToScreen(x + 1, y);
+        const bottom = worldToScreen(x + 1, y + 1);
+        const left = worldToScreen(x, y + 1);
+        ctx.beginPath();
+        ctx.moveTo(top.sx, top.sy);
+        ctx.lineTo(right.sx, right.sy);
+        ctx.lineTo(bottom.sx, bottom.sy);
+        ctx.lineTo(left.sx, left.sy);
+        ctx.closePath();
+        ctx.fillStyle = (x + y) % 2 === 0 ? getVar('--ab-floor-1') : getVar('--ab-floor-2');
+        ctx.fill();
+        ctx.strokeStyle = getVar('--ab-grid-line');
+        ctx.stroke();
+      }
+    }
+
+    // --- Entidades ordenadas por profundidad (x+y) para que se tapen bien ---
+    const drawables = [];
+    state.obstacles.forEach(o => drawables.push({ type: 'rock', x: o.x, y: o.y }));
+    state.enemies.forEach(en => drawables.push({ type: 'enemy', ref: en, x: en.x, y: en.y }));
+    drawables.push({ type: 'player', x: state.player.x, y: state.player.y });
+    drawables.sort((a, b) => (a.x + a.y) - (b.x + b.y));
+
+    drawables.forEach(d => {
+      const s = worldToScreen(d.x, d.y);
+      if (d.type === 'rock') drawRock(s);
+      else if (d.type === 'enemy') drawEnemy(s, d.ref);
+      else if (d.type === 'player') drawPlayer(s);
+    });
+
+    // --- Balas (encima de todo) ---
+    state.bullets.forEach(b => {
+      ctx.beginPath();
+      ctx.arc(b.sx, b.sy, b.radius, 0, Math.PI * 2);
+      ctx.fillStyle = b.owner === 'player' ? getVar('--ab-bullet-player') : getVar('--ab-bullet-enemy');
+      ctx.shadowColor = ctx.fillStyle;
+      ctx.shadowBlur = 8;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    });
+  }
+
+  function drawRock(s) {
+    ctx.beginPath();
+    ctx.ellipse(s.sx, s.sy, 26, 14, 0, 0, Math.PI * 2);
+    ctx.fillStyle = getVar('--ab-rock');
+    ctx.fill();
+  }
+
+  function drawEnemy(s, en) {
+    // Sombra
+    ctx.beginPath();
+    ctx.ellipse(s.sx, s.sy + 10, en.radius, en.radius * 0.4, 0, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    ctx.fill();
+
+    // Cuerpo
+    ctx.beginPath();
+    ctx.arc(s.sx, s.sy, en.radius, 0, Math.PI * 2);
+    ctx.fillStyle = getVar('--ab-enemy');
+    ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = getVar('--ab-enemy-dark');
+    ctx.stroke();
+
+    // Barra de vida
+    const w = en.radius * 2;
+    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+    ctx.fillRect(s.sx - w / 2, s.sy - en.radius - 12, w, 5);
+    ctx.fillStyle = getVar('--ab-hp-good');
+    ctx.fillRect(s.sx - w / 2, s.sy - en.radius - 12, w * (en.hp / en.maxHp), 5);
+  }
+
+  function drawPlayer(s) {
+    const p = state.player;
+
+    // Sombra
+    ctx.beginPath();
+    ctx.ellipse(s.sx, s.sy + 10, p.radius, p.radius * 0.4, 0, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    ctx.fill();
+
+    // Cañón apuntando al ratón (puramente visual, en espacio de pantalla)
+    const angle = Math.atan2(mouse.sy - s.sy, mouse.sx - s.sx);
+    ctx.strokeStyle = getVar('--ab-player-dark');
+    ctx.lineWidth = 5;
+    ctx.beginPath();
+    ctx.moveTo(s.sx, s.sy);
+    ctx.lineTo(s.sx + Math.cos(angle) * (p.radius + 14), s.sy + Math.sin(angle) * (p.radius + 14));
+    ctx.stroke();
+
+    // Cuerpo
+    ctx.beginPath();
+    ctx.arc(s.sx, s.sy, p.radius, 0, Math.PI * 2);
+    ctx.fillStyle = getVar('--ab-player');
+    ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = getVar('--ab-player-dark');
+    ctx.stroke();
+  }
+
+  // Pequeña ayuda para leer variables CSS desde el canvas
+  const rootStyles = getComputedStyle(document.documentElement);
+  function getVar(name) { return rootStyles.getPropertyValue(name).trim(); }
+
+  function loop(now) {
+    const dt = Math.min(0.05, (now - lastTime) / 1000); // clamp para evitar saltos si la pestaña pierde foco
+    lastTime = now;
+    update(dt);
+    render();
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+
+  // ---------- 7. FIN DE PARTIDA / REINICIO ----------
+  const hpBarInner = document.getElementById('hpBarInner');
+  const scoreBadge = document.getElementById('scoreBadge');
+  const gameOverOverlay = document.getElementById('gameOverOverlay');
+  const finalScore = document.getElementById('finalScore');
+  const restartBtn = document.getElementById('restartBtn');
+
+  function updateHUD() {
+    const pct = Math.max(0, state.player.hp / state.player.maxHp) * 100;
+    hpBarInner.style.width = pct + '%';
+    hpBarInner.style.background = pct > 30
+      ? 'linear-gradient(90deg, var(--ab-hp-good), #8effa3)'
+      : 'linear-gradient(90deg, var(--ab-hp-bad), #ff8a8a)';
+    scoreBadge.textContent = 'Puntos: ' + state.score;
+  }
+
+  function endGame() {
+    state.gameOver = true;
+    finalScore.textContent = 'Puntuación final: ' + state.score;
+    gameOverOverlay.classList.add('show');
+  }
+
+  restartBtn.addEventListener('click', () => {
+    state = freshState();
+    gameOverOverlay.classList.remove('show');
+    updateHUD();
+  });
+
+  updateHUD();
+  </script>
+</body>
+</html>
