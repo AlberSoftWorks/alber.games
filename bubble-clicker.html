@@ -12,7 +12,7 @@
     <p class="subtitle">Haz clic, mejora, trasciende la espuma</p>
     <button id="bgm-toggle" class="music-btn">🎵 Activar Música</button>
     <audio id="bgm-audio" src="https://cdn.pixabay.com/download/audio/2022/02/22/audio_d1718ab41b.mp3" loop></audio>
-    <div id="score">Puntos: 0</div>
+    <div id="score">Pops: 0</div>
     <div id="stats">Total reventadas: 0 · Valor base: 1 · Bonus global: x1</div>
 
     <div class="layout">
@@ -24,7 +24,7 @@
             <!-- ZONA DE PRESTIGIO -->
             <div class="prestige-zone">
                 <p>Esencia de Jabón: <span id="token-display">0</span></p>
-                <p id="prestige-bonus-desc">Bonus actual: +0% de puntos a todo</p>
+                <p id="prestige-bonus-desc">Bonus actual: +0% de Pops a todo</p>
                 <button id="btn-prestige" disabled>✨ Ascender (Requiere 20.000 pts)</button>
             </div>
 
@@ -49,7 +49,7 @@
             <!-- MEJORAS DE TIERS HIGH -->
             <div class="upgrade tier-high">
                 <h3>🧪 Jabón Concentrado</h3>
-                <p id="desc-jabon">+15 puntos base por burbuja</p>
+                <p id="desc-jabon">+15 Pops base por burbuja</p>
                 <button id="buy-jabon">Comprar (800 pts)</button>
             </div>
 
@@ -61,39 +61,39 @@
 
             <div class="upgrade tier-high">
                 <h3>⚛️ Espuma Termonuclear</h3>
-                <p id="desc-termonuclear">+200 puntos base por burbuja</p>
+                <p id="desc-termonuclear">+200 Pops base por burbuja</p>
                 <button id="buy-termonuclear">Comprar (40.000 pts)</button>
             </div>
 
             <!-- MEJORAS DE TIERS ULTRA -->
             <div class="upgrade tier-ultra">
                 <h3>☀️ Espuma Solar</h3>
-                <p id="desc-solar">+500 puntos base por burbuja</p>
+                <p id="desc-solar">+500 Pops base por burbuja</p>
                 <button id="buy-solar">Comprar (100.000 pts)</button>
             </div>
 
             <div class="upgrade tier-ultra">
                 <h3>🪐 Espuma Infernal</h3>
-                <p id="desc-infernal">+800 puntos base por burbuja</p>
+                <p id="desc-infernal">+800 Pops base por burbuja</p>
                 <button id="buy-infernal">Comprar (500.000 pts)</button>
             </div>
 
             <div class="upgrade tier-ultra">
                 <h3>🧬 Espuma Cuántica</h3>
-                <p id="desc-cuantica">+1200 puntos base por burbuja</p>
+                <p id="desc-cuantica">+1200 Pops base por burbuja</p>
                 <button id="buy-cuantica">Comprar (2.000.000 pts)</button>
             </div>
 
             <div class="upgrade tier-ultra">
                 <h3>🪐 Espuma Multiversal</h3>
-                <p id="desc-multiversal">+5000 puntos base por burbuja</p>
+                <p id="desc-multiversal">+5000 Pops base por burbuja</p>
                 <button id="buy-multiversal">Comprar (20.000.000 pts)</button>
             </div>
 
             <!-- MEJORAS DE TIERS MÁXIMO -->
             <div class="upgrade tier-maximo">
                 <h3>👁️ Espuma Primigenia</h3>
-                <p id="desc-primigenia">+20000 puntos base por burbuja</p>
+                <p id="desc-primigenia">+20000 Pops base por burbuja</p>
                 <button id="buy-primigenia">Comprar (5.000.000 pts)</button>
             </div>
         </div>
@@ -106,6 +106,69 @@
         const PRESTIGE_COST = 20000;
 
         function fmt(n) { return Math.floor(n).toLocaleString('es-ES'); }
+
+        // ---------- GUARDADO DE PARTIDA (localStorage) ----------
+        const SAVE_KEY = 'alberGames_bubbleClicker_save';
+
+        function saveGame() {
+            const save = {
+                points: state.points,
+                totalPops: state.totalPops,
+                clickValue: state.clickValue,
+                spawnInterval: state.spawnInterval,
+                goldenUnlocked: state.goldenUnlocked,
+                bombUnlocked: state.bombUnlocked,
+                frenzyUnlocked: state.frenzyUnlocked,
+                autopopRate: state.autopopRate,
+                prestigeTokens: state.prestigeTokens,
+                upgrades: {},
+                milestonesDone: milestones.map(m => m.done)
+            };
+            for (const key in state.upgrades) {
+                save.upgrades[key] = { level: state.upgrades[key].level, cost: state.upgrades[key].cost };
+            }
+            localStorage.setItem(SAVE_KEY, JSON.stringify(save));
+        }
+
+        function loadGame() {
+            const raw = localStorage.getItem(SAVE_KEY);
+            if (!raw) return;
+            try {
+                const save = JSON.parse(raw);
+                state.points = save.points ?? state.points;
+                state.totalPops = save.totalPops ?? state.totalPops;
+                state.clickValue = save.clickValue ?? state.clickValue;
+                state.spawnInterval = save.spawnInterval ?? state.spawnInterval;
+                state.goldenUnlocked = save.goldenUnlocked ?? false;
+                state.bombUnlocked = save.bombUnlocked ?? false;
+                state.frenzyUnlocked = save.frenzyUnlocked ?? false;
+                state.autopopRate = save.autopopRate ?? 0;
+                state.prestigeTokens = save.prestigeTokens ?? 0;
+
+                if (save.upgrades) {
+                    for (const key in save.upgrades) {
+                        if (state.upgrades[key]) {
+                            state.upgrades[key].level = save.upgrades[key].level;
+                            state.upgrades[key].cost = save.upgrades[key].cost;
+                        }
+                    }
+                }
+                if (save.milestonesDone) {
+                    save.milestonesDone.forEach((done, i) => {
+                        if (milestones[i]) milestones[i].done = done; // sin volver a lanzar el toast
+                    });
+                }
+            } catch (e) {
+                console.warn('No se pudo cargar la partida guardada:', e);
+            }
+        }
+
+        // Autoguardado periódico y al cerrar/cambiar de pestaña
+        setInterval(saveGame, 8000);
+        window.addEventListener('beforeunload', saveGame);
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) saveGame();
+        });
 
         const baseState = {
             points: 0,
@@ -121,14 +184,14 @@
                 click: { level: 0, cost: 10, mult: 1.5, element: 'buy-click', desc: 'desc-click', label: '+1 punto base' },
                 spawn: { level: 0, cost: 15, mult: 1.4, element: 'buy-spawn', desc: 'desc-spawn', label: 'Mayor aparición' },
                 autopop: { level: 0, cost: 60, mult: 1.8, element: 'buy-autopop', desc: 'desc-autopop', label: '+0.5 auto-pops/seg' },
-                jabon: { level: 0, cost: 800, mult: 1.6, element: 'buy-jabon', desc: 'desc-jabon', label: '+15 puntos base' },
+                jabon: { level: 0, cost: 800, mult: 1.6, element: 'buy-jabon', desc: 'desc-jabon', label: '+15 Pops base' },
                 maquina: { level: 0, cost: 3500, mult: 1.6, element: 'buy-maquina', desc: 'desc-maquina', label: '+5 auto-pops/seg' },
-                termonuclear: { level: 0, cost: 40000, mult: 1.8, element: 'buy-termonuclear', desc: 'desc-termonuclear', label: '+200 puntos base' },
-                solar: { level: 0, cost: 100000, mult: 2.0, element: 'buy-solar', desc: 'desc-solar', label: '+500 puntos base' },
-                infernal: { level: 0, cost: 500000, mult: 1.6, element: 'buy-infernal', desc: 'desc-infernal', label: '+800 puntos base' },
-                cuantica: { level: 0, cost: 2000000, mult: 1.6, element: 'buy-cuantica', desc: 'desc-cuantica', label: '+1200 puntos base' },
-                multiversal: { level: 0, cost: 10000000, mult: 1.6, element: 'buy-multiversal', desc: 'desc-multiversal', label: '+5000 puntos base' },
-                primigenia: { level: 0, cost: 50000000, mult: 1.6, element: 'buy-primigenia', desc: 'desc-primigenia', label: '+20000 puntos base' }
+                termonuclear: { level: 0, cost: 40000, mult: 1.8, element: 'buy-termonuclear', desc: 'desc-termonuclear', label: '+200 Pops base' },
+                solar: { level: 0, cost: 100000, mult: 2.0, element: 'buy-solar', desc: 'desc-solar', label: '+500 Pops base' },
+                infernal: { level: 0, cost: 500000, mult: 1.6, element: 'buy-infernal', desc: 'desc-infernal', label: '+800 Pops base' },
+                cuantica: { level: 0, cost: 2000000, mult: 1.6, element: 'buy-cuantica', desc: 'desc-cuantica', label: '+1200 Pops base' },
+                multiversal: { level: 0, cost: 10000000, mult: 1.6, element: 'buy-multiversal', desc: 'desc-multiversal', label: '+5000 Pops base' },
+                primigenia: { level: 0, cost: 50000000, mult: 1.6, element: 'buy-primigenia', desc: 'desc-primigenia', label: '+20000 Pops base' }
             }
         };
 
@@ -231,8 +294,8 @@
 
         function initMilestones() {
             return [
-                { pops: 10, done: false, apply: () => { toast('🎉 ¡10 burbujas! Probabilidad de críticos añadida (x3 puntos).'); } },
-                { pops: 50, done: false, apply: () => { state.goldenUnlocked = true; toast('🌟 ¡50 burbujas! Aparecen burbujas doradas (x5 puntos).'); } },
+                { pops: 10, done: false, apply: () => { toast('🎉 ¡10 burbujas! Probabilidad de críticos añadida (x3 Pops).'); } },
+                { pops: 50, done: false, apply: () => { state.goldenUnlocked = true; toast('🌟 ¡50 burbujas! Aparecen burbujas doradas (x5 Pops).'); } },
                 { pops: 100, done: false, apply: () => { state.bombUnlocked = true; toast('💥 ¡100 burbujas! Aparecen burbujas bomba (reacción en cadena)'); } },
                 { pops: 150, done: false, apply: () => { state.frenzyUnlocked = true; toast('🔥 ¡150 burbujas! Modo frenesí: doble aparición activa'); } },
                 { pops: 200, done: false, apply: () => { state.frenzyUnlocked = true; toast('🔥 ¡200 burbujas! Modo frenesí: doble aparición activa'); } },
@@ -374,7 +437,9 @@
                 if (state.frenzyUnlocked && Math.random() < 0.5) createBubble();
             }, state.spawnInterval);
         }
+        loadGame();
         restartSpawnLoop();
+        updateUI();;
 
         // Auto-Pop
         setInterval(() => {
@@ -420,6 +485,7 @@
                     if (key === 'maquina') state.autopopRate += 5;
 
                     updateUI();
+                    saveGame()
                 });
             }
         }
@@ -429,7 +495,7 @@
         btnPrestige.addEventListener('click', () => {
             const tokensToGain = Math.floor(state.points / PRESTIGE_COST);
             if (tokensToGain > 0) {
-                const confirmMsg = `¿Deseas ascender?\n\nPerderás tus puntos y mejoras actuales, pero ganarás ${tokensToGain} Esencia(s) de Jabón.\nCada Esencia añade permanentemente un +100% al multiplicador global de puntos.`;
+                const confirmMsg = `¿Deseas ascender?\n\nPerderás tus Pops y mejoras actuales, pero ganarás ${tokensToGain} Esencia(s) de Jabón.\nCada Esencia añade permanentemente un +100% al multiplicador global de Pops.`;
                 if (confirm(confirmMsg)) {
                     // Mantener tokens
                     const savedTokens = state.prestigeTokens + tokensToGain;
@@ -458,13 +524,14 @@
                     
                     toast(`✨ ¡Has ascendido! Tienes ${savedTokens} Esencias.`);
                     updateUI();
+                    saveGame()
                 }
             }
         });
 
         // ---------- ACTUALIZAR INTERFAZ ----------
         function updateUI() {
-            scoreEl.textContent = 'Puntos: ' + fmt(state.points);
+            scoreEl.textContent = 'Pops: ' + fmt(state.points);
             
             const globalMult = 1 + state.prestigeTokens;
             statsEl.textContent = `Total reventadas: ${state.totalPops} · Valor base: ${state.clickValue} · Bonus Global: x${globalMult}` +
@@ -472,7 +539,7 @@
 
             // Actualizar Prestigio
             tokenDisplay.textContent = state.prestigeTokens;
-            prestigeBonusDesc.textContent = `Bonus actual: +${state.prestigeTokens * 100}% de puntos a todo`;
+            prestigeBonusDesc.textContent = `Bonus actual: +${state.prestigeTokens * 100}% de Pops a todo`;
             
             const tokensGanables = Math.floor(state.points / PRESTIGE_COST);
             btnPrestige.textContent = tokensGanables > 0 ? `✨ Ascender (+${tokensGanables} Esencias)` : `✨ Ascender (Requiere ${fmt(PRESTIGE_COST)} pts)`;
