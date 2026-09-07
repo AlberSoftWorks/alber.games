@@ -8,7 +8,7 @@ Este es el repositorio de mi portal de minijuegos y experimentos web, desarrolla
 
 Mi página de juegos está diseñada para:
 
-- **Alojar** una colección propia de juegos interactivos (*Bubble Clicker, Tech Startup, Hop Hop y más en camino*) listos para jugar en el navegador sin instalaciones.
+- **Alojar** una colección propia de juegos interactivos (*Bubble Clicker, Tech Startup, Brawl Arena, Hop Hop y más en camino*) listos para jugar en el navegador sin instalaciones.
 - **Experimentar** con físicas, detección de colisiones, persistencia de datos local y sistemas de audio nativos.
 - **Servir** como complemento lúdico a mi perfil principal como desarrollador.
 
