@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alber.Games - Bloons Siege</title>
+<link rel="stylesheet" href="../style.css">
+<style>
+  /* ============================================================
+     TOWER DEFENSE — variables y estilos propios del juego
+     (prefijo "--td-", mismo patrón que Bubble Clicker "--bc-"
+     y Arena Brawl "--ab-": nada de esto pisa a otros juegos)
+     ============================================================ */
+  :root {
+    --td-bg-a: #0f1b12;
+    --td-bg-b: #16321f;
+    --td-grass-1: #1d4228;
+    --td-grass-2: #1a3a23;
+    --td-road: #6b5a3d;
+    --td-road-edge: #4d4028;
+    --td-red: #ff4b4b;
+    --td-blue: #4b9bff;
+    --td-green: #4bdc7a;
+    --td-yellow: #ffe27a;
+    --td-pink: #ff69b4;
+    --td-rainbow: linear-gradient(45deg, #ff4b4b, #ff69b4, #ffe27a, #4bdc7a, #4b9bff);
+    --td-basic: #6FE7FF;
+    --td-basic-dark: #2fa9c2;
+    --td-cannon: #FF6B5B;
+    --td-cannon-dark: #b6473b;
+    --td-sniper: #54ad00; 
+    --td-sniper-dark: #2f6e00; 
+    --td-super: #c58bff;
+    --td-super-dark: #8a4fd6;
+    --td-support: #FFC93C;
+    --td-support-dark: #c99a20;
+    --td-panel: #142018;
+    --td-panel-edge: #2b4433;
+  }
+
+  body.tower-defense {
+    min-height: 100vh;
+    margin: 0;
+    background: radial-gradient(circle at top, var(--td-bg-b), var(--td-bg-a) 75%);
+    font-family: var(--font-body, sans-serif);
+    color: #eaf5ee;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+
+  .tower-defense h1 {
+    font-family: var(--font-display, sans-serif);
+    color: var(--td-green);
+    text-shadow: 0 0 15px rgba(75, 220, 122, 0.35);
+    margin: 4px 0 2px 0;
+    text-align: center;
+  }
+
+  .tower-defense .subtitle {
+    color: #9db3a4;
+    margin: 0 0 14px 0;
+    text-align: center;
+    font-size: 0.95rem;
+  }
+
+  /* ---------- HUD superior ---------- */
+  #tdHud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 14px;
+  }
+
+  .td-badge {
+    background: var(--td-panel);
+    border: 1px solid var(--td-panel-edge);
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    font-family: var(--font-display, sans-serif);
+  }
+
+  #tdLives { color: #ff8787; }
+  #tdMoney { color: #ffe27a; }
+  #tdWave { color: #9fe6b8; }
+
+  .td-btn {
+    background: var(--td-green);
+    color: #0f1b12;
+    border: none;
+    font-weight: 700;
+    padding: 9px 20px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: transform 0.1s, filter 0.15s;
+  }
+  .td-btn:hover { filter: brightness(1.1); }
+  .td-btn:active { transform: scale(0.96); }
+  .td-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .td-btn.secondary {
+    background: var(--td-panel);
+    color: var(--td-green);
+    border: 1px solid var(--td-panel-edge);
+  }
+
+  /* ---------- Layout: canvas + panel lateral ---------- */
+  #tdLayout {
+    display: flex;
+    gap: 18px;
+    width: 100%;
+    max-width: 1180px;
+  }
+
+  #tdCanvasWrap { position: relative; flex: 1; }
+
+  #tdCanvas {
+    display: block;
+    width: 100%;
+    max-width: 900px;
+    aspect-ratio: 900 / 600;
+    background: var(--td-bg-a);
+    border-radius: 16px;
+    border: 1px solid var(--td-panel-edge);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+    cursor: crosshair;
+  }
+
+  #tdOverlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(8, 14, 10, 0.85);
+    border-radius: 16px;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    text-align: center;
+  }
+  #tdOverlay.show { display: flex; }
+  #tdOverlay h2 { font-family: var(--font-display, sans-serif); margin: 0; font-size: 1.7rem; }
+  #tdOverlay p { margin: 0; color: #cfe8d8; }
+
+  /* ---------- Panel lateral ---------- */
+  #tdPanel {
+    width: 250px;
+    flex-shrink: 0;
+    background: rgba(15, 27, 18, 0.9);
+    border: 1px solid var(--td-panel-edge);
+    border-radius: 18px;
+    padding: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    height: fit-content;
+  }
+
+  #tdPanel h2 {
+    margin-top: 0;
+    font-size: 1.05rem;
+    color: var(--td-green);
+    border-bottom: 1px solid var(--td-panel-edge);
+    padding-bottom: 8px;
+  }
+
+  .td-tower-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255,255,255,0.03);
+    border: 2px solid transparent;
+    border-radius: 12px;
+    padding: 10px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: border-color 0.15s, transform 0.15s;
+  }
+  .td-tower-option:hover { transform: translateY(-2px); }
+  .td-tower-option.armed { border-color: #fff; }
+  .td-tower-option.disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .td-swatch {
+    width: 30px; height: 30px; border-radius: 50%;
+    flex-shrink: 0; border: 2px solid rgba(255,255,255,0.4);
+  }
+
+  .td-tower-option .td-info { line-height: 1.3; }
+  .td-tower-option .td-info strong { display: block; font-size: 0.88rem; }
+  .td-tower-option .td-info span { font-size: 0.75rem; color: #a9c2b1; }
+
+  #tdSelected {
+    margin-top: 6px;
+    padding-top: 12px;
+    border-top: 1px dashed var(--td-panel-edge);
+  }
+  #tdSelected.hidden { display: none; }
+
+  #tdSelected h3 { margin: 0 0 6px 0; font-size: 1rem; }
+  #tdSelected p { margin: 2px 0; font-size: 0.8rem; color: #a9c2b1; }
+
+  .td-upgrade-btn {
+    width: 100%;
+    text-align: left;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--td-panel-edge);
+    color: #eaf5ee;
+    padding: 8px 10px;
+    border-radius: 8px;
+    margin-top: 6px;
+    cursor: pointer;
+    font-size: 0.78rem;
+    transition: background 0.15s;
+  }
+  .td-upgrade-btn:hover:not(:disabled) { background: rgba(75, 220, 122, 0.15); }
+  .td-upgrade-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+  .td-sell-btn {
+    width: 100%;
+    margin-top: 10px;
+    background: rgba(255, 75, 75, 0.15);
+    border: 1px solid var(--td-red);
+    color: #ffb3b3;
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.8rem;
+  }
+  .td-sell-btn:hover { background: rgba(255, 75, 75, 0.28); }
+
+  #tdHint {
+    margin-top: 10px;
+    color: #7d9186;
+    font-size: 0.8rem;
+    text-align: center;
+  }
+</style>
+</head>
+<body class="tower-defense">
+
+  <h1>🎈 Bloons Siege</h1>
+  <p class="subtitle">Planta torres, revienta capas, no dejes que lleguen al final del camino</p>
+
+  <div id="tdHud">
+    <div class="td-badge" id="tdLives">❤️ Vidas: 100</div>
+    <div class="td-badge" id="tdMoney">💰 250</div>
+    <div class="td-badge" id="tdWave">🌊 Oleada: 0 / 15</div>
+    <button class="td-btn" id="tdStartWave">▶️ Iniciar oleada</button>
+    <button class="td-btn secondary" id="tdSpeedBtn">x1</button>
+  </div>
+
+  <div id="tdLayout">
+    <div id="tdCanvasWrap">
+      <canvas id="tdCanvas" width="900" height="600"></canvas>
+      <div id="tdOverlay">
+        <h2 id="tdOverlayTitle">💀 Fin de la partida</h2>
+        <p id="tdOverlayText">Llegaste hasta la oleada 0</p>
+        <button class="td-btn" id="tdRestartBtn">Reintentar</button>
+      </div>
+    </div>
+
+    <div id="tdPanel">
+      <h2>🗼 Torres</h2>
+
+      <div class="td-tower-option" data-type="basic">
+        <div class="td-swatch" style="background:var(--td-basic)"></div>
+        <div class="td-info">
+          <strong>Básica — <span id="cost-basic">100</span>💰</strong>
+          <span>Rápida, alcance medio</span>
+        </div>
+      </div>
+
+      <div class="td-tower-option" data-type="cannon">
+        <div class="td-swatch" style="background:var(--td-cannon)"></div>
+        <div class="td-info">
+          <strong>Cañón — <span id="cost-cannon">160</span>💰</strong>
+          <span>Lenta, daño en área</span>
+        </div>
+      </div>
+
+      <div class="td-tower-option" data-type="sniper">
+        <div class="td-swatch" style="background:var(--td-sniper)"></div>
+        <div class="td-info">
+          <strong>Francotirador — <span id="cost-sniper">180</span>💰</strong>
+          <span>Alcance total, rompe 3 capas</span>
+        </div>
+      </div>
+
+      <div class="td-tower-option" data-type="super">
+        <div class="td-swatch" style="background:var(--td-super)"></div>
+        <div class="td-info">
+          <strong>Súper — <span id="cost-super">350</span>💰</strong>
+          <span>Súper velocidad y súper alcance</span>
+        </div>
+      </div>
+
+      <div class="td-tower-option" data-type="support">
+        <div class="td-swatch" style="background:var(--td-support)"></div>
+        <div class="td-info">
+          <strong>Soporte — <span id="cost-support">150</span>💰</strong>
+          <span>Aura que ralentiza</span>
+        </div>
+      </div>
+
+      <div id="tdSelected" class="hidden">
+        <h3 id="selTitle">Torre</h3>
+        <p id="selStats"></p>
+        <button class="td-upgrade-btn" id="upgA"></button>
+        <button class="td-upgrade-btn" id="upgB"></button>
+        <button class="td-sell-btn" id="sellBtn"></button>
+      </div>
+
+      <p id="tdHint">Selecciona una torre, luego haz clic una vez colocada para mejorarla.</p>
+    </div>
+  </div>
+
+<script>
+// ============================================================
+// TOWER DEFENSE — motor del juego
+// ============================================================
+
+// ---------- 1. CONFIGURACIÓN ----------
+const canvas = document.getElementById('tdCanvas');
+const ctx = canvas.getContext('2d');
+
+const WAYPOINTS = [
+  { x: -30, y: 80 },
+  { x: 200, y: 80 },
+  { x: 200, y: 320 },
+  { x: 480, y: 320 },
+  { x: 480, y: 90 },
+  { x: 700, y: 90 },
+  { x: 700, y: 480 },
+  { x: 930, y: 480 }
+];
+
+const BALLOON_TIERS = [
+  { name: 'rainbow', color: getCssVarLater('--td-rainbow'), speed: 280, radius: 21 },
+  { name: 'pink', color: getCssVarLater('--td-pink'), speed: 260, radius: 21 },
+  { name: 'yellow', color: getCssVarLater('--td-yellow'), speed: 220, radius: 19 },
+  { name: 'green', color: getCssVarLater('--td-green'), speed: 180, radius: 17 },
+  { name: 'blue', color: getCssVarLater('--td-blue'), speed: 160, radius: 15 },
+  { name: 'red', color: getCssVarLater('--td-red'), speed: 150, radius: 13 }
+];
+function getCssVarLater(name) { return name; }
+
+const TOWER_TYPES = {
+  basic: {
+    label: 'Básica', cost: 100, range: 130, fireInterval: 0.45, damage: 1,
+    projectileSpeed: 480, colorVar: '--td-basic', darkVar: '--td-basic-dark', splash: 0
+  },
+  cannon: {
+    label: 'Cañón', cost: 160, range: 105, fireInterval: 1.3, damage: 1,
+    projectileSpeed: 300, colorVar: '--td-cannon', darkVar: '--td-cannon-dark', splash: 55
+  },
+  sniper: {
+    label: 'Francotirador', cost: 180, range: 5000, fireInterval: 2.4, damage: 3,
+    projectileSpeed: 950, colorVar: '--td-sniper', darkVar: '--td-sniper-dark', splash: 0
+  },
+  super: {
+    label: 'Súper', cost: 350, range: 250, fireInterval: 0.35, damage: 1,
+    projectileSpeed: 1200, colorVar: '--td-super', darkVar: '--td-super-dark', splash: 100
+  },
+  support: {
+    label: 'Soporte', cost: 150, range: 110, slowFactor: 0.5,
+    colorVar: '--td-support', darkVar: '--td-support-dark', isSupport: true
+  }
+};
+
+const TOTAL_WAVES = 15;
+const PATH_CLEARANCE = 34;
+const TOWER_MIN_GAP = 34;
+
+// ---------- 2. ESTADO DEL JUEGO ----------
+function freshState() {
+  return {
+    money: 250,
+    lives: 100,
+    wave: 0,
+    towers: [],
+    balloons: [],
+    projectiles: [],
+    spawnQueue: [],
+    spawnTimer: 0,
+    waveActive: false,
+    gameOver: false,
+    victory: false,
+    speedMult: 1,
+    armedType: null,
+    selectedTower: null
+  };
+}
+let state = freshState();
+let cssVars = null;
+let colorCache = {}; // FIX: Caché de variables CSS para evitar lag severo en el dibujado.
+
+function resolveColors() {
+  cssVars = getComputedStyle(document.documentElement);
+  BALLOON_TIERS[0].color = cssVars.getPropertyValue('--td-rainbow').trim();
+  BALLOON_TIERS[1].color = cssVars.getPropertyValue('--td-pink').trim();
+  BALLOON_TIERS[2].color = cssVars.getPropertyValue('--td-yellow').trim();
+  BALLOON_TIERS[3].color = cssVars.getPropertyValue('--td-green').trim();
+  BALLOON_TIERS[4].color = cssVars.getPropertyValue('--td-blue').trim();
+  BALLOON_TIERS[5].color = cssVars.getPropertyValue('--td-red').trim();
+}
+function cssVar(name) {
+  if (!colorCache[name]) {
+    colorCache[name] = cssVars.getPropertyValue(name).trim();
+  }
+  return colorCache[name];
+}
+
+// ---------- 3. UTILIDADES GEOMÉTRICAS ----------
+function distToSegment(px, py, ax, ay, bx, by) {
+  const abx = bx - ax, aby = by - ay;
+  const apx = px - ax, apy = py - ay;
+  const lenSq = abx * abx + aby * aby || 1;
+  let t = (apx * abx + apy * aby) / lenSq;
+  t = Math.max(0, Math.min(1, t));
+  const cx = ax + abx * t, cy = ay + aby * t;
+  return Math.hypot(px - cx, py - cy);
+}
+
+function distanceToPath(x, y) {
+  let min = Infinity;
+  for (let i = 0; i < WAYPOINTS.length - 1; i++) {
+    const a = WAYPOINTS[i], b = WAYPOINTS[i + 1];
+    min = Math.min(min, distToSegment(x, y, a.x, a.y, b.x, b.y));
+  }
+  return min;
+}
+
+function isValidPlacement(x, y) {
+  if (x < 20 || x > canvas.width - 20 || y < 20 || y > canvas.height - 20) return false;
+  if (distanceToPath(x, y) < PATH_CLEARANCE) return false;
+  for (const t of state.towers) {
+    if (Math.hypot(t.x - x, t.y - y) < TOWER_MIN_GAP) return false;
+  }
+  return true;
+}
+
+// ---------- 4. OLEADAS Y SPAWN DE GLOBOS ----------
+function buildWaveQueue(n) {
+  const reds = 15 + n * 10; // Cada oleada añade 10 globos rojos más
+  const blues = Math.max(0, n - 0) * 9; // A partir de la oleada 2, se añaden 9 globos azules por oleada
+  const greens = Math.max(0, n - 1) * 8; // A partir de la oleada 4, se añade 8 globos verdes por oleada
+  const yellows = Math.max(0, n - 2) * 7; // A partir de la oleada 6, se añade 7 globos amarillos por oleada
+  const pinks = Math.max(0, n - 4) * 6; // A partir de la oleada 8, se añade 6 globos rosa por oleada
+  const rainbows = Math.max(0, n - 6) * 5; // A partir de la oleada 10, se añade 5 globos arcoíris por oleada
+  const queue = [];
+  for (let i = 0; i < reds; i++) queue.push('red');
+  for (let i = 0; i < blues; i++) queue.push('blue'); 
+  for (let i = 0; i < greens; i++) queue.push('green');  
+  for (let i = 0; i < yellows; i++) queue.push('yellow'); 
+  for (let i = 0; i < pinks; i++) queue.push('pink');
+  for (let i = 0; i < rainbows; i++) queue.push('rainbow')
+  for (let i = queue.length - 1; i > 0; i--) { // Mezcla aleatoria de la cola de globos
+    const j = Math.floor(Math.random() * (i + 1)); // Algoritmo de Fisher-Yates
+    [queue[i], queue[j]] = [queue[j], queue[i]]; // Intercambia elementos
+  }
+  return queue;
+}
+
+function tierIndexByName(name) {
+  return BALLOON_TIERS.findIndex(t => t.name === name);
+}
+
+function spawnBalloon(tierName) {
+  const idx = tierIndexByName(tierName);
+  state.balloons.push({
+    tierIndex: idx,
+    x: WAYPOINTS[0].x, y: WAYPOINTS[0].y,
+    wpIndex: 1,
+    slowMult: 1
+  });
+}
+
+function startWave() {
+  if (state.waveActive || state.gameOver || state.victory) return;
+  state.wave++;
+  state.spawnQueue = buildWaveQueue(state.wave);
+  state.spawnTimer = 0;
+  state.waveActive = true;
+  updateHUD();
+}
+
+// ---------- 5. LÓGICA DE TORRES ----------
+function findTarget(tower) {
+  let best = null, bestProgress = -1;
+  for (const b of state.balloons) {
+    const dx = b.x - tower.x, dy = b.y - tower.y;
+    if (Math.hypot(dx, dy) > tower.range) continue;
+    const progress = b.wpIndex + (b.segProgress || 0);
+    if (progress > bestProgress) { bestProgress = progress; best = b; }
+  }
+  return best;
+}
+
+function fireTower(tower, target) {
+  state.projectiles.push({
+    x: tower.x, y: tower.y,
+    target,
+    speed: tower.projectileSpeed,
+    damage: tower.damage,
+    splash: tower.splash,
+    colorVar: tower.colorVar
+  });
+}
+
+function damageBalloon(b, amount) {
+  const remaining = BALLOON_TIERS.length - b.tierIndex;
+  const actualDamage = Math.min(amount, remaining);
+  state.money += actualDamage;
+  b.tierIndex += actualDamage;
+  if (b.tierIndex >= BALLOON_TIERS.length) {
+    b.dead = true;
+  }
+}
+
+function applySplash(x, y, radius, amount) {
+  state.balloons.forEach(b => {
+    if (!b.dead && Math.hypot(b.x - x, b.y - y) <= radius) damageBalloon(b, amount);
+  });
+}
+
+// ---------- 6. MOVIMIENTO DE GLOBOS Y AURA ----------
+function updateBalloonSlows() {
+  state.balloons.forEach(b => {
+    let slow = 1;
+    for (const t of state.towers) {
+      if (t.type !== 'support') continue;
+      if (Math.hypot(b.x - t.x, b.y - t.y) <= t.range) {
+        slow = Math.min(slow, t.slowFactor);
+      }
+    }
+    b.slowMult = slow;
+  });
+}
+
+function moveBalloons(dt) {
+  for (const b of state.balloons) {
+    if (b.dead) continue;
+    if (b.wpIndex >= WAYPOINTS.length) continue;
+    const target = WAYPOINTS[b.wpIndex];
+    const prev = WAYPOINTS[b.wpIndex - 1];
+    const dx = target.x - b.x, dy = target.y - b.y;
+    const dist = Math.hypot(dx, dy) || 0.0001;
+    const tier = BALLOON_TIERS[b.tierIndex];
+    const move = tier.speed * b.slowMult * dt;
+
+    if (move >= dist) {
+      b.x = target.x; b.y = target.y;
+      b.wpIndex++;
+      if (b.wpIndex >= WAYPOINTS.length) {
+        const remaining = BALLOON_TIERS.length - b.tierIndex;
+        state.lives -= remaining;
+        b.dead = true;
+      }
+    } else {
+      b.x += (dx / dist) * move;
+      b.y += (dy / dist) * move;
+    }
+
+    const segLen = Math.hypot(target.x - (prev ? prev.x : b.x), target.y - (prev ? prev.y : b.y)) || 1;
+    b.segProgress = 1 - (dist / segLen);
+  }
+  if (state.lives <= 0 && !state.gameOver) endGame(false);
+}
+
+// ---------- 7. INTERACCIÓN: COLOCAR, SELECCIONAR, MEJORAR ----------
+document.querySelectorAll('.td-tower-option').forEach(el => {
+  el.addEventListener('click', () => {
+    const type = el.dataset.type;
+    if (state.money < TOWER_TYPES[type].cost) return;
+    state.armedType = state.armedType === type ? null : type;
+    state.selectedTower = null;
+    refreshTowerOptionUI();
+    renderSelectedPanel();
+  });
+});
+
+function refreshTowerOptionUI() {
+  document.querySelectorAll('.td-tower-option').forEach(el => {
+    const type = el.dataset.type;
+    el.classList.toggle('armed', state.armedType === type);
+    el.classList.toggle('disabled', state.money < TOWER_TYPES[type].cost);
+  });
+}
+
+let mouseX = -100, mouseY = -100;
+canvas.addEventListener('mousemove', (e) => {
+  const rect = canvas.getBoundingClientRect();
+  mouseX = (e.clientX - rect.left) * (canvas.width / rect.width);
+  mouseY = (e.clientY - rect.top) * (canvas.height / rect.height);
+});
+
+canvas.addEventListener('click', (e) => {
+  const rect = canvas.getBoundingClientRect();
+  const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+  const y = (e.clientY - rect.top) * (canvas.height / rect.height);
+
+  if (state.armedType) {
+    const cost = TOWER_TYPES[state.armedType].cost;
+    if (isValidPlacement(x, y) && state.money >= cost) {
+      placeTower(state.armedType, x, y);
+    }
+    state.armedType = null;
+    refreshTowerOptionUI();
+    return;
+  }
+
+  const clicked = state.towers.find(t => Math.hypot(t.x - x, t.y - y) < 20);
+  state.selectedTower = clicked || null;
+  renderSelectedPanel();
+});
+
+function placeTower(type, x, y) {
+  const cfg = TOWER_TYPES[type];
+  state.money -= cfg.cost;
+  const tower = {
+    type, x, y,
+    range: cfg.range,
+    fireInterval: cfg.fireInterval,
+    damage: cfg.damage,
+    projectileSpeed: cfg.projectileSpeed,
+    splash: cfg.splash,
+    slowFactor: cfg.slowFactor,
+    colorVar: cfg.colorVar,
+    darkVar: cfg.darkVar,
+    cooldown: 0,
+    totalSpent: cfg.cost,
+    upgradeLevels: { a: 0, b: 0 },
+    target: null
+  };
+  state.towers.push(tower);
+  updateHUD();
+}
+
+const UPGRADE_DEFS = {
+  basic: {
+    a: { label: 'Alcance', baseCost: 60, apply: (t) => t.range += 20 },
+    b: { label: 'Cadencia', baseCost: 70, apply: (t) => t.fireInterval = Math.max(0.1, t.fireInterval * 0.82) }
+  },
+  cannon: {
+    a: { label: 'Daño en área', baseCost: 90, apply: (t) => t.damage += 1 },
+    b: { label: 'Radio de explosión', baseCost: 80, apply: (t) => t.splash += 15 }
+  },
+  sniper: {
+    a: { label: 'Daño perforante', baseCost: 150, apply: (t) => t.damage += 1 },
+    b: { label: 'Cadencia', baseCost: 130, apply: (t) => t.fireInterval = Math.max(0.5, t.fireInterval * 0.85) }
+  },
+  super: {
+    a: { label: 'Cadencia', baseCost: 120, apply: (t) => t.fireInterval = Math.max(0.05, t.fireInterval * 0.8) },
+    b: { label: 'Alcance', baseCost: 100, apply: (t) => t.range += 30 }
+  },
+  support: {
+    a: { label: 'Radio del aura', baseCost: 70, apply: (t) => t.range += 25 },
+    b: { label: 'Fuerza de ralentización', baseCost: 100, apply: (t) => t.slowFactor = Math.max(0.15, t.slowFactor - 0.1) }
+  }
+};
+
+function upgradeCost(tower, slot) {
+  const def = UPGRADE_DEFS[tower.type][slot];
+  const level = tower.upgradeLevels[slot];
+  return Math.round(def.baseCost * Math.pow(1.55, level));
+}
+
+function buyUpgrade(tower, slot) {
+  const cost = upgradeCost(tower, slot);
+  if (state.money < cost) return;
+  state.money -= cost;
+  tower.totalSpent += cost;
+  tower.upgradeLevels[slot]++;
+  UPGRADE_DEFS[tower.type][slot].apply(tower);
+  updateHUD();
+  renderSelectedPanel();
+}
+
+function sellTower(tower) {
+  state.money += Math.round(tower.totalSpent * 0.7);
+  state.towers = state.towers.filter(t => t !== tower);
+  state.selectedTower = null;
+  updateHUD();
+  renderSelectedPanel();
+}
+
+const selPanel = document.getElementById('tdSelected');
+const selTitle = document.getElementById('selTitle');
+const selStats = document.getElementById('selStats');
+const upgABtn = document.getElementById('upgA');
+const upgBBtn = document.getElementById('upgB');
+const sellBtn = document.getElementById('sellBtn');
+
+function renderSelectedPanel() {
+  const t = state.selectedTower;
+  if (!t) { selPanel.classList.add('hidden'); return; }
+  selPanel.classList.remove('hidden');
+
+  const cfg = TOWER_TYPES[t.type];
+  selTitle.textContent = cfg.label;
+  if (t.type === 'support') {
+    selStats.textContent = `Radio: ${Math.round(t.range)} · Ralentización: ${Math.round((1 - t.slowFactor) * 100)}%`;
+  } else {
+    selStats.textContent = `Alcance: ${t.range >= 999 ? 'Total' : Math.round(t.range)} · Daño: ${t.damage} · Cadencia: ${t.fireInterval.toFixed(2)}s`;
+  }
+
+  const defA = UPGRADE_DEFS[t.type].a;
+  const defB = UPGRADE_DEFS[t.type].b;
+  const costA = upgradeCost(t, 'a');
+  const costB = upgradeCost(t, 'b');
+
+  upgABtn.textContent = `⬆️ ${defA.label} (Nv.${t.upgradeLevels.a}) — ${costA}💰`;
+  upgABtn.disabled = state.money < costA;
+  upgABtn.onclick = () => buyUpgrade(t, 'a');
+
+  upgBBtn.textContent = `⬆️ ${defB.label} (Nv.${t.upgradeLevels.b}) — ${costB}💰`;
+  upgBBtn.disabled = state.money < costB;
+  upgBBtn.onclick = () => buyUpgrade(t, 'b');
+
+  sellBtn.textContent = `💵 Vender (+${Math.round(t.totalSpent * 0.7)}💰)`;
+  sellBtn.onclick = () => sellTower(t);
+}
+
+// ---------- 8. BUCLE PRINCIPAL Y HUD ----------
+function updateTowers(dt) {
+  state.towers.forEach(t => {
+    if (t.type === 'support') return;
+    t.cooldown -= dt;
+    if (t.cooldown <= 0) {
+      const target = findTarget(t);
+      if (target) {
+        fireTower(t, target);
+        t.cooldown = t.fireInterval;
+      }
+    }
+  });
+}
+
+function updateProjectiles(dt) {
+  state.projectiles.forEach(p => {
+    if (!p.target || p.target.dead) { p.dead = true; return; }
+    const dx = p.target.x - p.x, dy = p.target.y - p.y;
+    const dist = Math.hypot(dx, dy) || 0.0001;
+    const move = p.speed * dt;
+    if (move >= dist) {
+      if (p.splash > 0) applySplash(p.target.x, p.target.y, p.splash, p.damage);
+      else damageBalloon(p.target, p.damage);
+      p.dead = true;
+    } else {
+      p.x += (dx / dist) * move;
+      p.y += (dy / dist) * move;
+    }
+  });
+  state.projectiles = state.projectiles.filter(p => !p.dead);
+}
+
+function updateSpawning(dt) {
+  if (!state.waveActive) return;
+  state.spawnTimer -= dt;
+  if (state.spawnTimer <= 0 && state.spawnQueue.length > 0) {
+    spawnBalloon(state.spawnQueue.shift());
+    state.spawnTimer = 0.55;
+  }
+  if (state.spawnQueue.length === 0 && state.balloons.length === 0) {
+    state.waveActive = false;
+    state.money += 25 + state.wave * 5;
+    updateHUD();
+    if (state.wave >= TOTAL_WAVES) endGame(true);
+  }
+}
+
+function update(dt) {
+  if (state.gameOver || state.victory) return;
+  updateSpawning(dt);
+  updateBalloonSlows();
+  moveBalloons(dt);
+  updateTowers(dt);
+  updateProjectiles(dt);
+  
+  // FIX CRÍTICO: Eliminar aquí los globos destruidos ANTES de dibujar para prevenir el crash de índice indefinido
+  state.balloons = state.balloons.filter(b => !b.dead);
+  
+  updateHUD();
+}
+
+function render() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const cell = 40;
+  for (let y = 0; y < canvas.height; y += cell) {
+    for (let x = 0; x < canvas.width; x += cell) {
+      ctx.fillStyle = ((x / cell + y / cell) % 2 === 0) ? cssVar('--td-grass-1') : cssVar('--td-grass-2');
+      ctx.fillRect(x, y, cell, cell);
+    }
+  }
+
+  ctx.strokeStyle = cssVar('--td-road-edge');
+  ctx.lineWidth = 46;
+  ctx.lineJoin = 'round';
+  ctx.lineCap = 'round';
+  drawPathStroke();
+  ctx.strokeStyle = cssVar('--td-road');
+  ctx.lineWidth = 38;
+  drawPathStroke();
+
+  if (state.armedType) {
+    const valid = isValidPlacement(mouseX, mouseY);
+    ctx.beginPath();
+    ctx.arc(mouseX, mouseY, TOWER_TYPES[state.armedType].range, 0, Math.PI * 2);
+    ctx.fillStyle = valid ? 'rgba(75,220,122,0.15)' : 'rgba(255,75,75,0.15)';
+    ctx.fill();
+    ctx.strokeStyle = valid ? 'rgba(75,220,122,0.6)' : 'rgba(255,75,75,0.6)';
+    ctx.stroke();
+  }
+  if (state.selectedTower) {
+    ctx.beginPath();
+    ctx.arc(state.selectedTower.x, state.selectedTower.y, state.selectedTower.range, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255,255,255,0.06)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+    ctx.stroke();
+  }
+
+  state.towers.forEach(t => {
+    ctx.beginPath();
+    ctx.arc(t.x, t.y, 16, 0, Math.PI * 2);
+    ctx.fillStyle = cssVar(t.colorVar);
+    ctx.fill();
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = t === state.selectedTower ? '#ffffff' : cssVar(t.darkVar);
+    ctx.stroke();
+  });
+
+  state.balloons.forEach(b => {
+    const tier = BALLOON_TIERS[b.tierIndex];
+    ctx.beginPath();
+    ctx.ellipse(b.x, b.y + tier.radius * 0.7, tier.radius, tier.radius * 0.35, 0, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, tier.radius, 0, Math.PI * 2);
+    ctx.fillStyle = tier.color;
+    ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = 'rgba(0,0,0,0.35)';
+    ctx.stroke();
+  });
+
+  state.projectiles.forEach(p => {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.splash > 0 ? 6 : 4, 0, Math.PI * 2);
+    ctx.fillStyle = cssVar(p.colorVar);
+    ctx.fill();
+  });
+}
+
+function drawPathStroke() {
+  ctx.beginPath();
+  ctx.moveTo(WAYPOINTS[0].x, WAYPOINTS[0].y);
+  for (let i = 1; i < WAYPOINTS.length; i++) ctx.lineTo(WAYPOINTS[i].x, WAYPOINTS[i].y);
+  ctx.stroke();
+}
+
+const livesEl = document.getElementById('tdLives');
+const moneyEl = document.getElementById('tdMoney');
+const waveEl = document.getElementById('tdWave');
+const startWaveBtn = document.getElementById('tdStartWave');
+
+function updateHUD() {
+  livesEl.textContent = `❤️ Vidas: ${Math.max(0, state.lives)}`;
+  moneyEl.textContent = `💰 ${state.money}`;
+  waveEl.textContent = `🌊 Oleada: ${state.wave} / ${TOTAL_WAVES}`;
+  startWaveBtn.disabled = state.waveActive || state.gameOver || state.victory;
+  Object.keys(TOWER_TYPES).forEach(type => {
+    const el = document.getElementById('cost-' + type);
+    if (el) el.textContent = TOWER_TYPES[type].cost;
+  });
+  refreshTowerOptionUI();
+}
+
+startWaveBtn.addEventListener('click', startWave);
+
+const speedBtn = document.getElementById('tdSpeedBtn');
+speedBtn.addEventListener('click', () => {
+  state.speedMult = state.speedMult === 1 ? 2 : 1;
+  speedBtn.textContent = 'x' + state.speedMult;
+});
+
+let lastTime = performance.now();
+function loop(now) {
+  const dt = Math.min(0.05, (now - lastTime) / 1000) * state.speedMult;
+  lastTime = now;
+  update(dt);
+  render();
+  requestAnimationFrame(loop);
+}
+
+// ---------- 9. FIN DE PARTIDA / VICTORIA / REINICIO ----------
+const overlay = document.getElementById('tdOverlay');
+const overlayTitle = document.getElementById('tdOverlayTitle');
+const overlayText = document.getElementById('tdOverlayText');
+const restartBtn = document.getElementById('tdRestartBtn');
+
+function endGame(won) {
+  state.gameOver = !won;
+  state.victory = won;
+  overlayTitle.textContent = won ? '🏆 ¡Victoria!' : '💀 Fin de la partida';
+  overlayText.textContent = won
+    ? `Has superado las ${TOTAL_WAVES} oleadas.`
+    : `Llegaste hasta la oleada ${state.wave}.`;
+  overlay.classList.add('show');
+  updateHUD();
+}
+
+restartBtn.addEventListener('click', () => {
+  state = freshState();
+  overlay.classList.remove('show');
+  speedBtn.textContent = 'x1';
+  updateHUD();
+  renderSelectedPanel();
+});
+
+// ---------- ARRANQUE ----------
+resolveColors();
+updateHUD();
+renderSelectedPanel();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
