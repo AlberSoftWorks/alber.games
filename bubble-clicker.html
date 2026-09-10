@@ -4,24 +4,31 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="description" content="Bubble Clicker: revienta burbujas, compra mejoras y trasciende la espuma.">
-  <meta name="theme-color" content="#140F2B">
+  <meta name="theme-color" content="#1e1c24">
   <title>Alber.Games — Bubble Clicker</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    .bubble-clicker nav{margin-bottom:10px}
-    .game-header{position:relative;text-align:center;padding:8px 16px 18px}
-    .game-header h1{margin:0;font-family:var(--font-display);font-size:clamp(2rem,5vw,3rem)}
-    .game-header .subtitle{margin:2px 0 14px;color:var(--muted)}
+    /* La navegación comparte estructura con Alber.Games, pero se integra
+       con la paleta de laboratorio de Bubble Clicker en vez de parecer
+       una tarjeta independiente sobre el juego. */
+    body.bubble-clicker{padding:0}
+    .bubble-clicker nav{width:100%;align-self:stretch;margin:0;background:rgba(11,12,16,.55);border-bottom:1px solid rgba(102,252,241,.14);box-shadow:0 4px 20px rgba(0,0,0,.12)}
+    .bubble-clicker .nav-link{background:rgba(31,40,51,.72);color:var(--bc-muted);border-color:transparent}
+    .bubble-clicker .nav-link:hover,.bubble-clicker .nav-link[aria-current="page"]{background:rgba(69,162,158,.12);border-color:var(--bc-teal);color:var(--bc-cyan);box-shadow:0 6px 16px rgba(69,162,158,.14)}
+    .bubble-clicker .nav-cta{color:var(--bc-void);background:var(--bc-cyan);box-shadow:0 4px 0 #32827e}
+    .bubble-clicker .nav-cta:hover{background:#9ffff8;box-shadow:0 2px 0 #32827e,0 8px 20px rgba(102,252,241,.3)}
+    .game-header{position:relative;text-align:center;padding:28px 16px 18px;width:100%}
+    .game-header h1{margin:0;font-family:var(--bc-font);font-size:clamp(2rem,5vw,3rem)}
+    .game-header .subtitle{margin:2px 0 14px;color:var(--bc-muted)}
     .game-actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
-    .music-btn{border:1px solid var(--panel-edge)!important;border-radius:999px!important;background:var(--panel)!important;color:var(--text)!important;padding:9px 16px!important;cursor:pointer;font:600 .9rem var(--font-body);transition:.2s ease}
-    .music-btn:hover{border-color:var(--sky)!important;transform:translateY(-2px)}
+    .music-btn{border:1px solid var(--bc-teal)!important;border-radius:999px!important;background:rgba(31,40,51,.8)!important;color:var(--bc-cyan)!important;padding:9px 16px!important;cursor:pointer;font:600 .9rem var(--bc-font);transition:.2s ease}
+    .music-btn:hover{background:var(--bc-teal)!important;color:var(--bc-void)!important;transform:translateY(-2px)}
     #score{transition:transform .1s ease}
-    .layout{align-items:start}
+    .layout{align-items:start;margin-bottom:20px}
     #gameArea{touch-action:manipulation;min-height:420px}
-    #shop{max-height:72vh;overflow:auto;scrollbar-width:thin}
-    #shop h2{position:sticky;top:0;z-index:2;padding-bottom:10px;background:inherit}
-    .save-status{font-size:.72rem;color:var(--muted);text-align:center;margin-top:7px;min-height:1em}
-    @media(max-width:720px){.bubble-clicker nav{margin-bottom:4px}.game-header{padding-bottom:12px}#shop{max-height:none}.layout{grid-template-columns:1fr}}
+    #shop{max-height:550px}
+    .save-status{font-size:.72rem;color:var(--bc-muted);text-align:center;margin-top:7px;min-height:1em}
+    @media(max-width:720px){.bubble-clicker nav{margin:0}.game-header{padding:20px 16px 12px}.layout{grid-template-columns:1fr}.layout{padding:0 12px}.bubble-clicker .nav-links-container{display:none}#shop{max-height:none}}
     @media(prefers-reduced-motion:reduce){.music-btn{transition:none}}
   </style>
 </head>
@@ -42,9 +49,7 @@
 <header class="game-header">
   <h1>🫧 Bubble Clicker</h1>
   <p class="subtitle">Haz clic, mejora, trasciende la espuma</p>
-  <div class="game-actions">
-    <button id="bgm-toggle" class="music-btn" type="button">🎵 Música: OFF</button>
-  </div>
+  <div class="game-actions"><button id="bgm-toggle" class="music-btn" type="button">🎵 Música: OFF</button></div>
 </header>
 
 <div id="score">Pops: 0</div>
@@ -52,15 +57,9 @@
 
 <div class="layout">
   <div id="gameArea" aria-label="Zona de juego de Bubble Clicker"></div>
-
   <div id="shop">
     <h2>🛒 Mejoras</h2>
-    <div class="prestige-zone">
-      <p>Esencia de Jabón: <span id="token-display">0</span></p>
-      <p id="prestige-bonus-desc">Bonus actual: +0% de Pops a todo</p>
-      <button id="btn-prestige" disabled>✨ Ascender (Requiere 20.000 pts)</button>
-    </div>
-
+    <div class="prestige-zone"><p>Esencia de Jabón: <span id="token-display">0</span></p><p id="prestige-bonus-desc">Bonus actual: +0% de Pops a todo</p><button id="btn-prestige" disabled>✨ Ascender (Requiere 20.000 pts)</button></div>
     <div class="upgrade"><h3>👆 Dedos rápidos</h3><p id="desc-click">+1 punto base por burbuja</p><button id="buy-click">Comprar (10 pts)</button></div>
     <div class="upgrade"><h3>🌀 Fábrica de burbujas</h3><p id="desc-spawn">Aparecen más burbujas</p><button id="buy-spawn">Comprar (15 pts)</button></div>
     <div class="upgrade"><h3>🤖 Auto-Pop</h3><p id="desc-autopop">Revienta burbujas automáticamente</p><button id="buy-autopop">Comprar (60 pts)</button></div>
@@ -78,59 +77,34 @@
 
 <script>
 'use strict';
-const PRESTIGE_COST=20000;
-const SAVE_KEY='alberGames_bubbleClicker_save';
-const fmt=n=>Math.floor(n).toLocaleString('es-ES');
-const baseState={points:0,totalPops:0,clickValue:1,spawnInterval:700,minSpawnInterval:20,goldenUnlocked:false,bombUnlocked:false,frenzyUnlocked:false,autopopRate:0,prestigeTokens:0,upgrades:{
- click:{level:0,cost:10,mult:1.5,element:'buy-click',desc:'desc-click',label:'+1 punto base'},
- spawn:{level:0,cost:15,mult:1.4,element:'buy-spawn',desc:'desc-spawn',label:'Mayor aparición'},
- autopop:{level:0,cost:60,mult:1.8,element:'buy-autopop',desc:'desc-autopop',label:'+0.5 auto-pops/seg'},
- jabon:{level:0,cost:800,mult:1.6,element:'buy-jabon',desc:'desc-jabon',label:'+15 Pops base'},
- maquina:{level:0,cost:3500,mult:1.6,element:'buy-maquina',desc:'desc-maquina',label:'+5 auto-pops/seg'},
- termonuclear:{level:0,cost:40000,mult:1.8,element:'buy-termonuclear',desc:'desc-termonuclear',label:'+200 Pops base'},
- solar:{level:0,cost:100000,mult:2,element:'buy-solar',desc:'desc-solar',label:'+500 Pops base'},
- infernal:{level:0,cost:500000,mult:1.6,element:'buy-infernal',desc:'desc-infernal',label:'+800 Pops base'},
- cuantica:{level:0,cost:2000000,mult:1.6,element:'buy-cuantica',desc:'desc-cuantica',label:'+1200 Pops base'},
- multiversal:{level:0,cost:10000000,mult:1.6,element:'buy-multiversal',desc:'desc-multiversal',label:'+5000 Pops base'},
- primigenia:{level:0,cost:50000000,mult:1.6,element:'buy-primigenia',desc:'desc-primigenia',label:'+20000 Pops base'}
-}};
+const PRESTIGE_COST=20000,SAVE_KEY='alberGames_bubbleClicker_save',fmt=n=>Math.floor(n).toLocaleString('es-ES');
+const baseState={points:0,totalPops:0,clickValue:1,spawnInterval:700,minSpawnInterval:20,goldenUnlocked:false,bombUnlocked:false,frenzyUnlocked:false,autopopRate:0,prestigeTokens:0,upgrades:{click:{level:0,cost:10,mult:1.5,element:'buy-click',desc:'desc-click',label:'+1 punto base'},spawn:{level:0,cost:15,mult:1.4,element:'buy-spawn',desc:'desc-spawn',label:'Mayor aparición'},autopop:{level:0,cost:60,mult:1.8,element:'buy-autopop',desc:'desc-autopop',label:'+0.5 auto-pops/seg'},jabon:{level:0,cost:800,mult:1.6,element:'buy-jabon',desc:'desc-jabon',label:'+15 Pops base'},maquina:{level:0,cost:3500,mult:1.6,element:'buy-maquina',desc:'desc-maquina',label:'+5 auto-pops/seg'},termonuclear:{level:0,cost:40000,mult:1.8,element:'buy-termonuclear',desc:'desc-termonuclear',label:'+200 Pops base'},solar:{level:0,cost:100000,mult:2,element:'buy-solar',desc:'desc-solar',label:'+500 Pops base'},infernal:{level:0,cost:500000,mult:1.6,element:'buy-infernal',desc:'desc-infernal',label:'+800 Pops base'},cuantica:{level:0,cost:2000000,mult:1.6,element:'buy-cuantica',desc:'desc-cuantica',label:'+1200 Pops base'},multiversal:{level:0,cost:10000000,mult:1.6,element:'buy-multiversal',desc:'desc-multiversal',label:'+5000 Pops base'},primigenia:{level:0,cost:50000000,mult:1.6,element:'buy-primigenia',desc:'desc-primigenia',label:'+20000 Pops base'}}};
 let state=JSON.parse(JSON.stringify(baseState));
 const gameArea=document.getElementById('gameArea'),scoreEl=document.getElementById('score'),statsEl=document.getElementById('stats'),tokenDisplay=document.getElementById('token-display'),prestigeBonusDesc=document.getElementById('prestige-bonus-desc'),btnPrestige=document.getElementById('btn-prestige'),saveStatus=document.getElementById('save-status');
-
-// Audio: efectos cortos + música generativa real de fondo.
 let audioCtx=null,musicGain=null,musicTimer=null,musicNodes=[],isMusicPlaying=false;
-function initAudio(){if(!audioCtx){audioCtx=new(window.AudioContext||window.webkitAudioContext)();}if(audioCtx.state==='suspended')audioCtx.resume();}
+function initAudio(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume();}
 function playTone(freq,duration=.08,type='sine',volume=.12){initAudio();if(!audioCtx)return;const o=audioCtx.createOscillator(),g=audioCtx.createGain(),t=audioCtx.currentTime;o.type=type;o.frequency.setValueAtTime(freq,t);o.frequency.exponentialRampToValueAtTime(freq*1.8,t+duration);g.gain.setValueAtTime(volume,t);g.gain.exponentialRampToValueAtTime(.001,t+duration);o.connect(g);g.connect(audioCtx.destination);o.start(t);o.stop(t+duration);}
-function playPopSound(crit=false){playTone(crit?600:300+Math.random()*150,.08,'sine',.16);}
-function playUpgradeSound(){playTone(440,.15,'triangle',.1);setTimeout(()=>playTone(660,.15,'triangle',.08),70);}
-function stopMusic(){if(musicTimer){clearInterval(musicTimer);musicTimer=null;}musicNodes.forEach(n=>{try{n.stop()}catch(e){}});musicNodes=[];if(musicGain){musicGain.disconnect();musicGain=null;}isMusicPlaying=false;}
-function startMusic(){initAudio();if(isMusicPlaying)return;isMusicPlaying=true;const master=audioCtx.createGain();master.gain.value=.045;master.connect(audioCtx.destination);musicGain=master;const scale=[261.63,293.66,329.63,392,440,523.25,587.33];let step=0;
- const beat=()=>{if(!isMusicPlaying)return;const now=audioCtx.currentTime;const melody=[0,2,4,2,1,3,5,3,0,4,2,5,4,2,1,3][step%16];const bass=[0,0,4,4,1,1,5,5][step%8];const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='triangle';o.frequency.value=scale[melody];g.gain.setValueAtTime(.001,now);g.gain.linearRampToValueAtTime(.42,now+.025);g.gain.exponentialRampToValueAtTime(.001,now+.32);o.connect(g);g.connect(master);o.start(now);o.stop(now+.34);musicNodes.push(o);
- if(step%2===0){const b=audioCtx.createOscillator(),bg=audioCtx.createGain();b.type='sine';b.frequency.value=scale[bass]/2;bg.gain.setValueAtTime(.001,now);bg.gain.linearRampToValueAtTime(.16,now+.03);bg.gain.exponentialRampToValueAtTime(.001,now+.45);b.connect(bg);bg.connect(master);b.start(now);b.stop(now+.46);musicNodes.push(b);}step++;};beat();musicTimer=setInterval(beat,375);}
-const bgmToggle=document.getElementById('bgm-toggle');
-bgmToggle.addEventListener('click',()=>{if(isMusicPlaying){stopMusic();bgmToggle.textContent='🎵 Música: OFF';}else{startMusic();bgmToggle.textContent='🎶 Música: ON';}});
-
-let milestones=[{pops:10,done:false,apply:()=>toast('🎉 ¡10 burbujas! Probabilidad de críticos añadida (x3 Pops).')},{pops:50,done:false,apply:()=>{state.goldenUnlocked=true;toast('🌟 ¡50 burbujas! Aparecen burbujas doradas (x5 Pops).')}},{pops:100,done:false,apply:()=>{state.bombUnlocked=true;toast('💥 ¡100 burbujas! Aparecen burbujas bomba (reacción en cadena).')}},{pops:150,done:false,apply:()=>{state.frenzyUnlocked=true;toast('🔥 ¡150 burbujas! Modo frenesí activado.')}},{pops:250,done:false,apply:()=>toast('🚀 ¡250 burbujas! Ya no hay vuelta atrás.')},{pops:500,done:false,apply:()=>toast('👑 ¡500 burbujas! La espuma te reconoce como maestro.')},{pops:1000,done:false,apply:()=>toast('🧬 ¡1.000 burbujas! Has entrado en territorio absurdo.')},{pops:2500,done:false,apply:()=>toast('🔥 ¡2.500 burbujas! Te mereces un descanso.') }];
-function initMilestones(){return milestones.map(m=>({...m}));}
-function checkMilestones(){milestones.forEach(m=>{if(!m.done&&state.totalPops>=m.pops){m.done=true;m.apply();}});}
-let toastTimeout;function toast(msg){let el=document.querySelector('.toast');if(!el){el=document.createElement('div');el.className='toast';document.body.appendChild(el);}el.textContent=msg;requestAnimationFrame(()=>el.classList.add('show'));clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>el.classList.remove('show'),3000);}
-function randomBetween(a,b){return Math.random()*(b-a)+a;}
-function createBubble(){const max=40;if(gameArea.querySelectorAll('.bubble:not(.pop)').length>=max)return;const r=Math.random();let type='normal';if(state.bombUnlocked&&r<.05)type='bomb';else if(state.goldenUnlocked&&r<.15)type='golden';const b=document.createElement('div');b.classList.add('bubble');if(type!=='normal')b.classList.add(type);b.dataset.type=type;const size=type==='golden'?randomBetween(40,60):type==='bomb'?randomBetween(45,65):randomBetween(35,75);b.style.width=b.style.height=size+'px';b.style.left=randomBetween(0,Math.max(gameArea.clientWidth-size,0))+'px';b.style.top=randomBetween(0,Math.max(gameArea.clientHeight-size,0))+'px';b.addEventListener('pointerdown',e=>{e.preventDefault();popBubble(b);});gameArea.appendChild(b);setTimeout(()=>{if(gameArea.contains(b)&&!b.classList.contains('pop')){b.style.transition='opacity .6s';b.style.opacity='0';setTimeout(()=>b.remove(),600);}},type==='golden'?3000:4500);}
-function showFloatingText(b,text,crit){const ft=document.createElement('div');ft.className='floatText '+(crit?'crit':'');ft.textContent=text;ft.style.left=b.style.left;ft.style.top=b.style.top;gameArea.appendChild(ft);setTimeout(()=>ft.remove(),800);}
-function popBubble(b,silent=false){if(!gameArea.contains(b)||b.classList.contains('pop'))return;b.classList.add('pop');const type=b.dataset.type,globalMult=1+state.prestigeTokens,isCrit=milestones[0].done&&Math.random()<.1,critMult=isCrit?3:1;let base=state.clickValue;if(type==='golden')base*=15;if(type==='bomb')base*=3;const value=Math.round(base*globalMult*critMult);state.points+=value;if(!silent){state.totalPops++;playPopSound(isCrit);}showFloatingText(b,'+'+fmt(value),isCrit);scoreEl.style.transform='scale(1.1)';setTimeout(()=>scoreEl.style.transform='scale(1)',100);setTimeout(()=>b.remove(),250);if(type==='bomb'&&!silent)chainPop();if(!silent)checkMilestones();updateUI();}
-function chainPop(){Array.from(gameArea.querySelectorAll('.bubble:not(.pop)')).sort(()=>Math.random()-.5).slice(0,4).forEach((b,i)=>setTimeout(()=>popBubble(b,true),80*(i+1)));}
-let spawnLoopId=null;function restartSpawnLoop(){if(spawnLoopId)clearInterval(spawnLoopId);spawnLoopId=setInterval(()=>{createBubble();if(state.frenzyUnlocked&&Math.random()<.5)createBubble();},state.spawnInterval);}
-
-function saveGame(){try{const save={points:state.points,totalPops:state.totalPops,clickValue:state.clickValue,spawnInterval:state.spawnInterval,goldenUnlocked:state.goldenUnlocked,bombUnlocked:state.bombUnlocked,frenzyUnlocked:state.frenzyUnlocked,autopopRate:state.autopopRate,prestigeTokens:state.prestigeTokens,upgrades:{},milestonesDone:milestones.map(m=>m.done)};for(const k in state.upgrades)save.upgrades[k]={level:state.upgrades[k].level,cost:state.upgrades[k].cost};localStorage.setItem(SAVE_KEY,JSON.stringify(save));saveStatus.textContent='Partida guardada';setTimeout(()=>saveStatus.textContent='',1200);}catch(e){console.warn('No se pudo guardar la partida:',e);}}
-function loadGame(){try{const raw=localStorage.getItem(SAVE_KEY);if(!raw)return;const s=JSON.parse(raw);state.points=s.points??0;state.totalPops=s.totalPops??0;state.clickValue=s.clickValue??1;state.spawnInterval=s.spawnInterval??700;state.goldenUnlocked=!!s.goldenUnlocked;state.bombUnlocked=!!s.bombUnlocked;state.frenzyUnlocked=!!s.frenzyUnlocked;state.autopopRate=s.autopopRate??0;state.prestigeTokens=s.prestigeTokens??0;if(s.upgrades)for(const k in s.upgrades)if(state.upgrades[k]){state.upgrades[k].level=s.upgrades[k].level??0;state.upgrades[k].cost=s.upgrades[k].cost??baseState.upgrades[k].cost;}if(Array.isArray(s.milestonesDone))s.milestonesDone.forEach((d,i)=>{if(milestones[i])milestones[i].done=!!d;});}catch(e){console.warn('No se pudo cargar la partida:',e);}}
-setInterval(saveGame,8000);window.addEventListener('beforeunload',saveGame);document.addEventListener('visibilitychange',()=>{if(document.hidden)saveGame();});
-
-function setupShop(){for(const key in state.upgrades){const u=state.upgrades[key],btn=document.getElementById(u.element);btn.addEventListener('click',()=>{if(state.points<u.cost)return;playUpgradeSound();state.points-=u.cost;u.level++;u.cost=Math.round(u.cost*u.mult);if(key==='click')state.clickValue+=1;if(key==='jabon')state.clickValue+=15;if(key==='termonuclear')state.clickValue+=200;if(key==='solar')state.clickValue+=500;if(key==='infernal')state.clickValue+=800;if(key==='cuantica')state.clickValue+=1200;if(key==='multiversal')state.clickValue+=5000;if(key==='primigenia')state.clickValue+=20000;if(key==='spawn'){state.spawnInterval=Math.max(state.minSpawnInterval,Math.round(state.spawnInterval*.87));restartSpawnLoop();}if(key==='autopop')state.autopopRate+=.5;if(key==='maquina')state.autopopRate+=5;updateUI();saveGame();});}}
-btnPrestige.addEventListener('click',()=>{const gain=Math.floor(state.points/PRESTIGE_COST);if(!gain)return;if(!confirm(`¿Deseas ascender?\n\nPerderás tus Pops y mejoras actuales, pero ganarás ${gain} Esencia(s) de Jabón.\nCada Esencia añade permanentemente un +100% al multiplicador global de Pops.`))return;state.prestigeTokens+=gain;state.points=0;state.totalPops=0;state.clickValue=1;state.spawnInterval=700;state.goldenUnlocked=false;state.bombUnlocked=false;state.frenzyUnlocked=false;state.autopopRate=0;for(const k in state.upgrades){state.upgrades[k].level=0;state.upgrades[k].cost=baseState.upgrades[k].cost;}milestones=initMilestones();gameArea.innerHTML='';restartSpawnLoop();toast(`✨ ¡Has ascendido! Tienes ${state.prestigeTokens} Esencias.`);updateUI();saveGame();});
-function updateUI(){scoreEl.textContent='Pops: '+fmt(state.points);const mult=1+state.prestigeTokens;statsEl.textContent=`Total reventadas: ${state.totalPops} · Valor base: ${fmt(state.clickValue)} · Bonus Global: x${mult}`+(state.autopopRate>0?` · Auto-Pop: ${state.autopopRate.toFixed(1)}/s`:'');tokenDisplay.textContent=state.prestigeTokens;prestigeBonusDesc.textContent=`Bonus actual: +${state.prestigeTokens*100}% de Pops a todo`;const gain=Math.floor(state.points/PRESTIGE_COST);btnPrestige.textContent=gain>0?`✨ Ascender (+${gain} Esencias)`:`✨ Ascender (Requiere ${fmt(PRESTIGE_COST)} pts)`;btnPrestige.disabled=state.points<PRESTIGE_COST;for(const k in state.upgrades){const u=state.upgrades[k],btn=document.getElementById(u.element),desc=document.getElementById(u.desc);desc.textContent=`${u.label} (Nv. ${u.level})`;btn.textContent=`Comprar (${fmt(u.cost)} pts)`;const max=k==='spawn'&&state.spawnInterval<=state.minSpawnInterval;if(max)btn.textContent='Máximo';btn.disabled=state.points<u.cost||max;}}
-
-loadGame();setupShop();restartSpawnLoop();updateUI();
-setInterval(()=>{if(state.autopopRate<=0)return;let count=Math.floor(state.autopopRate);if(Math.random()<state.autopopRate-count)count++;const bubbles=Array.from(gameArea.querySelectorAll('.bubble:not(.pop)')).sort(()=>Math.random()-.5);bubbles.slice(0,count).forEach(b=>popBubble(b,true));},1000);
+function playPopSound(crit=false){playTone(crit?600:300+Math.random()*150,.08,'sine',.16)}
+function playUpgradeSound(){playTone(440,.15,'triangle',.1);setTimeout(()=>playTone(660,.15,'triangle',.08),70)}
+function stopMusic(){if(musicTimer){clearInterval(musicTimer);musicTimer=null}musicNodes.forEach(n=>{try{n.stop()}catch(e){}});musicNodes=[];if(musicGain){musicGain.disconnect();musicGain=null}isMusicPlaying=false}
+function startMusic(){initAudio();if(isMusicPlaying)return;isMusicPlaying=true;const master=audioCtx.createGain();master.gain.value=.045;master.connect(audioCtx.destination);musicGain=master;const scale=[261.63,293.66,329.63,392,440,523.25,587.33];let step=0;const beat=()=>{if(!isMusicPlaying)return;const now=audioCtx.currentTime,melody=[0,2,4,2,1,3,5,3,0,4,2,5,4,2,1,3][step%16],bass=[0,0,4,4,1,1,5,5][step%8],o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='triangle';o.frequency.value=scale[melody];g.gain.setValueAtTime(.001,now);g.gain.linearRampToValueAtTime(.42,now+.025);g.gain.exponentialRampToValueAtTime(.001,now+.32);o.connect(g);g.connect(master);o.start(now);o.stop(now+.34);musicNodes.push(o);if(step%2===0){const b=audioCtx.createOscillator(),bg=audioCtx.createGain();b.type='sine';b.frequency.value=scale[bass]/2;bg.gain.setValueAtTime(.001,now);bg.gain.linearRampToValueAtTime(.16,now+.03);bg.gain.exponentialRampToValueAtTime(.001,now+.45);b.connect(bg);bg.connect(master);b.start(now);b.stop(now+.46);musicNodes.push(b)}step++};beat();musicTimer=setInterval(beat,375)}
+document.getElementById('bgm-toggle').addEventListener('click',()=>{const btn=document.getElementById('bgm-toggle');if(isMusicPlaying){stopMusic();btn.textContent='🎵 Música: OFF'}else{startMusic();btn.textContent='🎶 Música: ON'}});
+let milestones=[{pops:10,done:false,apply:()=>toast('🎉 ¡10 burbujas! Probabilidad de críticos añadida (x3 Pops).')},{pops:50,done:false,apply:()=>{state.goldenUnlocked=true;toast('🌟 ¡50 burbujas! Aparecen burbujas doradas (x5 Pops).')}},{pops:100,done:false,apply:()=>{state.bombUnlocked=true;toast('💥 ¡100 burbujas! Aparecen burbujas bomba (reacción en cadena).')}},{pops:150,done:false,apply:()=>{state.frenzyUnlocked=true;toast('🔥 ¡150 burbujas! Modo frenesí activado.')}},{pops:250,done:false,apply:()=>toast('🚀 ¡250 burbujas! Ya no hay vuelta atrás.')},{pops:500,done:false,apply:()=>toast('👑 ¡500 burbujas! La espuma te reconoce como maestro.')},{pops:1000,done:false,apply:()=>toast('🧬 ¡1.000 burbujas! Has entrado en territorio absurdo.')},{pops:2500,done:false,apply:()=>toast('🔥 ¡2.500 burbujas! Te mereces un descanso.')}];
+function initMilestones(){return milestones.map(m=>({...m))}function checkMilestones(){milestones.forEach(m=>{if(!m.done&&state.totalPops>=m.pops){m.done=true;m.apply()}})}
+let toastTimeout;function toast(msg){let el=document.querySelector('.toast');if(!el){el=document.createElement('div');el.className='toast';document.body.appendChild(el)}el.textContent=msg;requestAnimationFrame(()=>el.classList.add('show'));clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>el.classList.remove('show'),3000)}
+function randomBetween(a,b){return Math.random()*(b-a)+a}
+function createBubble(){const max=40;if(gameArea.querySelectorAll('.bubble:not(.pop)').length>=max)return;const r=Math.random();let type='normal';if(state.bombUnlocked&&r<.05)type='bomb';else if(state.goldenUnlocked&&r<.15)type='golden';const b=document.createElement('div');b.classList.add('bubble');if(type!=='normal')b.classList.add(type);b.dataset.type=type;const size=type==='golden'?randomBetween(40,60):type==='bomb'?randomBetween(45,65):randomBetween(35,75);b.style.width=b.style.height=size+'px';b.style.left=randomBetween(0,Math.max(gameArea.clientWidth-size,0))+'px';b.style.top=randomBetween(0,Math.max(gameArea.clientHeight-size,0))+'px';b.addEventListener('pointerdown',e=>{e.preventDefault();popBubble(b)});gameArea.appendChild(b);setTimeout(()=>{if(gameArea.contains(b)&&!b.classList.contains('pop')){b.style.transition='opacity .6s';b.style.opacity='0';setTimeout(()=>b.remove(),600)}},type==='golden'?3000:4500)}
+function showFloatingText(b,text,crit){const ft=document.createElement('div');ft.className='floatText '+(crit?'crit':'');ft.textContent=text;ft.style.left=b.style.left;ft.style.top=b.style.top;gameArea.appendChild(ft);setTimeout(()=>ft.remove(),800)}
+function popBubble(b,silent=false){if(!gameArea.contains(b)||b.classList.contains('pop'))return;b.classList.add('pop');const type=b.dataset.type,globalMult=1+state.prestigeTokens,isCrit=milestones[0].done&&Math.random()<.1,critMult=isCrit?3:1;let base=state.clickValue;if(type==='golden')base*=15;if(type==='bomb')base*=3;const value=Math.round(base*globalMult*critMult);state.points+=value;if(!silent){state.totalPops++;playPopSound(isCrit)}showFloatingText(b,'+'+fmt(value),isCrit);scoreEl.style.transform='scale(1.1)';setTimeout(()=>scoreEl.style.transform='scale(1)',100);setTimeout(()=>b.remove(),250);if(type==='bomb'&&!silent)chainPop();if(!silent)checkMilestones();updateUI()}
+function chainPop(){Array.from(gameArea.querySelectorAll('.bubble:not(.pop)')).sort(()=>Math.random()-.5).slice(0,4).forEach((b,i)=>setTimeout(()=>popBubble(b,true),80*(i+1)))}
+let spawnLoopId=null;function restartSpawnLoop(){if(spawnLoopId)clearInterval(spawnLoopId);spawnLoopId=setInterval(()=>{createBubble();if(state.frenzyUnlocked&&Math.random()<.5)createBubble()},state.spawnInterval)}
+function saveGame(){try{const save={points:state.points,totalPops:state.totalPops,clickValue:state.clickValue,spawnInterval:state.spawnInterval,goldenUnlocked:state.goldenUnlocked,bombUnlocked:state.bombUnlocked,frenzyUnlocked:state.frenzyUnlocked,autopopRate:state.autopopRate,prestigeTokens:state.prestigeTokens,upgrades:{},milestonesDone:milestones.map(m=>m.done)};for(const k in state.upgrades)save.upgrades[k]={level:state.upgrades[k].level,cost:state.upgrades[k].cost};localStorage.setItem(SAVE_KEY,JSON.stringify(save));saveStatus.textContent='Partida guardada';setTimeout(()=>saveStatus.textContent='',1200)}catch(e){console.warn('No se pudo guardar la partida:',e)}}
+function loadGame(){try{const raw=localStorage.getItem(SAVE_KEY);if(!raw)return;const s=JSON.parse(raw);state.points=s.points??0;state.totalPops=s.totalPops??0;state.clickValue=s.clickValue??1;state.spawnInterval=s.spawnInterval??700;state.goldenUnlocked=!!s.goldenUnlocked;state.bombUnlocked=!!s.bombUnlocked;state.frenzyUnlocked=!!s.frenzyUnlocked;state.autopopRate=s.autopopRate??0;state.prestigeTokens=s.prestigeTokens??0;if(s.upgrades)for(const k in s.upgrades)if(state.upgrades[k]){state.upgrades[k].level=s.upgrades[k].level??0;state.upgrades[k].cost=s.upgrades[k].cost??baseState.upgrades[k].cost}if(Array.isArray(s.milestonesDone))s.milestonesDone.forEach((d,i)=>{if(milestones[i])milestones[i].done=!!d})}catch(e){console.warn('No se pudo cargar la partida:',e)}}
+setInterval(saveGame,8000);window.addEventListener('beforeunload',saveGame);document.addEventListener('visibilitychange',()=>{if(document.hidden)saveGame()});
+function setupShop(){for(const key in state.upgrades){const u=state.upgrades[key],btn=document.getElementById(u.element);btn.addEventListener('click',()=>{if(state.points<u.cost)return;playUpgradeSound();state.points-=u.cost;u.level++;u.cost=Math.round(u.cost*u.mult);if(key==='click')state.clickValue+=1;if(key==='jabon')state.clickValue+=15;if(key==='termonuclear')state.clickValue+=200;if(key==='solar')state.clickValue+=500;if(key==='infernal')state.clickValue+=800;if(key==='cuantica')state.clickValue+=1200;if(key==='multiversal')state.clickValue+=5000;if(key==='primigenia')state.clickValue+=20000;if(key==='spawn'){state.spawnInterval=Math.max(state.minSpawnInterval,Math.round(state.spawnInterval*.87));restartSpawnLoop()}if(key==='autopop')state.autopopRate+=.5;if(key==='maquina')state.autopopRate+=5;updateUI();saveGame()})}}
+btnPrestige.addEventListener('click',()=>{const gain=Math.floor(state.points/PRESTIGE_COST);if(!gain)return;if(!confirm(`¿Deseas ascender?\n\nPerderás tus Pops y mejoras actuales, pero ganarás ${gain} Esencia(s) de Jabón.\nCada Esencia añade permanentemente un +100% al multiplicador global de Pops.`))return;state.prestigeTokens+=gain;state.points=0;state.totalPops=0;state.clickValue=1;state.spawnInterval=700;state.goldenUnlocked=false;state.bombUnlocked=false;state.frenzyUnlocked=false;state.autopopRate=0;for(const k in state.upgrades){state.upgrades[k].level=0;state.upgrades[k].cost=baseState.upgrades[k].cost}milestones=initMilestones();gameArea.innerHTML='';restartSpawnLoop();toast(`✨ ¡Has ascendido! Tienes ${state.prestigeTokens} Esencias.`);updateUI();saveGame()});
+function updateUI(){scoreEl.textContent='Pops: '+fmt(state.points);const mult=1+state.prestigeTokens;statsEl.textContent=`Total reventadas: ${state.totalPops} · Valor base: ${fmt(state.clickValue)} · Bonus Global: x${mult}`+(state.autopopRate>0?` · Auto-Pop: ${state.autopopRate.toFixed(1)}/s`:'');tokenDisplay.textContent=state.prestigeTokens;prestigeBonusDesc.textContent=`Bonus actual: +${state.prestigeTokens*100}% de Pops a todo`;const gain=Math.floor(state.points/PRESTIGE_COST);btnPrestige.textContent=gain>0?`✨ Ascender (+${gain} Esencias)`:`✨ Ascender (Requiere ${fmt(PRESTIGE_COST)} pts)`;btnPrestige.disabled=state.points<PRESTIGE_COST;for(const k in state.upgrades){const u=state.upgrades[k],btn=document.getElementById(u.element),desc=document.getElementById(u.desc);desc.textContent=`${u.label} (Nv. ${u.level})`;btn.textContent=`Comprar (${fmt(u.cost)} pts)`;const max=k==='spawn'&&state.spawnInterval<=state.minSpawnInterval;if(max)btn.textContent='Máximo';btn.disabled=state.points<u.cost||max}}
+loadGame();setupShop();restartSpawnLoop();updateUI();setInterval(()=>{if(state.autopopRate<=0)return;let count=Math.floor(state.autopopRate);if(Math.random()<state.autopopRate-count)count++;const bubbles=Array.from(gameArea.querySelectorAll('.bubble:not(.pop)')).sort(()=>Math.random()-.5);bubbles.slice(0,count).forEach(b=>popBubble(b,true))},1000);
 </script>
 </body>
 </html>
