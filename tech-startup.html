@@ -1,589 +1,748 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alber.Games — Tech Startup</title>
-    <link rel="stylesheet" href="style.css">
-    <style>
-          /* ---------- NAV ESTÉTICO Y ANIMADO ---------- */
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b1020">
+  <title>Alber.Games — Tech Startup</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* =========================================================
+       TECH STARTUP — UI propia del juego
+       El CSS global sigue controlando la marca/nav. Aquí solo
+       se define la interfaz y estética específica del juego.
+       ========================================================= */
+    :root {
+      --ts-bg: #070b16;
+      --ts-panel: rgba(15, 22, 39, .88);
+      --ts-panel-2: #111a2d;
+      --ts-border: rgba(116, 151, 205, .20);
+      --ts-text: #eef4ff;
+      --ts-muted: #8d9bb5;
+      --ts-cyan: #5ee7ff;
+      --ts-purple: #9b7cff;
+      --ts-green: #62e6a5;
+      --ts-yellow: #ffd166;
+      --ts-red: #ff6b7a;
+      --ts-shadow: 0 22px 60px rgba(0,0,0,.34);
+    }
 
-        nav {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 15px 6vw;
-            position: sticky;
-            top: 0;
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            z-index: 9999;
-            border-bottom: 1px solid var(--panel-edge);
-            transition: all 0.4s ease;
-        }
+    body.tech-startup-page {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 12% 8%, rgba(94,231,255,.11), transparent 30%),
+        radial-gradient(circle at 88% 18%, rgba(155,124,255,.13), transparent 34%),
+        linear-gradient(180deg, #070b16 0%, #0b1020 55%, #080c17 100%);
+      overflow-x: hidden;
+    }
 
-        .brand {
-            font-family: var(--font-display);
-            font-weight: 800;
-            font-size: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            letter-spacing: 0.5px;
-            text-decoration: none;
-            color: var(--text);
-            transition: transform 0.3s ease;
-        }
+    .ts-shell {
+      width: min(1180px, calc(100% - 32px));
+      margin: 30px auto 70px;
+    }
 
-        .brand:hover {
-            transform: scale(1.05) rotate(-2deg);
-        }
+    .ts-topbar {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 20px;
+      align-items: end;
+      margin-bottom: 20px;
+    }
 
-        .brand-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: var(--sky);
-            box-shadow: 0 0 12px var(--sky);
-            transition: all 0.3s ease;
-        }
+    .ts-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--ts-cyan);
+      font: 700 .78rem var(--font-body);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
 
-        /* Animación loca para el punto del logo al hacer hover */
-        .brand:hover .brand-dot {
-            animation: crazyBounce 0.4s infinite alternate cubic-bezier(0.5, 0.05, 1, 0.5);
-        }
+    .ts-kicker::before {
+      content: '';
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--ts-green);
+      box-shadow: 0 0 14px var(--ts-green);
+    }
 
-        @keyframes crazyBounce {
-            0% { transform: translateY(0) scale(1); background: var(--sky); box-shadow: 0 0 12px var(--sky); }
-            100% { transform: translateY(-10px) scale(1.3); background: var(--coral); box-shadow: 0 0 20px var(--coral); }
-        }
+    .ts-title {
+      margin: 0;
+      color: var(--ts-text);
+      font: 800 clamp(2rem, 5vw, 3.3rem)/.98 var(--font-display);
+      letter-spacing: -.035em;
+    }
 
-        .nav-links-container {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
+    .ts-subtitle {
+      max-width: 680px;
+      margin: 10px 0 0;
+      color: var(--ts-muted);
+    }
 
-        .nav-link {
-            text-decoration: none;
-            color: var(--muted);
-            font-family: var(--font-display);
-            font-size: 1.05rem;
-            font-weight: 600;
-            padding: 8px 20px;
-            border-radius: 50px;
-            background: var(--panel);
-            border: 2px solid transparent;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
+    .ts-save {
+      color: var(--ts-muted);
+      font-size: .78rem;
+      text-align: right;
+    }
 
-        /* Efecto de brillo que atraviesa el botón */
-        .nav-link::before {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%;
-            width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(111, 231, 255, 0.3), transparent);
-            transition: left 0.5s ease;
-        }
+    .ts-save strong { color: var(--ts-green); }
 
-        .nav-link:hover {
-            transform: translateY(-5px) scale(1.05) rotate(3deg);
-            box-shadow: 0 8px 15px rgba(111, 231, 255, 0.2);
-            border-color: var(--sky);
-            color: var(--sky);
-            background: var(--ink);
-        }
+    .ts-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(320px, .85fr);
+      gap: 18px;
+      align-items: start;
+    }
 
-        .nav-link:hover::before {
-            left: 100%;
-        }
+    .ts-card {
+      position: relative;
+      overflow: hidden;
+      background: var(--ts-panel);
+      border: 1px solid var(--ts-border);
+      border-radius: 22px;
+      box-shadow: var(--ts-shadow);
+      backdrop-filter: blur(14px);
+    }
 
-        /* Botón de Llamada a la Acción (CTA) del menú */
-        .nav-cta {
-            text-decoration: none;
-            color: #1A1330;
-            background: var(--gold);
-            font-family: var(--font-display);
-            font-size: 1.05rem;
-            font-weight: 800;
-            padding: 10px 24px;
-            border-radius: 50px;
-            box-shadow: 0 5px 0 #C99A20;
-            animation: pulseNav 2s infinite;
-            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
-            margin-left: 10px;
-        }
+    .ts-main { padding: 24px; }
 
-        .nav-cta:hover {
-            transform: translateY(-3px) scale(1.1) rotate(-3deg);
-            box-shadow: 0 2px 0 #C99A20, 0 10px 25px rgba(255, 201, 60, 0.5);
-            animation-play-state: paused;
-            background: #ffdb6e;
-        }
+    .ts-score-label {
+      color: var(--ts-muted);
+      font-size: .78rem;
+      font-weight: 700;
+      letter-spacing: .11em;
+      text-transform: uppercase;
+    }
 
-        .nav-cta:active {
-            transform: translateY(2px) scale(0.95);
-            box-shadow: 0 0 0 #C99A20;
-        }
+    #score-display {
+      margin: 3px 0 0;
+      color: var(--ts-text);
+      font: 800 clamp(3rem, 9vw, 5.8rem)/1 var(--font-display);
+      letter-spacing: -.055em;
+      text-shadow: 0 0 34px rgba(94,231,255,.14);
+      user-select: none;
+    }
 
-        @keyframes pulseNav {
-            0% { box-shadow: 0 5px 0 #C99A20, 0 0 0 0 rgba(255, 201, 60, 0.5); }
-            70% { box-shadow: 0 5px 0 #C99A20, 0 0 0 15px rgba(255, 201, 60, 0); }
-            100% { box-shadow: 0 5px 0 #C99A20, 0 0 0 0 rgba(255, 201, 60, 0); }
-        }
+    .ts-rate {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 10px 0 22px;
+    }
 
-        /* Adaptación para móviles del menú */
-        @media (max-width: 720px) {
-            .nav-links-container {
-            display: none; /* Aquí podrías añadir un menú hamburguesa más adelante si crecen los links */
-            }
-        }
+    .ts-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.045);
+      border: 1px solid var(--ts-border);
+      color: var(--ts-muted);
+      font-size: .78rem;
+    }
 
-        /* --------- FIN NAV ESTÉTICO Y ANIMADO --------- */
+    .ts-pill strong { color: var(--ts-text); }
 
-        /* 1. ESTILOS BASE Y FRENESÍ */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f4f9;
-            color: #333;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            text-align: center;
-            transition: background-color 0.5s;
-            overflow: hidden;
-        }
+    #click-btn {
+      width: 100%;
+      min-height: 118px;
+      border: 1px solid rgba(94,231,255,.45);
+      border-radius: 20px;
+      color: #03131a;
+      background: linear-gradient(135deg, var(--ts-cyan), #78a7ff 55%, var(--ts-purple));
+      box-shadow: 0 15px 35px rgba(94,231,255,.16), inset 0 1px 0 rgba(255,255,255,.45);
+      cursor: pointer;
+      font: 800 1.25rem var(--font-display);
+      transition: transform .12s ease, filter .2s ease, box-shadow .2s ease;
+      user-select: none;
+    }
 
-        body.frenesi { background-color: #ffeaa7; }
+    #click-btn:hover { filter: brightness(1.08); box-shadow: 0 20px 42px rgba(94,231,255,.22); }
+    #click-btn:active { transform: scale(.985); }
+    #click-btn .btn-small { display:block; margin-top:5px; font:600 .76rem var(--font-body); opacity:.72; }
 
-        .container {
-            background: white;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-            max-width: 550px;
-            width: 90%;
-            transition: transform 0.2s ease;
-            position: relative;
-            z-index: 2;
-            max-height: 95vh;
-            overflow-y: auto; /* Por si la pantalla es muy pequeña */
-        }
+    .ts-progress {
+      height: 7px;
+      margin: 17px 0 0;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+    }
 
-        /* Ocultar barra de scroll para mantener el estilo limpio */
-        .container::-webkit-scrollbar { display: none; }
-        
-        h1 { margin-top: 0; color: #2c3e50; font-size: 26px; margin-bottom: 5px;}
+    .ts-progress > span {
+      display: block;
+      width: 0%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--ts-cyan), var(--ts-purple));
+      transition: width .25s ease;
+    }
 
-        #score-display {
-            font-size: 48px;
-            font-weight: bold;
-            color: #27ae60;
-            margin: 5px 0;
-            user-select: none;
-            transition: transform 0.1s;
-        }
+    .ts-section {
+      padding: 18px 24px 22px;
+      border-top: 1px solid var(--ts-border);
+    }
 
-        /* Botón principal */
-        #click-btn {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            font-size: 20px;
-            font-weight: bold;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: transform 0.05s, background-color 0.2s, box-shadow 0.2s;
-            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
-            user-select: none;
-            margin-bottom: 15px;
-            width: 100%;
-        }
+    .ts-section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
 
-        #click-btn:active {
-            transform: scale(0.96);
-            box-shadow: 0 2px 10px rgba(52, 152, 219, 0.4);
-        }
+    .ts-section h2 {
+      margin: 0;
+      color: var(--ts-text);
+      font: 800 1.2rem var(--font-display);
+    }
 
-        /* ZONA DE PRESTIGIO */
-        .prestige-zone {
-            background: linear-gradient(135deg, #f39c12, #d35400);
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            color: white;
-            box-shadow: 0 4px 15px rgba(211, 84, 0, 0.3);
-        }
+    .ts-section-note { color: var(--ts-muted); font-size: .76rem; }
 
-        #btn-prestige {
-            background-color: white;
-            color: #d35400;
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 10px;
-            transition: transform 0.2s;
-        }
+    .upgrades {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 10px;
+    }
 
-        #btn-prestige:hover:not(:disabled) { transform: scale(1.02); }
-        #btn-prestige:disabled { background-color: #f1c40f; color: #fff; cursor: not-allowed; opacity: 0.7;}
+    .upgrade-btn {
+      position: relative;
+      min-height: 94px;
+      padding: 13px;
+      text-align: left;
+      color: var(--ts-text);
+      background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.02));
+      border: 1px solid var(--ts-border);
+      border-radius: 15px;
+      cursor: pointer;
+      transition: transform .16s ease, border-color .16s ease, background .16s ease;
+    }
 
-        /* Sección de mejoras (Grid de 2 columnas) */
-        .upgrades {
-            border-top: 2px dashed #ecf0f1;
-            padding-top: 15px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
+    .upgrade-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      border-color: rgba(94,231,255,.45);
+      background: rgba(94,231,255,.06);
+    }
 
-        .upgrade-btn {
-            color: white;
-            border: none;
-            padding: 12px 10px;
-            font-size: 13px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+    .upgrade-btn:disabled { opacity: .43; cursor: not-allowed; }
+    .upgrade-name { display:block; font-weight:800; font-size:.9rem; }
+    .upgrade-desc { display:block; color:var(--ts-muted); font-size:.72rem; margin-top:3px; }
+    .cost-span { display:inline-block; margin-top:9px; color:var(--ts-yellow); font-size:.72rem; font-weight:700; }
 
-        .upgrade-btn:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.1); }
-        .upgrade-btn:disabled { background-color: #bdc3c7 !important; cursor: not-allowed; transform: none; filter: none; }
-        .cost-span { font-size: 11px; margin-top: 4px; background: rgba(0,0,0,0.2); padding: 2px 6px; border-radius: 4px;}
+    .ts-side { display: grid; gap: 18px; }
 
-        /* Colores por tipo de mejora */
-        #btn-teclado { background-color: #e67e22; }
-        #btn-junior { background-color: #9b59b6; }
-        #btn-senior { background-color: #34495e; } 
-        #btn-lead { background-color: #e74c3c; } 
-        #btn-ia { background-color: #1abc9c; } 
-        #btn-quantum { background-color: #8e44ad; } 
+    .ts-side-card { padding: 20px; }
 
-        /* Estadísticas */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            font-size: 13px;
-            color: #7f8c8d;
-            margin-top: 15px;
-            background: #f8f9fa;
-            padding: 12px;
-            border-radius: 10px;
-        }
+    .ts-side-title {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:14px;
+    }
 
-        /* ANIMACIONES Y CAFÉ (Mantenido igual) */
-        .floating-text {
-            position: absolute; pointer-events: none;
-            animation: floatUp 1s ease-out forwards; font-weight: bold; z-index: 10;
-        }
-        .normal-click { color: #3498db; font-size: 20px; }
-        .crit-click { color: #e74c3c; font-size: 32px; text-shadow: 0 2px 5px rgba(231, 76, 60, 0.5); }
-        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-60px) scale(1.2); } }
+    .ts-side-title h2 { margin:0; color:var(--ts-text); font:800 1.15rem var(--font-display); }
 
-        #cafe-buff {
-            position: absolute; font-size: 50px; cursor: pointer; user-select: none; display: none; z-index: 5;
-            animation: pulse 1s infinite, floatAround 3s ease-in-out infinite alternate; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.2));
-        }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
-    </style>
+    .ts-level {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:13px 0;
+      border-bottom:1px solid var(--ts-border);
+      color:var(--ts-muted);
+      font-size:.82rem;
+    }
+    .ts-level:last-child { border-bottom:0; }
+    .ts-level strong { color:var(--ts-text); font-size:1rem; }
+
+    .prestige-zone {
+      padding: 17px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(155,124,255,.16), rgba(94,231,255,.07));
+      border: 1px solid rgba(155,124,255,.3);
+    }
+
+    #btn-prestige {
+      width:100%;
+      margin-top:12px;
+      padding:11px 14px;
+      border:0;
+      border-radius:12px;
+      background:linear-gradient(135deg,var(--ts-purple),#6f5cf0);
+      color:white;
+      font:800 .86rem var(--font-body);
+      cursor:pointer;
+    }
+    #btn-prestige:disabled { opacity:.35; cursor:not-allowed; }
+
+    .milestone {
+      display:grid;
+      grid-template-columns:auto 1fr auto;
+      align-items:center;
+      gap:10px;
+      padding:10px 0;
+      border-bottom:1px solid var(--ts-border);
+      font-size:.78rem;
+    }
+    .milestone:last-child { border-bottom:0; }
+    .milestone-icon { font-size:1.1rem; }
+    .milestone small { display:block; color:var(--ts-muted); margin-top:2px; }
+    .milestone.done strong { color:var(--ts-green); }
+
+    .event-banner {
+      display:none;
+      margin: 18px 0 0;
+      padding: 12px 14px;
+      border: 1px solid rgba(255,209,102,.32);
+      border-radius: 13px;
+      background: rgba(255,209,102,.07);
+      color: var(--ts-yellow);
+      font-size:.8rem;
+    }
+    .event-banner.active { display:block; animation:eventIn .25s ease; }
+    @keyframes eventIn { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:none} }
+
+    .floating-text {
+      position: fixed;
+      pointer-events: none;
+      z-index: 10000;
+      color: var(--ts-cyan);
+      font: 800 1.15rem var(--font-display);
+      text-shadow: 0 3px 16px rgba(0,0,0,.45);
+      animation: floatUp .8s ease-out forwards;
+    }
+    .floating-text.crit { color: var(--ts-yellow); font-size:1.45rem; }
+    @keyframes floatUp { to { opacity:0; transform:translateY(-65px) scale(1.12); } }
+
+    #cafe-buff {
+      position:fixed;
+      right:24px;
+      bottom:24px;
+      z-index:9000;
+      display:none;
+      padding:13px 15px;
+      border-radius:15px;
+      background:rgba(17,26,45,.96);
+      border:1px solid rgba(255,209,102,.45);
+      box-shadow:var(--ts-shadow);
+      color:var(--ts-yellow);
+      font-size:1.7rem;
+      cursor:pointer;
+      animation:coffeePulse 1s infinite alternate;
+    }
+    @keyframes coffeePulse { to { transform:translateY(-5px) rotate(2deg); } }
+
+    .ts-toast {
+      position:fixed;
+      left:50%;
+      bottom:24px;
+      transform:translate(-50%,20px);
+      opacity:0;
+      z-index:11000;
+      max-width:min(420px,calc(100% - 30px));
+      padding:12px 16px;
+      border-radius:13px;
+      background:#10182a;
+      border:1px solid var(--ts-border);
+      color:var(--ts-text);
+      box-shadow:var(--ts-shadow);
+      transition:.25s ease;
+      pointer-events:none;
+      text-align:center;
+      font-size:.82rem;
+    }
+    .ts-toast.show { opacity:1; transform:translate(-50%,0); }
+
+    @media (max-width: 820px) {
+      .ts-grid { grid-template-columns: 1fr; }
+      .ts-side { grid-template-columns: repeat(2,minmax(0,1fr)); }
+    }
+    @media (max-width: 620px) {
+      .ts-shell { width:min(100% - 20px,1180px); margin-top:18px; }
+      .ts-topbar { grid-template-columns:1fr; }
+      .ts-save { text-align:left; }
+      .ts-main,.ts-side-card { padding:17px; }
+      .ts-section { padding:16px 17px 18px; }
+      .upgrades,.ts-side { grid-template-columns:1fr; }
+      #click-btn { min-height:100px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *,*::before,*::after { animation-duration:.001ms !important; animation-iteration-count:1 !important; scroll-behavior:auto !important; }
+    }
+  </style>
 </head>
-<body>
-    <nav>
-        <a href="#" class="brand">
-        <span class="brand-dot"></span>Alber.Games
-        </a>
-        
-        <div class="nav-links-container">
-        <a href="https://albersoftworks.github.io/alber.games/bubble-clicker" class="nav-link">Bubble Clicker</a>
-        <a href="https://albersoftworks.github.io/alber.games/tech-startup" class="nav-link">Tech Startup</a>
-        <a href="https://albersoftworks.github.io/alber.games/hop-hop" class="nav-link">Hop Hop</a>
-        <a href="https://albersoftworks.github.io" target="_blank" rel="noopener" class="nav-cta">Contacto</a>
-        </div>
-    </nav>
-
-    <div id="cafe-buff">☕</div>
-
-    <div class="container">
-        <h1>🚀 Tech Startup</h1>
-        <p id="status-text" style="margin:0 0 10px 0;">Haz clic para escribir código.</p>
-        
-        <div id="score-display">0</div>
-        <p style="margin-top: -5px; margin-bottom: 15px; color: #7f8c8d; font-weight: bold;">LÍNEAS DE CÓDIGO</p>
-        
-        <button id="click-btn">💻 Escribir Código</button>
-
-        <!-- NUEVA ZONA: PRESTIGIO -->
-        <div class="prestige-zone">
-            <div style="font-size: 14px;">Tokens de Prestigio: <span id="stat-tokens" style="font-weight: bold; font-size: 18px;">0</span></div>
-            <div style="font-size: 12px; margin-bottom: 5px;">Bonus Global Pasivo: <span id="stat-bonus">+0%</span></div>
-            <button id="btn-prestige" disabled>
-                🔄 Refactorizar Sistema<br>
-                <span style="font-size: 11px; font-weight: normal;">(Requiere 10.000 líneas. Da +50% global por Token)</span>
-            </button>
-        </div>
-        
-        <div class="upgrades">
-            <button id="btn-teclado" class="upgrade-btn" disabled>
-                ⌨️ Teclado (+1/clic) <span id="cost-teclado" class="cost-span">Coste: 20</span>
-            </button>
-            <button id="btn-junior" class="upgrade-btn" disabled>
-                👶 Junior (+1 líns/seg) <span id="cost-junior" class="cost-span">Coste: 15</span>
-            </button>
-            <button id="btn-senior" class="upgrade-btn" disabled>
-                🧙‍♂️ Senior (+5 líns/seg) <span id="cost-senior" class="cost-span">Coste: 150</span>
-            </button>
-            <button id="btn-lead" class="upgrade-btn" disabled>
-                👑 Tech Lead (+50/seg) <span id="cost-lead" class="cost-span">Coste: 1.500</span>
-            </button>
-            <button id="btn-ia" class="upgrade-btn" disabled>
-                🤖 IA Generativa (+500/seg) <span id="cost-ia" class="cost-span">Coste: 15.000</span>
-            </button>
-            <button id="btn-quantum" class="upgrade-btn" disabled>
-                🌌 S. Cuántico (+5.000/seg) <span id="cost-quantum" class="cost-span">Coste: 200.000</span>
-            </button>
-        </div>
-        
-        <div class="stats-grid">
-            <div>Poder x Clic: <span id="stat-click" style="font-weight: bold; color: #333;">1</span></div>
-            <div>Líneas / Seg: <span id="stat-lps" style="font-weight: bold; color: #27ae60;">0</span></div>
-        </div>
+<body class="tech-startup-page">
+  <nav>
+    <a href="index.html" class="brand"><span class="brand-dot"></span>Alber.Games</a>
+    <div class="nav-links-container">
+      <a href="bubble-clicker.html" class="nav-link">Bubble Clicker</a>
+      <a href="bloons-siege.html" class="nav-link">Bloons Siege</a>
+      <a href="tech-startup.html" class="nav-link">Tech Startup</a>
+      <a href="brawl-arena.html" class="nav-link">Brawl Arena</a>
+      <a href="hop-hop.html" class="nav-link">Hop Hop</a>
+      <a href="https://albersoftworks.github.io" target="_blank" rel="noopener" class="nav-cta">Contacto</a>
     </div>
+  </nav>
 
-    <script>
-        // --- 1. ESTADO DEL JUEGO ---
-        let lineasDeCodigo = 0;
-        let poderBaseClick = 1; 
-        
-        // Empleados/Mejoras (Cantidades)
-        let c_teclados = 0; let c_juniors = 0; let c_seniors = 0;
-        let c_leads = 0; let c_ias = 0; let c_quantums = 0;
-        
-        // Costes iniciales
-        let costes = {
-            teclado: 20, junior: 15, senior: 150, lead: 1500, ia: 15000, quantum: 200000
-        };
+  <main class="ts-shell">
+    <header class="ts-topbar">
+      <div>
+        <div class="ts-kicker">Startup OS · v2</div>
+        <h1 class="ts-title">Construye una empresa. Luego automatízala.</h1>
+        <p class="ts-subtitle">Escribe código, contrata talento, desbloquea productos, reinvierte tus beneficios y escala hasta convertir una idea cutre en una máquina tecnológica.</p>
+      </div>
+      <div class="ts-save">Guardado local: <strong id="save-status">activo</strong><br>Progreso persistente en este dispositivo</div>
+    </header>
 
-        // Sistema de Prestigio
-        let tokensPrestigio = 0;
-        const PRECIO_TOKEN = 10000; // Cada 10k líneas ganas 1 token al reiniciar
+    <div class="ts-grid">
+      <section class="ts-card ts-main">
+        <div class="ts-score-label">Líneas de código</div>
+        <div id="score-display">0</div>
+        <div class="ts-rate">
+          <span class="ts-pill">Por clic <strong id="stat-per-click">+1</strong></span>
+          <span class="ts-pill">Por segundo <strong id="stat-per-sec">+0</strong></span>
+          <span class="ts-pill">Multiplicador <strong id="stat-multiplier">x1.00</strong></span>
+        </div>
 
-        // Buffs
-        const probCritico = 0.10; 
-        const multCritico = 5;
-        let buffCafeActivo = false;
+        <button id="click-btn" type="button">
+          Escribir código
+          <span class="btn-small">Pulsa, construye, escala.</span>
+        </button>
+        <div class="ts-progress" aria-label="Progreso hacia el siguiente hito"><span id="milestone-progress"></span></div>
+        <div id="event-banner" class="event-banner"></div>
+      </section>
 
-        // --- 2. CONEXIÓN CON EL DOM ---
-        const scoreDisplay = document.getElementById('score-display');
-        const clickBtn = document.getElementById('click-btn');
-        const statusText = document.getElementById('status-text');
-        const cafeBuff = document.getElementById('cafe-buff');
+      <aside class="ts-side">
+        <section class="ts-card ts-side-card">
+          <div class="ts-side-title"><h2>Panel ejecutivo</h2><span class="ts-kicker" style="margin:0">LIVE</span></div>
+          <div class="ts-level"><span>Rango</span><strong id="stat-level">Fundador</strong></div>
+          <div class="ts-level"><span>Proyectos enviados</span><strong id="stat-projects">0</strong></div>
+          <div class="ts-level"><span>Clicks totales</span><strong id="stat-clicks">0</strong></div>
+          <div class="ts-level"><span>Ingresos generados</span><strong id="stat-total">0</strong></div>
+        </section>
 
-        // Textos de Stats y Prestigio
-        const statTokens = document.getElementById('stat-tokens');
-        const statBonus = document.getElementById('stat-bonus');
-        const statClick = document.getElementById('stat-click');
-        const statLps = document.getElementById('stat-lps');
-        const btnPrestige = document.getElementById('btn-prestige');
+        <section class="ts-card ts-side-card">
+          <div class="ts-side-title"><h2>Prestigio</h2><span id="stat-tokens" style="color:var(--ts-purple);font-weight:800">0 tokens</span></div>
+          <div class="prestige-zone">
+            <strong>Refactorización mayor</strong>
+            <p style="margin:5px 0;color:var(--ts-muted);font-size:.76rem">Reinicia tus líneas y mejoras a cambio de un multiplicador permanente.</p>
+            <div style="font-size:.76rem;color:var(--ts-muted)">Siguiente reinicio: <strong id="prestige-requirement" style="color:var(--ts-text)">10.000</strong></div>
+            <button id="btn-prestige" type="button" disabled>Refactorizar sistema</button>
+          </div>
+        </section>
+      </aside>
 
-        // Mapeo de botones de mejora para facilitar acceso
-        const mejoras = {
-            teclado: { btn: document.getElementById('btn-teclado'), costTxt: document.getElementById('cost-teclado'), baseCost: 20, mult: 2.0 },
-            junior:  { btn: document.getElementById('btn-junior'),  costTxt: document.getElementById('cost-junior'),  baseCost: 15, mult: 1.25 },
-            senior:  { btn: document.getElementById('btn-senior'),  costTxt: document.getElementById('cost-senior'),  baseCost: 150, mult: 1.3 },
-            lead:    { btn: document.getElementById('btn-lead'),    costTxt: document.getElementById('cost-lead'),    baseCost: 1500, mult: 1.35 },
-            ia:      { btn: document.getElementById('btn-ia'),      costTxt: document.getElementById('cost-ia'),      baseCost: 15000, mult: 1.4 },
-            quantum: { btn: document.getElementById('btn-quantum'), costTxt: document.getElementById('cost-quantum'), baseCost: 200000, mult: 1.5 }
-        };
+      <section class="ts-card">
+        <div class="ts-section">
+          <div class="ts-section-head"><h2>Equipo y automatización</h2><span class="ts-section-note">Compra con líneas de código</span></div>
+          <div class="upgrades">
+            <button id="btn-teclado" class="upgrade-btn" type="button"><span class="upgrade-name">⌨️ Teclado mecánico</span><span class="upgrade-desc">+1 línea por clic</span><span id="cost-teclado" class="cost-span">Coste: 20</span></button>
+            <button id="btn-junior" class="upgrade-btn" type="button"><span class="upgrade-name">👨‍💻 Junior developer</span><span class="upgrade-desc">+1 línea por segundo</span><span id="cost-junior" class="cost-span">Coste: 15</span></button>
+            <button id="btn-senior" class="upgrade-btn" type="button"><span class="upgrade-name">🧠 Senior engineer</span><span class="upgrade-desc">+5 líneas por segundo</span><span id="cost-senior" class="cost-span">Coste: 150</span></button>
+            <button id="btn-lead" class="upgrade-btn" type="button"><span class="upgrade-name">👑 Tech Lead</span><span class="upgrade-desc">+50 líneas por segundo</span><span id="cost-lead" class="cost-span">Coste: 1.500</span></button>
+            <button id="btn-ia" class="upgrade-btn" type="button"><span class="upgrade-name">🤖 Copiloto IA</span><span class="upgrade-desc">+400 líneas por segundo</span><span id="cost-ia" class="cost-span">Coste: 15.000</span></button>
+            <button id="btn-quantum" class="upgrade-btn" type="button"><span class="upgrade-name">⚛️ Infraestructura cuántica</span><span class="upgrade-desc">+4.000 líneas por segundo</span><span id="cost-quantum" class="cost-span">Coste: 250.000</span></button>
+          </div>
+        </div>
+      </section>
 
-        // --- 3. LÓGICA PRINCIPAL ---
-        function obtenerMultiplicadorGlobal() {
-            // Cada token de prestigio da un +50% (0.5). Café da un x3 a todo.
-            let multPrestigio = 1 + (tokensPrestigio * 0.5);
-            let multCafe = buffCafeActivo ? 3 : 1;
-            return multPrestigio * multCafe;
+      <section class="ts-card">
+        <div class="ts-section">
+          <div class="ts-section-head"><h2>Roadmap</h2><span class="ts-section-note">Desbloquea hitos</span></div>
+          <div id="milestones"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div id="cafe-buff" title="¡Café gratis!">☕</div>
+  <div id="toast" class="ts-toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const SAVE_KEY = 'alberGames.techStartup.v2';
+      const PRESTIGE_BASE = 10000;
+      const MAX_OFFLINE_SECONDS = 60 * 60 * 8;
+
+      const $ = (id) => document.getElementById(id);
+      const els = {
+        score: $('score-display'), click: $('click-btn'), status: $('save-status'),
+        perClick: $('stat-per-click'), perSec: $('stat-per-sec'), multiplier: $('stat-multiplier'),
+        tokens: $('stat-tokens'), level: $('stat-level'), projects: $('stat-projects'), clicks: $('stat-clicks'), total: $('stat-total'),
+        prestige: $('btn-prestige'), prestigeReq: $('prestige-requirement'), progress: $('milestone-progress'),
+        event: $('event-banner'), coffee: $('cafe-buff'), toast: $('toast'), milestones: $('milestones')
+      };
+
+      const upgrades = {
+        teclado: { button: 'btn-teclado', cost: 'cost-teclado', base: 20, growth: 1.55, power: 1, kind: 'click' },
+        junior: { button: 'btn-junior', cost: 'cost-junior', base: 15, growth: 1.55, power: 1, kind: 'sec' },
+        senior: { button: 'btn-senior', cost: 'cost-senior', base: 150, growth: 1.58, power: 5, kind: 'sec' },
+        lead: { button: 'btn-lead', cost: 'cost-lead', base: 1500, growth: 1.62, power: 50, kind: 'sec' },
+        ia: { button: 'btn-ia', cost: 'cost-ia', base: 15000, growth: 1.66, power: 400, kind: 'sec' },
+        quantum: { button: 'btn-quantum', cost: 'cost-quantum', base: 250000, growth: 1.72, power: 4000, kind: 'sec' }
+      };
+
+      const milestones = [
+        [100, 'MVP', 'Lanza tu primer prototipo'],
+        [1000, 'Primer cliente', 'Alguien paga por tu código'],
+        [10000, 'Seed round', 'Tu startup ya tiene tracción'],
+        [100000, 'Serie A', 'Empieza la maquinaria'],
+        [1000000, 'Unicornio', 'Has roto el mercado'],
+        [10000000, 'Tech titan', 'Ahora eres parte del problema']
+      ];
+
+      const defaults = {
+        score: 0, total: 0, clicks: 0, tokens: 0, projects: 0,
+        clickLevel: 0, lastSave: Date.now(), eventUntil: 0, eventMultiplier: 1
+      };
+
+      Object.keys(upgrades).forEach(k => defaults[k + 'Level'] = 0);
+      let state = { ...defaults };
+      let lastTick = performance.now();
+      let saveTimer = 0;
+      let coffeeTimer = 0;
+
+      function fmt(n) {
+        if (!Number.isFinite(n)) return '0';
+        if (Math.abs(n) < 1000) return Math.floor(n).toLocaleString('es-ES');
+        const units = [['T','e12'],['B','e9'],['M','e6'],['k','e3']];
+        for (const [suffix, exp] of units) {
+          const value = n / 10 ** Number(exp.replace('e',''));
+          if (value >= 1) return value >= 100 ? value.toFixed(0) + suffix : value.toFixed(1) + suffix;
         }
+        return Math.floor(n).toLocaleString('es-ES');
+      }
 
-        function actualizarPantalla() {
-            scoreDisplay.innerText = Math.floor(lineasDeCodigo);
-            
-            let multGlobal = obtenerMultiplicadorGlobal();
-            
-            // Cálculos base
-            let poderClicTotal = poderBaseClick * multGlobal;
-            let lineasPorSegundo = ((c_juniors * 1) + (c_seniors * 5) + (c_leads * 50) + (c_ias * 500) + (c_quantums * 5000)) * multGlobal;
-            
-            statClick.innerText = Math.floor(poderClicTotal);
-            statLps.innerText = Math.floor(lineasPorSegundo);
-            statTokens.innerText = tokensPrestigio;
-            statBonus.innerText = "+" + (tokensPrestigio * 50) + "%";
+      function rawNumber(n) { return Math.max(0, Math.floor(n)); }
 
-            // Botón de prestigio (habilitar si tiene suficientes líneas para ganar al menos 1 token)
-            let tokensGanables = Math.floor(lineasDeCodigo / PRECIO_TOKEN);
-            if (tokensGanables >= 1) {
-                btnPrestige.disabled = false;
-                btnPrestige.innerHTML = `🔄 Refactorizar Sistema<br><span style="font-size: 11px;">(Reinicias y ganas +${tokensGanables} Tokens)</span>`;
-            } else {
-                btnPrestige.disabled = true;
-                btnPrestige.innerHTML = `🔄 Refactorizar Sistema<br><span style="font-size: 11px;">(Requiere 10.000 líneas para 1 Token)</span>`;
-            }
+      function multiplier() {
+        return 1 + state.tokens * 0.15;
+      }
 
-            // Actualizar botones de mejora
-            for (let key in mejoras) {
-                let m = mejoras[key];
-                m.costTxt.innerText = `Coste: ${Math.floor(costes[key])}`;
-                m.btn.disabled = lineasDeCodigo < costes[key];
-            }
+      function perClick() {
+        return (1 + state.clickLevel) * multiplier() * state.eventMultiplier;
+      }
+
+      function perSecond() {
+        let base = 0;
+        for (const [key, u] of Object.entries(upgrades)) base += state[key + 'Level'] * u.power;
+        return base * multiplier() * state.eventMultiplier;
+      }
+
+      function cost(key) {
+        const u = upgrades[key];
+        return Math.floor(u.base * Math.pow(u.growth, state[key + 'Level']));
+      }
+
+      function levelName() {
+        const p = state.total;
+        if (p >= 10000000) return 'Titán tecnológico';
+        if (p >= 1000000) return 'Unicornio';
+        if (p >= 100000) return 'CEO';
+        if (p >= 10000) return 'Founder';
+        if (p >= 1000) return 'Co-founder';
+        if (p >= 100) return 'Hacker';
+        return 'Fundador';
+      }
+
+      function prestigeRequirement() {
+        return PRESTIGE_BASE * Math.pow(2.1, state.tokens);
+      }
+
+      function updateMilestones() {
+        els.milestones.innerHTML = milestones.map(([need, title, desc]) => {
+          const done = state.total >= need;
+          return `<div class="milestone ${done ? 'done' : ''}"><span class="milestone-icon">${done ? '✓' : '○'}</span><div><strong>${title}</strong><small>${desc} · ${fmt(need)} líneas</small></div><span>${done ? 'OK' : Math.min(100, Math.floor(state.total / need * 100)) + '%'}</span></div>`;
+        }).join('');
+      }
+
+      function updateUI() {
+        const pc = perClick();
+        const ps = perSecond();
+        els.score.textContent = fmt(state.score);
+        els.perClick.textContent = '+' + fmt(pc);
+        els.perSec.textContent = '+' + fmt(ps);
+        els.multiplier.textContent = 'x' + multiplier().toFixed(2);
+        els.tokens.textContent = state.tokens + (state.tokens === 1 ? ' token' : ' tokens');
+        els.level.textContent = levelName();
+        els.projects.textContent = state.projects.toLocaleString('es-ES');
+        els.clicks.textContent = state.clicks.toLocaleString('es-ES');
+        els.total.textContent = fmt(state.total);
+
+        const req = prestigeRequirement();
+        els.prestigeReq.textContent = fmt(req);
+        els.prestige.disabled = state.score < req;
+
+        const next = milestones.find(([need]) => state.total < need);
+        const previous = milestones[milestones.indexOf(next) - 1]?.[0] || 0;
+        const pct = next ? ((state.total - previous) / (next[0] - previous)) * 100 : 100;
+        els.progress.style.width = Math.max(0, Math.min(100, pct)) + '%';
+
+        for (const [key, u] of Object.entries(upgrades)) {
+          const button = $(u.button);
+          const price = cost(key);
+          $(u.cost).textContent = 'Coste: ' + fmt(price);
+          button.disabled = state.score < price;
+          button.querySelector('.upgrade-desc').dataset.level = state[key + 'Level'];
+          button.title = 'Nivel actual: ' + state[key + 'Level'];
         }
+        updateMilestones();
+      }
 
-        function mostrarNumeroFlotante(cantidad, x, y, esCritico) {
-            const flotante = document.createElement('div');
-            flotante.classList.add('floating-text');
-            flotante.innerText = `+${Math.floor(cantidad)}`;
-            
-            if (esCritico) {
-                flotante.classList.add('crit-click');
-                flotante.innerText += ' ¡CRIT!';
-            } else {
-                flotante.classList.add('normal-click');
-            }
+      function addLines(amount, x, y, crit = false) {
+        state.score += amount;
+        state.total += amount;
+        const node = document.createElement('div');
+        node.className = 'floating-text' + (crit ? ' crit' : '');
+        node.textContent = '+' + fmt(amount) + (crit ? ' CRÍTICO' : '');
+        node.style.left = (x || innerWidth / 2) + 'px';
+        node.style.top = (y || innerHeight / 2) + 'px';
+        document.body.appendChild(node);
+        setTimeout(() => node.remove(), 850);
+        checkMilestones();
+        updateUI();
+      }
 
-            flotante.style.left = `${x}px`; flotante.style.top = `${y}px`;
-            document.body.appendChild(flotante);
-            setTimeout(() => flotante.remove(), 1000);
+      function clickCode(event) {
+        const critical = Math.random() < Math.min(.25, .05 + state.tokens * .005);
+        const amount = perClick() * (critical ? 5 : 1);
+        state.clicks++;
+        addLines(amount, event?.clientX, event?.clientY, critical);
+      }
+
+      function buyUpgrade(key) {
+        const u = upgrades[key];
+        const price = cost(key);
+        if (state.score < price) return;
+        state.score -= price;
+        state[key + 'Level']++;
+        toast('Mejora comprada: ' + $(u.button).querySelector('.upgrade-name').textContent.replace(/^\S+\s*/, '') + '.');
+        updateUI();
+        save(true);
+      }
+
+      function prestige() {
+        const req = prestigeRequirement();
+        if (state.score < req) return;
+        state.tokens++;
+        state.score = 0;
+        state.projects++;
+        state.clickLevel = 0;
+        for (const key of Object.keys(upgrades)) state[key + 'Level'] = 0;
+        toast('Refactorización completada. Multiplicador permanente: x' + multiplier().toFixed(2));
+        updateUI();
+        save(true);
+      }
+
+      function checkMilestones() {
+        const unlocked = milestones.filter(([need]) => state.total >= need).length;
+        if (unlocked > state.projects) {
+          state.projects = unlocked;
+          toast('Hito desbloqueado. La empresa sigue creciendo.');
         }
+      }
 
-        // --- 4. EVENTOS DE CLIC ---
-        clickBtn.addEventListener('click', (e) => {
-            let multGlobal = obtenerMultiplicadorGlobal();
-            let ganancia = poderBaseClick * multGlobal;
-            let esCritico = Math.random() < probCritico;
+      function randomEvent() {
+        if (state.score < 500 || state.eventUntil > Date.now()) return;
+        if (Math.random() > .0025) return;
+        state.eventUntil = Date.now() + 20000;
+        state.eventMultiplier = 2;
+        els.event.textContent = '🔥 Product Hunt te está mirando: producción x2 durante 20 segundos.';
+        els.event.classList.add('active');
+        setTimeout(() => {
+          state.eventMultiplier = 1;
+          state.eventUntil = 0;
+          els.event.classList.remove('active');
+          toast('El hype ha terminado. Vuelta a producción normal.');
+        }, 20000);
+      }
 
-            if (esCritico) ganancia *= multCritico;
-            
-            lineasDeCodigo += ganancia;
-            
-            const rect = clickBtn.getBoundingClientRect();
-            const x = (e.clientX || rect.left + rect.width / 2) - 10 + (Math.random() * 20);
-            const y = (e.clientY || rect.top + rect.height / 2) - 20;
+      function coffee() {
+        if (coffeeTimer > Date.now()) return;
+        coffeeTimer = Date.now() + 45000;
+        state.eventMultiplier = 3;
+        state.eventUntil = Date.now() + 10000;
+        els.coffee.style.display = 'none';
+        toast('Café conseguido: producción x3 durante 10 segundos.');
+        setTimeout(() => { state.eventMultiplier = 1; state.eventUntil = 0; }, 10000);
+      }
 
-            mostrarNumeroFlotante(ganancia, x, y, esCritico);
-            
-            scoreDisplay.style.transform = 'scale(1.05)';
-            setTimeout(() => scoreDisplay.style.transform = 'scale(1)', 50);
+      function maybeCoffee() {
+        if (coffeeTimer <= Date.now() && els.coffee.style.display !== 'block' && Math.random() < .0015) els.coffee.style.display = 'block';
+      }
 
-            actualizarPantalla();
-        });
-
-        // Funciones de compra
-        function comprarMejora(tipo) {
-            if (lineasDeCodigo >= costes[tipo]) {
-                lineasDeCodigo -= costes[tipo];
-                costes[tipo] *= mejoras[tipo].mult; // Aumentar precio
-                return true;
-            }
-            return false;
+      function tick(now) {
+        const delta = Math.min(2, (now - lastTick) / 1000);
+        lastTick = now;
+        const passive = perSecond() * delta;
+        if (passive > 0) {
+          state.score += passive;
+          state.total += passive;
         }
+        randomEvent();
+        maybeCoffee();
+        updateUI();
+        requestAnimationFrame(tick);
+      }
 
-        mejoras.teclado.btn.addEventListener('click', () => { if(comprarMejora('teclado')) { poderBaseClick += 1; c_teclados++; actualizarPantalla(); }});
-        mejoras.junior.btn.addEventListener('click', () => { if(comprarMejora('junior')) { c_juniors++; actualizarPantalla(); }});
-        mejoras.senior.btn.addEventListener('click', () => { if(comprarMejora('senior')) { c_seniors++; actualizarPantalla(); }});
-        mejoras.lead.btn.addEventListener('click', () => { if(comprarMejora('lead')) { c_leads++; actualizarPantalla(); }});
-        mejoras.ia.btn.addEventListener('click', () => { if(comprarMejora('ia')) { c_ias++; actualizarPantalla(); }});
-        mejoras.quantum.btn.addEventListener('click', () => { if(comprarMejora('quantum')) { c_quantums++; actualizarPantalla(); }});
+      function toast(message) {
+        els.toast.textContent = message;
+        els.toast.classList.add('show');
+        clearTimeout(toast.timer);
+        toast.timer = setTimeout(() => els.toast.classList.remove('show'), 2200);
+      }
 
-        // --- 5. SISTEMA DE PRESTIGIO (REINICIO) ---
-        btnPrestige.addEventListener('click', () => {
-            let tokensGanables = Math.floor(lineasDeCodigo / PRECIO_TOKEN);
-            if (tokensGanables >= 1) {
-                let confirmar = confirm(`¿Estás seguro de que quieres refactorizar tu código?\n\nPERDERÁS: Todas tus líneas, teclados y empleados.\nGANARÁS: ${tokensGanables} Tokens de Prestigio (Bonus permanente de +${tokensGanables*50}% a todo).\n\n¡Es el único camino para alcanzar el Servidor Cuántico!`);
-                
-                if (confirmar) {
-                    // Dar tokens
-                    tokensPrestigio += tokensGanables;
-                    
-                    // Resetear progreso
-                    lineasDeCodigo = 0;
-                    poderBaseClick = 1;
-                    c_teclados = 0; c_juniors = 0; c_seniors = 0;
-                    c_leads = 0; c_ias = 0; c_quantums = 0;
-                    
-                    // Resetear costes
-                    for (let key in costes) {
-                        costes[key] = mejoras[key].baseCost;
-                    }
+      function save(force = false) {
+        const now = Date.now();
+        if (!force && now - saveTimer < 2500) return;
+        state.lastSave = now;
+        localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+        saveTimer = now;
+        els.status.textContent = 'activo';
+      }
 
-                    // Efecto visual
-                    document.body.style.backgroundColor = "#fff";
-                    setTimeout(() => document.body.style.backgroundColor = "", 200);
+      function load() {
+        try {
+          const saved = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null');
+          if (!saved) return;
+          state = { ...defaults, ...saved };
+          const elapsed = Math.min(MAX_OFFLINE_SECONDS, Math.max(0, (Date.now() - Number(saved.lastSave || Date.now())) / 1000));
+          const offline = perSecond() * elapsed;
+          if (offline > 1) {
+            state.score += offline;
+            state.total += offline;
+            setTimeout(() => toast('Mientras estabas fuera, tu equipo generó ' + fmt(offline) + ' líneas.'), 500);
+          }
+        } catch (error) {
+          localStorage.removeItem(SAVE_KEY);
+        }
+      }
 
-                    actualizarPantalla();
-                }
-            }
-        });
+      els.click.addEventListener('click', clickCode);
+      els.prestige.addEventListener('click', prestige);
+      els.coffee.addEventListener('click', coffee);
+      for (const key of Object.keys(upgrades)) $(upgrades[key].button).addEventListener('click', () => buyUpgrade(key));
 
-        // --- 6. BUCLE PRINCIPAL Y EVENTOS ALEATORIOS ---
-        setInterval(() => {
-            let multGlobal = obtenerMultiplicadorGlobal();
-            let lineasPorSegundo = ((c_juniors * 1) + (c_seniors * 5) + (c_leads * 50) + (c_ias * 500) + (c_quantums * 5000)) * multGlobal;
-            
-            if (lineasPorSegundo > 0) {
-                lineasDeCodigo += lineasPorSegundo;
-                actualizarPantalla();
-            }
-        }, 1000);
+      document.addEventListener('visibilitychange', () => { if (document.hidden) save(true); });
+      window.addEventListener('beforeunload', () => save(true));
+      window.addEventListener('keydown', (event) => {
+        if (event.code === 'Space' && !event.repeat && document.activeElement?.tagName !== 'BUTTON') {
+          event.preventDefault();
+          clickCode();
+        }
+      });
 
-        setInterval(() => {
-            if (Math.random() < 0.15 && !buffCafeActivo) {
-                cafeBuff.style.display = 'block';
-                const maxX = window.innerWidth - 100;
-                const maxY = window.innerHeight - 100;
-                cafeBuff.style.left = `${Math.random() * maxX + 20}px`;
-                cafeBuff.style.top = `${Math.random() * maxY + 20}px`;
-
-                setTimeout(() => {
-                    if (cafeBuff.style.display === 'block') cafeBuff.style.display = 'none';
-                }, 4000); // 4 segundos para pillarlo
-            }
-        }, 10000);
-
-        cafeBuff.addEventListener('click', () => {
-            cafeBuff.style.display = 'none';
-            buffCafeActivo = true;
-            
-            document.body.classList.add('frenesi');
-            statusText.innerText = "¡CAFEÍNA AL MÁXIMO! x3 EN TODO";
-            statusText.style.color = "#d35400"; statusText.style.fontWeight = "bold";
-            actualizarPantalla();
-
-            setTimeout(() => {
-                buffCafeActivo = false;
-                document.body.classList.remove('frenesi');
-                statusText.innerText = "Haz clic para escribir código.";
-                statusText.style.color = "#7f8c8d"; statusText.style.fontWeight = "normal";
-                actualizarPantalla();
-            }, 10000);
-        });
-
-        // Iniciar
-        actualizarPantalla();
-    </script>
-
+      load();
+      updateUI();
+      requestAnimationFrame(tick);
+      setInterval(() => save(), 2500);
+    })();
+  </script>
 </body>
 </html>
