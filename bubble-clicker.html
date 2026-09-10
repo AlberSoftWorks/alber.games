@@ -1,570 +1,136 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Alber.Games - Bubble Clicker</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="Bubble Clicker: revienta burbujas, compra mejoras y trasciende la espuma.">
+  <meta name="theme-color" content="#140F2B">
+  <title>Alber.Games — Bubble Clicker</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .bubble-clicker nav{margin-bottom:10px}
+    .game-header{position:relative;text-align:center;padding:8px 16px 18px}
+    .game-header h1{margin:0;font-family:var(--font-display);font-size:clamp(2rem,5vw,3rem)}
+    .game-header .subtitle{margin:2px 0 14px;color:var(--muted)}
+    .game-actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+    .music-btn{border:1px solid var(--panel-edge)!important;border-radius:999px!important;background:var(--panel)!important;color:var(--text)!important;padding:9px 16px!important;cursor:pointer;font:600 .9rem var(--font-body);transition:.2s ease}
+    .music-btn:hover{border-color:var(--sky)!important;transform:translateY(-2px)}
+    #score{transition:transform .1s ease}
+    .layout{align-items:start}
+    #gameArea{touch-action:manipulation;min-height:420px}
+    #shop{max-height:72vh;overflow:auto;scrollbar-width:thin}
+    #shop h2{position:sticky;top:0;z-index:2;padding-bottom:10px;background:inherit}
+    .save-status{font-size:.72rem;color:var(--muted);text-align:center;margin-top:7px;min-height:1em}
+    @media(max-width:720px){.bubble-clicker nav{margin-bottom:4px}.game-header{padding-bottom:12px}#shop{max-height:none}.layout{grid-template-columns:1fr}}
+    @media(prefers-reduced-motion:reduce){.music-btn{transition:none}}
+  </style>
 </head>
 <body class="bubble-clicker">
 
-    <h1>🫧 Bubble Clicker</h1>
-    <p class="subtitle">Haz clic, mejora, trasciende la espuma</p>
-    <button id="bgm-toggle" class="music-btn">🎵 Activar Música</button>
-    <audio id="bgm-audio" src="https://cdn.pixabay.com/download/audio/2022/02/22/audio_d1718ab41b.mp3" loop></audio>
-    <div id="score">Pops: 0</div>
-    <div id="stats">Total reventadas: 0 · Valor base: 1 · Bonus global: x1</div>
+<nav aria-label="Navegación principal">
+  <a href="index.html" class="brand" aria-label="Alber.Games — inicio"><span class="brand-dot" aria-hidden="true"></span>Alber.Games</a>
+  <div class="nav-links-container">
+    <a href="bubble-clicker.html" class="nav-link" aria-current="page">Bubble Clicker</a>
+    <a href="bloons-siege.html" class="nav-link">Bloons Siege</a>
+    <a href="tech-startup.html" class="nav-link">Tech Startup</a>
+    <a href="brawl-arena.html" class="nav-link">Brawl Arena</a>
+    <a href="hop-hop.html" class="nav-link">Hop Hop</a>
+    <a href="https://albersoftworks.github.io" target="_blank" rel="noopener noreferrer" class="nav-cta">Contacto</a>
+  </div>
+</nav>
 
-    <div class="layout">
-        <div id="gameArea"></div>
+<header class="game-header">
+  <h1>🫧 Bubble Clicker</h1>
+  <p class="subtitle">Haz clic, mejora, trasciende la espuma</p>
+  <div class="game-actions">
+    <button id="bgm-toggle" class="music-btn" type="button">🎵 Música: OFF</button>
+  </div>
+</header>
 
-        <div id="shop">
-            <h2>🛒 Mejoras</h2>
+<div id="score">Pops: 0</div>
+<div id="stats">Total reventadas: 0 · Valor base: 1 · Bonus global: x1</div>
 
-            <!-- ZONA DE PRESTIGIO -->
-            <div class="prestige-zone">
-                <p>Esencia de Jabón: <span id="token-display">0</span></p>
-                <p id="prestige-bonus-desc">Bonus actual: +0% de Pops a todo</p>
-                <button id="btn-prestige" disabled>✨ Ascender (Requiere 20.000 pts)</button>
-            </div>
+<div class="layout">
+  <div id="gameArea" aria-label="Zona de juego de Bubble Clicker"></div>
 
-            <div class="upgrade">
-                <h3>👆 Dedos rápidos</h3>
-                <p id="desc-click">+1 punto base por burbuja</p>
-                <button id="buy-click">Comprar (10 pts)</button>
-            </div>
-
-            <div class="upgrade">
-                <h3>🌀 Fábrica de burbujas</h3>
-                <p id="desc-spawn">Aparecen más burbujas</p>
-                <button id="buy-spawn">Comprar (15 pts)</button>
-            </div>
-
-            <div class="upgrade">
-                <h3>🤖 Auto-Pop</h3>
-                <p id="desc-autopop">Revienta burbujas automáticamente</p>
-                <button id="buy-autopop">Comprar (60 pts)</button>
-            </div>
-
-            <!-- MEJORAS DE TIERS HIGH -->
-            <div class="upgrade tier-high">
-                <h3>🧪 Jabón Concentrado</h3>
-                <p id="desc-jabon">+15 Pops base por burbuja</p>
-                <button id="buy-jabon">Comprar (800 pts)</button>
-            </div>
-
-            <div class="upgrade tier-high">
-                <h3>⚙️ Compresor Industrial</h3>
-                <p id="desc-maquina">+5 auto-pops por segundo</p>
-                <button id="buy-maquina">Comprar (3.500 pts)</button>
-            </div>
-
-            <div class="upgrade tier-high">
-                <h3>⚛️ Espuma Termonuclear</h3>
-                <p id="desc-termonuclear">+200 Pops base por burbuja</p>
-                <button id="buy-termonuclear">Comprar (40.000 pts)</button>
-            </div>
-
-            <!-- MEJORAS DE TIERS ULTRA -->
-            <div class="upgrade tier-ultra">
-                <h3>☀️ Espuma Solar</h3>
-                <p id="desc-solar">+500 Pops base por burbuja</p>
-                <button id="buy-solar">Comprar (100.000 pts)</button>
-            </div>
-
-            <div class="upgrade tier-ultra">
-                <h3>🪐 Espuma Infernal</h3>
-                <p id="desc-infernal">+800 Pops base por burbuja</p>
-                <button id="buy-infernal">Comprar (500.000 pts)</button>
-            </div>
-
-            <div class="upgrade tier-ultra">
-                <h3>🧬 Espuma Cuántica</h3>
-                <p id="desc-cuantica">+1200 Pops base por burbuja</p>
-                <button id="buy-cuantica">Comprar (2.000.000 pts)</button>
-            </div>
-
-            <div class="upgrade tier-ultra">
-                <h3>🪐 Espuma Multiversal</h3>
-                <p id="desc-multiversal">+5000 Pops base por burbuja</p>
-                <button id="buy-multiversal">Comprar (20.000.000 pts)</button>
-            </div>
-
-            <!-- MEJORAS DE TIERS MÁXIMO -->
-            <div class="upgrade tier-maximo">
-                <h3>👁️ Espuma Primigenia</h3>
-                <p id="desc-primigenia">+20000 Pops base por burbuja</p>
-                <button id="buy-primigenia">Comprar (5.000.000 pts)</button>
-            </div>
-        </div>
+  <div id="shop">
+    <h2>🛒 Mejoras</h2>
+    <div class="prestige-zone">
+      <p>Esencia de Jabón: <span id="token-display">0</span></p>
+      <p id="prestige-bonus-desc">Bonus actual: +0% de Pops a todo</p>
+      <button id="btn-prestige" disabled>✨ Ascender (Requiere 20.000 pts)</button>
     </div>
 
-    <script>
-        // ---------------- //
-        // ESTADO DEL JUEGO //
-        // ---------------  //
-        const PRESTIGE_COST = 20000;
+    <div class="upgrade"><h3>👆 Dedos rápidos</h3><p id="desc-click">+1 punto base por burbuja</p><button id="buy-click">Comprar (10 pts)</button></div>
+    <div class="upgrade"><h3>🌀 Fábrica de burbujas</h3><p id="desc-spawn">Aparecen más burbujas</p><button id="buy-spawn">Comprar (15 pts)</button></div>
+    <div class="upgrade"><h3>🤖 Auto-Pop</h3><p id="desc-autopop">Revienta burbujas automáticamente</p><button id="buy-autopop">Comprar (60 pts)</button></div>
+    <div class="upgrade tier-high"><h3>🧪 Jabón Concentrado</h3><p id="desc-jabon">+15 Pops base por burbuja</p><button id="buy-jabon">Comprar (800 pts)</button></div>
+    <div class="upgrade tier-high"><h3>⚙️ Compresor Industrial</h3><p id="desc-maquina">+5 auto-pops por segundo</p><button id="buy-maquina">Comprar (3.500 pts)</button></div>
+    <div class="upgrade tier-high"><h3>⚛️ Espuma Termonuclear</h3><p id="desc-termonuclear">+200 Pops base por burbuja</p><button id="buy-termonuclear">Comprar (40.000 pts)</button></div>
+    <div class="upgrade tier-ultra"><h3>☀️ Espuma Solar</h3><p id="desc-solar">+500 Pops base por burbuja</p><button id="buy-solar">Comprar (100.000 pts)</button></div>
+    <div class="upgrade tier-ultra"><h3>🪐 Espuma Infernal</h3><p id="desc-infernal">+800 Pops base por burbuja</p><button id="buy-infernal">Comprar (500.000 pts)</button></div>
+    <div class="upgrade tier-ultra"><h3>🧬 Espuma Cuántica</h3><p id="desc-cuantica">+1200 Pops base por burbuja</p><button id="buy-cuantica">Comprar (2.000.000 pts)</button></div>
+    <div class="upgrade tier-ultra"><h3>🪐 Espuma Multiversal</h3><p id="desc-multiversal">+5000 Pops base por burbuja</p><button id="buy-multiversal">Comprar (20.000.000 pts)</button></div>
+    <div class="upgrade tier-maximo"><h3>👁️ Espuma Primigenia</h3><p id="desc-primigenia">+20000 Pops base por burbuja</p><button id="buy-primigenia">Comprar (50.000.000 pts)</button></div>
+    <div class="save-status" id="save-status" aria-live="polite"></div>
+  </div>
+</div>
 
-        function fmt(n) { return Math.floor(n).toLocaleString('es-ES'); }
+<script>
+'use strict';
+const PRESTIGE_COST=20000;
+const SAVE_KEY='alberGames_bubbleClicker_save';
+const fmt=n=>Math.floor(n).toLocaleString('es-ES');
+const baseState={points:0,totalPops:0,clickValue:1,spawnInterval:700,minSpawnInterval:20,goldenUnlocked:false,bombUnlocked:false,frenzyUnlocked:false,autopopRate:0,prestigeTokens:0,upgrades:{
+ click:{level:0,cost:10,mult:1.5,element:'buy-click',desc:'desc-click',label:'+1 punto base'},
+ spawn:{level:0,cost:15,mult:1.4,element:'buy-spawn',desc:'desc-spawn',label:'Mayor aparición'},
+ autopop:{level:0,cost:60,mult:1.8,element:'buy-autopop',desc:'desc-autopop',label:'+0.5 auto-pops/seg'},
+ jabon:{level:0,cost:800,mult:1.6,element:'buy-jabon',desc:'desc-jabon',label:'+15 Pops base'},
+ maquina:{level:0,cost:3500,mult:1.6,element:'buy-maquina',desc:'desc-maquina',label:'+5 auto-pops/seg'},
+ termonuclear:{level:0,cost:40000,mult:1.8,element:'buy-termonuclear',desc:'desc-termonuclear',label:'+200 Pops base'},
+ solar:{level:0,cost:100000,mult:2,element:'buy-solar',desc:'desc-solar',label:'+500 Pops base'},
+ infernal:{level:0,cost:500000,mult:1.6,element:'buy-infernal',desc:'desc-infernal',label:'+800 Pops base'},
+ cuantica:{level:0,cost:2000000,mult:1.6,element:'buy-cuantica',desc:'desc-cuantica',label:'+1200 Pops base'},
+ multiversal:{level:0,cost:10000000,mult:1.6,element:'buy-multiversal',desc:'desc-multiversal',label:'+5000 Pops base'},
+ primigenia:{level:0,cost:50000000,mult:1.6,element:'buy-primigenia',desc:'desc-primigenia',label:'+20000 Pops base'}
+}};
+let state=JSON.parse(JSON.stringify(baseState));
+const gameArea=document.getElementById('gameArea'),scoreEl=document.getElementById('score'),statsEl=document.getElementById('stats'),tokenDisplay=document.getElementById('token-display'),prestigeBonusDesc=document.getElementById('prestige-bonus-desc'),btnPrestige=document.getElementById('btn-prestige'),saveStatus=document.getElementById('save-status');
 
-        // ---------- GUARDADO DE PARTIDA (localStorage) ----------
-        const SAVE_KEY = 'alberGames_bubbleClicker_save';
+// Audio: efectos cortos + música generativa real de fondo.
+let audioCtx=null,musicGain=null,musicTimer=null,musicNodes=[],isMusicPlaying=false;
+function initAudio(){if(!audioCtx){audioCtx=new(window.AudioContext||window.webkitAudioContext)();}if(audioCtx.state==='suspended')audioCtx.resume();}
+function playTone(freq,duration=.08,type='sine',volume=.12){initAudio();if(!audioCtx)return;const o=audioCtx.createOscillator(),g=audioCtx.createGain(),t=audioCtx.currentTime;o.type=type;o.frequency.setValueAtTime(freq,t);o.frequency.exponentialRampToValueAtTime(freq*1.8,t+duration);g.gain.setValueAtTime(volume,t);g.gain.exponentialRampToValueAtTime(.001,t+duration);o.connect(g);g.connect(audioCtx.destination);o.start(t);o.stop(t+duration);}
+function playPopSound(crit=false){playTone(crit?600:300+Math.random()*150,.08,'sine',.16);}
+function playUpgradeSound(){playTone(440,.15,'triangle',.1);setTimeout(()=>playTone(660,.15,'triangle',.08),70);}
+function stopMusic(){if(musicTimer){clearInterval(musicTimer);musicTimer=null;}musicNodes.forEach(n=>{try{n.stop()}catch(e){}});musicNodes=[];if(musicGain){musicGain.disconnect();musicGain=null;}isMusicPlaying=false;}
+function startMusic(){initAudio();if(isMusicPlaying)return;isMusicPlaying=true;const master=audioCtx.createGain();master.gain.value=.045;master.connect(audioCtx.destination);musicGain=master;const scale=[261.63,293.66,329.63,392,440,523.25,587.33];let step=0;
+ const beat=()=>{if(!isMusicPlaying)return;const now=audioCtx.currentTime;const melody=[0,2,4,2,1,3,5,3,0,4,2,5,4,2,1,3][step%16];const bass=[0,0,4,4,1,1,5,5][step%8];const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='triangle';o.frequency.value=scale[melody];g.gain.setValueAtTime(.001,now);g.gain.linearRampToValueAtTime(.42,now+.025);g.gain.exponentialRampToValueAtTime(.001,now+.32);o.connect(g);g.connect(master);o.start(now);o.stop(now+.34);musicNodes.push(o);
+ if(step%2===0){const b=audioCtx.createOscillator(),bg=audioCtx.createGain();b.type='sine';b.frequency.value=scale[bass]/2;bg.gain.setValueAtTime(.001,now);bg.gain.linearRampToValueAtTime(.16,now+.03);bg.gain.exponentialRampToValueAtTime(.001,now+.45);b.connect(bg);bg.connect(master);b.start(now);b.stop(now+.46);musicNodes.push(b);}step++;};beat();musicTimer=setInterval(beat,375);}
+const bgmToggle=document.getElementById('bgm-toggle');
+bgmToggle.addEventListener('click',()=>{if(isMusicPlaying){stopMusic();bgmToggle.textContent='🎵 Música: OFF';}else{startMusic();bgmToggle.textContent='🎶 Música: ON';}});
 
-        function saveGame() {
-            const save = {
-                points: state.points,
-                totalPops: state.totalPops,
-                clickValue: state.clickValue,
-                spawnInterval: state.spawnInterval,
-                goldenUnlocked: state.goldenUnlocked,
-                bombUnlocked: state.bombUnlocked,
-                frenzyUnlocked: state.frenzyUnlocked,
-                autopopRate: state.autopopRate,
-                prestigeTokens: state.prestigeTokens,
-                upgrades: {},
-                milestonesDone: milestones.map(m => m.done)
-            };
-            for (const key in state.upgrades) {
-                save.upgrades[key] = { level: state.upgrades[key].level, cost: state.upgrades[key].cost };
-            }
-            localStorage.setItem(SAVE_KEY, JSON.stringify(save));
-        }
+let milestones=[{pops:10,done:false,apply:()=>toast('🎉 ¡10 burbujas! Probabilidad de críticos añadida (x3 Pops).')},{pops:50,done:false,apply:()=>{state.goldenUnlocked=true;toast('🌟 ¡50 burbujas! Aparecen burbujas doradas (x5 Pops).')}},{pops:100,done:false,apply:()=>{state.bombUnlocked=true;toast('💥 ¡100 burbujas! Aparecen burbujas bomba (reacción en cadena).')}},{pops:150,done:false,apply:()=>{state.frenzyUnlocked=true;toast('🔥 ¡150 burbujas! Modo frenesí activado.')}},{pops:250,done:false,apply:()=>toast('🚀 ¡250 burbujas! Ya no hay vuelta atrás.')},{pops:500,done:false,apply:()=>toast('👑 ¡500 burbujas! La espuma te reconoce como maestro.')},{pops:1000,done:false,apply:()=>toast('🧬 ¡1.000 burbujas! Has entrado en territorio absurdo.')},{pops:2500,done:false,apply:()=>toast('🔥 ¡2.500 burbujas! Te mereces un descanso.') }];
+function initMilestones(){return milestones.map(m=>({...m}));}
+function checkMilestones(){milestones.forEach(m=>{if(!m.done&&state.totalPops>=m.pops){m.done=true;m.apply();}});}
+let toastTimeout;function toast(msg){let el=document.querySelector('.toast');if(!el){el=document.createElement('div');el.className='toast';document.body.appendChild(el);}el.textContent=msg;requestAnimationFrame(()=>el.classList.add('show'));clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>el.classList.remove('show'),3000);}
+function randomBetween(a,b){return Math.random()*(b-a)+a;}
+function createBubble(){const max=40;if(gameArea.querySelectorAll('.bubble:not(.pop)').length>=max)return;const r=Math.random();let type='normal';if(state.bombUnlocked&&r<.05)type='bomb';else if(state.goldenUnlocked&&r<.15)type='golden';const b=document.createElement('div');b.classList.add('bubble');if(type!=='normal')b.classList.add(type);b.dataset.type=type;const size=type==='golden'?randomBetween(40,60):type==='bomb'?randomBetween(45,65):randomBetween(35,75);b.style.width=b.style.height=size+'px';b.style.left=randomBetween(0,Math.max(gameArea.clientWidth-size,0))+'px';b.style.top=randomBetween(0,Math.max(gameArea.clientHeight-size,0))+'px';b.addEventListener('pointerdown',e=>{e.preventDefault();popBubble(b);});gameArea.appendChild(b);setTimeout(()=>{if(gameArea.contains(b)&&!b.classList.contains('pop')){b.style.transition='opacity .6s';b.style.opacity='0';setTimeout(()=>b.remove(),600);}},type==='golden'?3000:4500);}
+function showFloatingText(b,text,crit){const ft=document.createElement('div');ft.className='floatText '+(crit?'crit':'');ft.textContent=text;ft.style.left=b.style.left;ft.style.top=b.style.top;gameArea.appendChild(ft);setTimeout(()=>ft.remove(),800);}
+function popBubble(b,silent=false){if(!gameArea.contains(b)||b.classList.contains('pop'))return;b.classList.add('pop');const type=b.dataset.type,globalMult=1+state.prestigeTokens,isCrit=milestones[0].done&&Math.random()<.1,critMult=isCrit?3:1;let base=state.clickValue;if(type==='golden')base*=15;if(type==='bomb')base*=3;const value=Math.round(base*globalMult*critMult);state.points+=value;if(!silent){state.totalPops++;playPopSound(isCrit);}showFloatingText(b,'+'+fmt(value),isCrit);scoreEl.style.transform='scale(1.1)';setTimeout(()=>scoreEl.style.transform='scale(1)',100);setTimeout(()=>b.remove(),250);if(type==='bomb'&&!silent)chainPop();if(!silent)checkMilestones();updateUI();}
+function chainPop(){Array.from(gameArea.querySelectorAll('.bubble:not(.pop)')).sort(()=>Math.random()-.5).slice(0,4).forEach((b,i)=>setTimeout(()=>popBubble(b,true),80*(i+1)));}
+let spawnLoopId=null;function restartSpawnLoop(){if(spawnLoopId)clearInterval(spawnLoopId);spawnLoopId=setInterval(()=>{createBubble();if(state.frenzyUnlocked&&Math.random()<.5)createBubble();},state.spawnInterval);}
 
-        function loadGame() {
-            const raw = localStorage.getItem(SAVE_KEY);
-            if (!raw) return;
-            try {
-                const save = JSON.parse(raw);
-                state.points = save.points ?? state.points;
-                state.totalPops = save.totalPops ?? state.totalPops;
-                state.clickValue = save.clickValue ?? state.clickValue;
-                state.spawnInterval = save.spawnInterval ?? state.spawnInterval;
-                state.goldenUnlocked = save.goldenUnlocked ?? false;
-                state.bombUnlocked = save.bombUnlocked ?? false;
-                state.frenzyUnlocked = save.frenzyUnlocked ?? false;
-                state.autopopRate = save.autopopRate ?? 0;
-                state.prestigeTokens = save.prestigeTokens ?? 0;
+function saveGame(){try{const save={points:state.points,totalPops:state.totalPops,clickValue:state.clickValue,spawnInterval:state.spawnInterval,goldenUnlocked:state.goldenUnlocked,bombUnlocked:state.bombUnlocked,frenzyUnlocked:state.frenzyUnlocked,autopopRate:state.autopopRate,prestigeTokens:state.prestigeTokens,upgrades:{},milestonesDone:milestones.map(m=>m.done)};for(const k in state.upgrades)save.upgrades[k]={level:state.upgrades[k].level,cost:state.upgrades[k].cost};localStorage.setItem(SAVE_KEY,JSON.stringify(save));saveStatus.textContent='Partida guardada';setTimeout(()=>saveStatus.textContent='',1200);}catch(e){console.warn('No se pudo guardar la partida:',e);}}
+function loadGame(){try{const raw=localStorage.getItem(SAVE_KEY);if(!raw)return;const s=JSON.parse(raw);state.points=s.points??0;state.totalPops=s.totalPops??0;state.clickValue=s.clickValue??1;state.spawnInterval=s.spawnInterval??700;state.goldenUnlocked=!!s.goldenUnlocked;state.bombUnlocked=!!s.bombUnlocked;state.frenzyUnlocked=!!s.frenzyUnlocked;state.autopopRate=s.autopopRate??0;state.prestigeTokens=s.prestigeTokens??0;if(s.upgrades)for(const k in s.upgrades)if(state.upgrades[k]){state.upgrades[k].level=s.upgrades[k].level??0;state.upgrades[k].cost=s.upgrades[k].cost??baseState.upgrades[k].cost;}if(Array.isArray(s.milestonesDone))s.milestonesDone.forEach((d,i)=>{if(milestones[i])milestones[i].done=!!d;});}catch(e){console.warn('No se pudo cargar la partida:',e);}}
+setInterval(saveGame,8000);window.addEventListener('beforeunload',saveGame);document.addEventListener('visibilitychange',()=>{if(document.hidden)saveGame();});
 
-                if (save.upgrades) {
-                    for (const key in save.upgrades) {
-                        if (state.upgrades[key]) {
-                            state.upgrades[key].level = save.upgrades[key].level;
-                            state.upgrades[key].cost = save.upgrades[key].cost;
-                        }
-                    }
-                }
-                if (save.milestonesDone) {
-                    save.milestonesDone.forEach((done, i) => {
-                        if (milestones[i]) milestones[i].done = done; // sin volver a lanzar el toast
-                    });
-                }
-            } catch (e) {
-                console.warn('No se pudo cargar la partida guardada:', e);
-            }
-        }
+function setupShop(){for(const key in state.upgrades){const u=state.upgrades[key],btn=document.getElementById(u.element);btn.addEventListener('click',()=>{if(state.points<u.cost)return;playUpgradeSound();state.points-=u.cost;u.level++;u.cost=Math.round(u.cost*u.mult);if(key==='click')state.clickValue+=1;if(key==='jabon')state.clickValue+=15;if(key==='termonuclear')state.clickValue+=200;if(key==='solar')state.clickValue+=500;if(key==='infernal')state.clickValue+=800;if(key==='cuantica')state.clickValue+=1200;if(key==='multiversal')state.clickValue+=5000;if(key==='primigenia')state.clickValue+=20000;if(key==='spawn'){state.spawnInterval=Math.max(state.minSpawnInterval,Math.round(state.spawnInterval*.87));restartSpawnLoop();}if(key==='autopop')state.autopopRate+=.5;if(key==='maquina')state.autopopRate+=5;updateUI();saveGame();});}}
+btnPrestige.addEventListener('click',()=>{const gain=Math.floor(state.points/PRESTIGE_COST);if(!gain)return;if(!confirm(`¿Deseas ascender?\n\nPerderás tus Pops y mejoras actuales, pero ganarás ${gain} Esencia(s) de Jabón.\nCada Esencia añade permanentemente un +100% al multiplicador global de Pops.`))return;state.prestigeTokens+=gain;state.points=0;state.totalPops=0;state.clickValue=1;state.spawnInterval=700;state.goldenUnlocked=false;state.bombUnlocked=false;state.frenzyUnlocked=false;state.autopopRate=0;for(const k in state.upgrades){state.upgrades[k].level=0;state.upgrades[k].cost=baseState.upgrades[k].cost;}milestones=initMilestones();gameArea.innerHTML='';restartSpawnLoop();toast(`✨ ¡Has ascendido! Tienes ${state.prestigeTokens} Esencias.`);updateUI();saveGame();});
+function updateUI(){scoreEl.textContent='Pops: '+fmt(state.points);const mult=1+state.prestigeTokens;statsEl.textContent=`Total reventadas: ${state.totalPops} · Valor base: ${fmt(state.clickValue)} · Bonus Global: x${mult}`+(state.autopopRate>0?` · Auto-Pop: ${state.autopopRate.toFixed(1)}/s`:'');tokenDisplay.textContent=state.prestigeTokens;prestigeBonusDesc.textContent=`Bonus actual: +${state.prestigeTokens*100}% de Pops a todo`;const gain=Math.floor(state.points/PRESTIGE_COST);btnPrestige.textContent=gain>0?`✨ Ascender (+${gain} Esencias)`:`✨ Ascender (Requiere ${fmt(PRESTIGE_COST)} pts)`;btnPrestige.disabled=state.points<PRESTIGE_COST;for(const k in state.upgrades){const u=state.upgrades[k],btn=document.getElementById(u.element),desc=document.getElementById(u.desc);desc.textContent=`${u.label} (Nv. ${u.level})`;btn.textContent=`Comprar (${fmt(u.cost)} pts)`;const max=k==='spawn'&&state.spawnInterval<=state.minSpawnInterval;if(max)btn.textContent='Máximo';btn.disabled=state.points<u.cost||max;}}
 
-        // Autoguardado periódico y al cerrar/cambiar de pestaña
-        setInterval(saveGame, 8000);
-        window.addEventListener('beforeunload', saveGame);
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden) saveGame();
-        });
-
-        const baseState = {
-            points: 0,
-            totalPops: 0,
-            clickValue: 1,
-            spawnInterval: 700,
-            minSpawnInterval: 20,
-            goldenUnlocked: false,
-            bombUnlocked: false,
-            frenzyUnlocked: false,
-            autopopRate: 0,
-            upgrades: {
-                click: { level: 0, cost: 10, mult: 1.5, element: 'buy-click', desc: 'desc-click', label: '+1 punto base' },
-                spawn: { level: 0, cost: 15, mult: 1.4, element: 'buy-spawn', desc: 'desc-spawn', label: 'Mayor aparición' },
-                autopop: { level: 0, cost: 60, mult: 1.8, element: 'buy-autopop', desc: 'desc-autopop', label: '+0.5 auto-pops/seg' },
-                jabon: { level: 0, cost: 800, mult: 1.6, element: 'buy-jabon', desc: 'desc-jabon', label: '+15 Pops base' },
-                maquina: { level: 0, cost: 3500, mult: 1.6, element: 'buy-maquina', desc: 'desc-maquina', label: '+5 auto-pops/seg' },
-                termonuclear: { level: 0, cost: 40000, mult: 1.8, element: 'buy-termonuclear', desc: 'desc-termonuclear', label: '+200 Pops base' },
-                solar: { level: 0, cost: 100000, mult: 2.0, element: 'buy-solar', desc: 'desc-solar', label: '+500 Pops base' },
-                infernal: { level: 0, cost: 500000, mult: 1.6, element: 'buy-infernal', desc: 'desc-infernal', label: '+800 Pops base' },
-                cuantica: { level: 0, cost: 2000000, mult: 1.6, element: 'buy-cuantica', desc: 'desc-cuantica', label: '+1200 Pops base' },
-                multiversal: { level: 0, cost: 10000000, mult: 1.6, element: 'buy-multiversal', desc: 'desc-multiversal', label: '+5000 Pops base' },
-                primigenia: { level: 0, cost: 50000000, mult: 1.6, element: 'buy-primigenia', desc: 'desc-primigenia', label: '+20000 Pops base' }
-            }
-        };
-
-        let state = JSON.parse(JSON.stringify(baseState));
-        state.prestigeTokens = 0; // Persiste tras el reseteo
-
-        const gameArea = document.getElementById('gameArea');
-        const scoreEl = document.getElementById('score');
-        const statsEl = document.getElementById('stats');
-        const tokenDisplay = document.getElementById('token-display');
-        const prestigeBonusDesc = document.getElementById('prestige-bonus-desc');
-        const btnPrestige = document.getElementById('btn-prestige');
-
-        // -------------- //
-        // MUSICA Y AUDIO //
-        // -------------- //
-        let audioCtx = null;
-
-        function initAudio() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-        }
-
-        // Sonido para clics en burbujas (Pop dinámico con pitch aleatorio)
-        function playPopSound(isCrit = false) {
-            initAudio();
-            if (!audioCtx) return;
-
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-
-            osc.type = 'sine';
-            
-            // Tono base variable para que no suene monótono
-            const baseFreq = isCrit ? 600 : (300 + Math.random() * 150);
-            osc.frequency.setValueAtTime(baseFreq, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.8, audioCtx.currentTime + 0.08);
-
-            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
-
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.08);
-        }
-
-        // Sonido para compras de mejoras (Tono metálico/electrónico ascendente)
-        function playUpgradeSound() {
-            initAudio();
-            if (!audioCtx) return;
-
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(440, audioCtx.currentTime); // Nota La
-            osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.15); // Sube una octava
-
-            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
-
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.15);
-        }
-
-        // Control de Música de Fondo
-        const bgmAudio = document.getElementById('bgm-audio');
-        const bgmToggle = document.getElementById('bgm-toggle');
-        let isMusicPlaying = false;
-
-        bgmToggle.addEventListener('click', () => {
-            initAudio(); // Desbloquea el contexto de audio general
-            if (isMusicPlaying) {
-                bgmAudio.pause();
-                bgmToggle.textContent = '🎵 Música: OFF';
-                bgmToggle.style.backgroundColor = 'rgba(31, 40, 51, 0.8)';
-            } else {
-                bgmAudio.play();
-                bgmToggle.textContent = '🎶 Música: ON';
-                bgmToggle.style.backgroundColor = '#45a29e';
-                bgmToggle.style.color = '#0b0c10';
-            }
-            isMusicPlaying = !isMusicPlaying;
-        });
-        // --------------------- //
-        // FIN DE MUSICA Y AUDIO //
-        // --------------------- //
-
-        // ---------- HITOS AUTOMÁTICOS ----------
-        let milestones = initMilestones();
-
-        function initMilestones() {
-            return [
-                { pops: 10, done: false, apply: () => { toast('🎉 ¡10 burbujas! Probabilidad de críticos añadida (x3 Pops).'); } },
-                { pops: 50, done: false, apply: () => { state.goldenUnlocked = true; toast('🌟 ¡50 burbujas! Aparecen burbujas doradas (x5 Pops).'); } },
-                { pops: 100, done: false, apply: () => { state.bombUnlocked = true; toast('💥 ¡100 burbujas! Aparecen burbujas bomba (reacción en cadena)'); } },
-                { pops: 150, done: false, apply: () => { state.frenzyUnlocked = true; toast('🔥 ¡150 burbujas! Modo frenesí: doble aparición activa'); } },
-                { pops: 200, done: false, apply: () => { state.frenzyUnlocked = true; toast('🔥 ¡200 burbujas! Modo frenesí: doble aparición activa'); } },
-                { pops: 300, done: false, apply: () => { state.frenzyUnlocked = true; toast('🔥 ¡300 burbujas! Modo frenesí: doble aparición activa'); } },
-                { pops: 400, done: false, apply: () => { state.frenzyUnlocked = true; toast('🔥 ¡400 burbujas! Modo frenesí: doble aparición activa'); } },
-                { pops: 500, done: false, apply: () => { state.frenzyUnlocked = true; toast('🔥 ¡500 burbujas! Modo frenesí: doble aparición activa'); } },
-                { pops: 1000, done: false, apply: () => { state.frenzyUnlocked = true; toast('🔥 ¡1000 burbujas! Modo frenesí: doble aparición activa'); } },
-                { pops: 1500, done: false, apply: () => { state.frenzyUnlocked = true; toast('🔥 ¡1500 burbujas! Modo frenesí: doble aparición activa'); } },
-                { pops: 2500, done: false, apply: () => { state.frenzyUnlocked = true; toast('🔥 ¡2500 burbujas, QUE LOCO! Modo frenesí: doble aparición activa (te mereces un descanso)'); } }
-            ];
-        }
-
-        function checkMilestones() {
-            milestones.forEach(m => {
-                if (!m.done && state.totalPops >= m.pops) {
-                    m.done = true;
-                    m.apply();
-                }
-            });
-        }
-
-        // ---------- TOASTS ----------
-        let toastTimeout;
-        function toast(msg) {
-            let el = document.querySelector('.toast');
-            if (!el) {
-                el = document.createElement('div');
-                el.className = 'toast';
-                document.body.appendChild(el);
-            }
-            el.textContent = msg;
-            requestAnimationFrame(() => el.classList.add('show'));
-            clearTimeout(toastTimeout);
-            toastTimeout = setTimeout(() => el.classList.remove('show'), 3000);
-        }
-
-        // ---------- BURBUJAS ----------
-        function randomBetween(min, max) { return Math.random() * (max - min) + min; }
-
-        function createBubble() {
-            const MAX_BUBBLES = 40;
-            if (gameArea.querySelectorAll('.bubble:not(.pop)').length >= MAX_BUBBLES) return;
-            const r = Math.random();
-            let type = 'normal';
-            if (state.bombUnlocked && r < 0.05) type = 'bomb';
-            else if (state.goldenUnlocked && r < 0.15) type = 'golden';
-
-            const bubble = document.createElement('div');
-            bubble.classList.add('bubble');
-            if (type !== 'normal') bubble.classList.add(type);
-            bubble.dataset.type = type;
-
-            const size = type === 'golden' ? randomBetween(40, 60) :
-                         type === 'bomb' ? randomBetween(45, 65) : randomBetween(35, 75);
-
-            bubble.style.width = size + 'px';
-            bubble.style.height = size + 'px';
-            const areaW = gameArea.clientWidth - size;
-            const areaH = gameArea.clientHeight - size;
-            bubble.style.left = randomBetween(0, Math.max(areaW, 0)) + 'px';
-            bubble.style.top = randomBetween(0, Math.max(areaH, 0)) + 'px';
-
-            // pointerdown funciona igual para ratón, dedo y lápiz óptico
-            bubble.addEventListener('pointerdown', (e) => {
-                e.preventDefault();
-                popBubble(bubble);
-            });
-            gameArea.appendChild(bubble);
-
-            setTimeout(() => {
-                if (gameArea.contains(bubble) && !bubble.classList.contains('pop')) {
-                    bubble.style.transition = 'opacity 0.6s';
-                    bubble.style.opacity = '0';
-                    setTimeout(() => bubble.remove(), 600);
-                }
-            }, type === 'golden' ? 3000 : 4500); // Doradas desaparecen antes
-        }
-
-        function showFloatingText(bubble, text, isCrit) {
-            const ft = document.createElement('div');
-            ft.className = `floatText ${isCrit ? 'crit' : ''}`;
-            ft.textContent = text;
-            ft.style.left = bubble.style.left;
-            ft.style.top = bubble.style.top;
-            gameArea.appendChild(ft);
-            setTimeout(() => ft.remove(), 800);
-        }
-
-        function popBubble(bubble, silent = false) {
-            if (!gameArea.contains(bubble) || bubble.classList.contains('pop')) return;
-            bubble.classList.add('pop');
-
-            const type = bubble.dataset.type;
-            const globalMult = 1 + state.prestigeTokens; // Multiplicador de prestigio
-            
-            // Probabilidad de crítico si tienes más de 10 pops
-            const isCrit = milestones[0].done && Math.random() < 0.1;
-            const critMult = isCrit ? 3 : 1;
-
-            let baseVal = state.clickValue;
-            if (type === 'golden') baseVal *= 15;
-            if (type === 'bomb') baseVal *= 3;
-
-            const finalValue = Math.round(baseVal * globalMult * critMult);
-
-            state.points += finalValue;
-            if (!silent) {
-                state.totalPops++;
-                playPopSound(isCrit);
-            }
-
-            showFloatingText(bubble, '+' + fmt(finalValue), isCrit);
-            
-            // Animación del marcador
-            scoreEl.style.transform = 'scale(1.1)';
-            setTimeout(() => scoreEl.style.transform = 'scale(1)', 100);
-
-            updateUI();
-            setTimeout(() => bubble.remove(), 250);
-
-            if (type === 'bomb' && !silent) chainPop(bubble);
-            if (!silent) checkMilestones();
-        }
-
-        function chainPop(sourceBubble) {
-            const others = Array.from(gameArea.querySelectorAll('.bubble:not(.pop)'));
-            others.sort(() => Math.random() - 0.5);
-            others.slice(0, 4).forEach((b, i) => {
-                setTimeout(() => popBubble(b, true), 80 * (i + 1));
-            });
-        }
-
-        // ---------- BUCLES ----------
-        let spawnLoopId = null;
-        function restartSpawnLoop() {
-            if (spawnLoopId) clearInterval(spawnLoopId);
-            spawnLoopId = setInterval(() => {
-                createBubble();
-                if (state.frenzyUnlocked && Math.random() < 0.5) createBubble();
-            }, state.spawnInterval);
-        }
-        loadGame();
-        restartSpawnLoop();
-        updateUI();;
-
-        // Auto-Pop
-        setInterval(() => {
-            if (state.autopopRate <= 0) return;
-            const count = Math.floor(state.autopopRate);
-            const remainder = state.autopopRate - count;
-            
-            let popsToDo = count;
-            if (Math.random() < remainder) popsToDo++;
-
-            const bubbles = Array.from(gameArea.querySelectorAll('.bubble:not(.pop)'));
-            bubbles.sort(() => Math.random() - 0.5);
-            bubbles.slice(0, popsToDo).forEach(b => popBubble(b, true)); // Auto pops count silently para hitos
-        }, 1000);
-
-        // ---------- COMPRAS ----------
-        function setupShop() {
-            for (const key in state.upgrades) {
-                const u = state.upgrades[key];
-                document.getElementById(u.element).addEventListener('click', () => {
-                    if (state.points < u.cost) return; // Si no hay dinero, no hace nada
-                    
-                    playUpgradeSound(); // <--- AQUÍ DISPARAS EL SONIDO DE MEJORA
-                    
-                    state.points -= u.cost;
-                    u.level++;
-                    u.cost = Math.round(u.cost * u.mult);
-
-                    // Aplicar mejoras
-                    if (key === 'click') state.clickValue += 1;
-                    if (key === 'jabon') state.clickValue += 15;
-                    if (key === 'termonuclear') state.clickValue += 200;
-                    if (key === 'solar') state.clickValue += 500;
-                    if (key === 'infernal') state.clickValue += 800;
-                    if (key === 'cuantica') state.clickValue += 1200;
-                    if (key === 'multiversal') state.clickValue += 5000;
-                    if (key === 'primigenia') state.clickValue += 20000;
-                    if (key === 'spawn') {
-                        state.spawnInterval = Math.max(state.minSpawnInterval, Math.round(state.spawnInterval * 0.87));
-                        restartSpawnLoop();
-                    }
-                    if (key === 'autopop') state.autopopRate += 0.5;
-                    if (key === 'maquina') state.autopopRate += 5;
-
-                    updateUI();
-                    saveGame()
-                });
-            }
-        }
-        setupShop();
-
-        // ---------- PRESTIGIO ----------
-        btnPrestige.addEventListener('click', () => {
-            const tokensToGain = Math.floor(state.points / PRESTIGE_COST);
-            if (tokensToGain > 0) {
-                const confirmMsg = `¿Deseas ascender?\n\nPerderás tus Pops y mejoras actuales, pero ganarás ${tokensToGain} Esencia(s) de Jabón.\nCada Esencia añade permanentemente un +100% al multiplicador global de Pops.`;
-                if (confirm(confirmMsg)) {
-                    // Mantener tokens
-                    const savedTokens = state.prestigeTokens + tokensToGain;
-                    
-                    // Resetear estado SIN reemplazar el objeto "state" ni sus mejoras,
-                    // para que los botones (que guardan referencia directa a cada mejora)
-                    // sigan apuntando a los datos correctos tras ascender.
-                    state.points = 0;
-                    state.totalPops = 0;
-                    state.clickValue = baseState.clickValue;
-                    state.spawnInterval = baseState.spawnInterval;
-                    state.goldenUnlocked = false;
-                    state.bombUnlocked = false;
-                    state.frenzyUnlocked = false;
-                    state.autopopRate = 0;
-                    for (const key in state.upgrades) {
-                        state.upgrades[key].level = baseState.upgrades[key].level;
-                        state.upgrades[key].cost = baseState.upgrades[key].cost;
-                    }
-                    state.prestigeTokens = savedTokens;
-                    milestones = initMilestones();
-                    
-                    // Limpiar pantalla
-                    gameArea.innerHTML = '';
-                    restartSpawnLoop();
-                    
-                    toast(`✨ ¡Has ascendido! Tienes ${savedTokens} Esencias.`);
-                    updateUI();
-                    saveGame()
-                }
-            }
-        });
-
-        // ---------- ACTUALIZAR INTERFAZ ----------
-        function updateUI() {
-            scoreEl.textContent = 'Pops: ' + fmt(state.points);
-            
-            const globalMult = 1 + state.prestigeTokens;
-            statsEl.textContent = `Total reventadas: ${state.totalPops} · Valor base: ${state.clickValue} · Bonus Global: x${globalMult}` +
-                (state.autopopRate > 0 ? ` · Auto-Pop: ${state.autopopRate.toFixed(1)}/s` : '');
-
-            // Actualizar Prestigio
-            tokenDisplay.textContent = state.prestigeTokens;
-            prestigeBonusDesc.textContent = `Bonus actual: +${state.prestigeTokens * 100}% de Pops a todo`;
-            
-            const tokensGanables = Math.floor(state.points / PRESTIGE_COST);
-            btnPrestige.textContent = tokensGanables > 0 ? `✨ Ascender (+${tokensGanables} Esencias)` : `✨ Ascender (Requiere ${fmt(PRESTIGE_COST)} pts)`;
-            btnPrestige.disabled = state.points < PRESTIGE_COST;
-
-            // Actualizar Botones de Mejora
-            for (const key in state.upgrades) {
-                const u = state.upgrades[key];
-                const btn = document.getElementById(u.element);
-                const desc = document.getElementById(u.desc);
-                
-                desc.textContent = `${u.label} (Nv. ${u.level})`;
-                btn.textContent = `Comprar (${fmt(u.cost)} pts)`;
-                
-                let limitReached = false;
-                if (key === 'spawn' && state.spawnInterval <= state.minSpawnInterval) {
-                    limitReached = true;
-                    btn.textContent = 'Máximo';
-                }
-                
-                btn.disabled = state.points < u.cost || limitReached;
-            }
-        }
-
-        updateUI();
-    </script>
+loadGame();setupShop();restartSpawnLoop();updateUI();
+setInterval(()=>{if(state.autopopRate<=0)return;let count=Math.floor(state.autopopRate);if(Math.random()<state.autopopRate-count)count++;const bubbles=Array.from(gameArea.querySelectorAll('.bubble:not(.pop)')).sort(()=>Math.random()-.5);bubbles.slice(0,count).forEach(b=>popBubble(b,true));},1000);
+</script>
 </body>
 </html>
