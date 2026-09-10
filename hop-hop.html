@@ -1,707 +1,87 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Alber.Games — Hop Hop</title>
-    <link rel="stylesheet" href="style.css">
-    <style>
-        * { box-sizing: border-box; }
-        html, body { overscroll-behavior: none; }
-        body {
-            margin: 0;
-            padding: 16px;
-            background-color: #2c3e50;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: white;
-            overflow-x: hidden;
-        }
-
-          /* ---------- NAV ESTÉTICO Y ANIMADO ---------- */
-
-        nav {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 15px 6vw;
-            position: sticky;
-            top: 0;
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            z-index: 9999;
-            border-bottom: 1px solid var(--panel-edge);
-            transition: all 0.4s ease;
-        }
-
-        .brand {
-            font-family: var(--font-display);
-            font-weight: 800;
-            font-size: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            letter-spacing: 0.5px;
-            text-decoration: none;
-            color: var(--text);
-            transition: transform 0.3s ease;
-        }
-
-        .brand:hover {
-            transform: scale(1.05) rotate(-2deg);
-        }
-
-        .brand-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: var(--sky);
-            box-shadow: 0 0 12px var(--sky);
-            transition: all 0.3s ease;
-        }
-
-        /* Animación loca para el punto del logo al hacer hover */
-        .brand:hover .brand-dot {
-            animation: crazyBounce 0.4s infinite alternate cubic-bezier(0.5, 0.05, 1, 0.5);
-        }
-
-        @keyframes crazyBounce {
-            0% { transform: translateY(0) scale(1); background: var(--sky); box-shadow: 0 0 12px var(--sky); }
-            100% { transform: translateY(-10px) scale(1.3); background: var(--coral); box-shadow: 0 0 20px var(--coral); }
-        }
-
-        .nav-links-container {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .nav-link {
-            text-decoration: none;
-            color: var(--muted);
-            font-family: var(--font-display);
-            font-size: 1.05rem;
-            font-weight: 600;
-            padding: 8px 20px;
-            border-radius: 50px;
-            background: var(--panel);
-            border: 2px solid transparent;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        /* Efecto de brillo que atraviesa el botón */
-        .nav-link::before {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%;
-            width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(111, 231, 255, 0.3), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .nav-link:hover {
-            transform: translateY(-5px) scale(1.05) rotate(3deg);
-            box-shadow: 0 8px 15px rgba(111, 231, 255, 0.2);
-            border-color: var(--sky);
-            color: var(--sky);
-            background: var(--ink);
-        }
-
-        .nav-link:hover::before {
-            left: 100%;
-        }
-
-        /* Botón de Llamada a la Acción (CTA) del menú */
-        .nav-cta {
-            text-decoration: none;
-            color: #f9f9fa;
-            background: var(--gold);
-            font-family: var(--font-display);
-            font-size: 1.05rem;
-            font-weight: 600;
-            padding: 10px 24px;
-            border-radius: 50px;
-            box-shadow: 0 5px 0 #C99A20;
-            animation: pulseNav 2s infinite;
-            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
-            margin-left: 10px;
-        }
-
-        .nav-cta:hover {
-            transform: translateY(-3px) scale(1.1) rotate(-3deg);
-            box-shadow: 0 2px 0 #C99A20, 0 10px 25px rgba(255, 201, 60, 0.5);
-            color: #000000;
-            animation-play-state: paused;
-            background: #ffdb6e;
-        }
-
-        .nav-cta:active {
-            transform: translateY(2px) scale(0.95);
-            box-shadow: 0 0 0 #C99A20;
-        }
-
-        @keyframes pulseNav {
-            0% { box-shadow: 0 5px 0 #C99A20, 0 0 0 0 rgba(255, 201, 60, 0.5); }
-            70% { box-shadow: 0 5px 0 #C99A20, 0 0 0 15px rgba(255, 201, 60, 0); }
-            100% { box-shadow: 0 5px 0 #C99A20, 0 0 0 0 rgba(255, 201, 60, 0); }
-        }
-
-        /* Adaptación para móviles del menú */
-        @media (max-width: 720px) {
-            .nav-links-container {
-            display: none; /* Aquí podrías añadir un menú hamburguesa más adelante si crecen los links */
-            }
-        }
-
-        /* --------- FIN NAV ESTÉTICO Y ANIMADO --------- */
-
-        #game-container {
-            position: relative;
-            width: 100%;
-            max-width: 800px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            border-radius: 8px;
-            overflow: hidden;
-            outline: none;
-        }
-
-        canvas {
-            display: block;
-            width: 100%;
-            height: auto;
-            background: linear-gradient(to bottom, #87CEEB, #E0F6FF);
-            touch-action: none;
-        }
-
-        .ui-layer {
-            position: absolute;
-            top: 4%;
-            left: 3%;
-            right: 3%;
-            display: flex;
-            justify-content: space-between;
-            font-size: clamp(14px, 3vw, 24px);
-            font-weight: bold;
-            color: #333;
-            text-shadow: 2px 2px 0px white;
-            pointer-events: none;
-        }
-
-        #start-overlay {
-            position: absolute;
-            inset: 0;
-            background: rgba(0,0,0,0.55);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            cursor: pointer;
-            z-index: 5;
-        }
-
-        #start-overlay p {
-            font-size: clamp(16px, 4vw, 22px);
-            font-weight: bold;
-            max-width: 80%;
-        }
-
-        #game-over {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.85);
-            padding: 30px 40px;
-            border-radius: 15px;
-            text-align: center;
-            display: none;
-            color: white;
-            border: 2px solid #e74c3c;
-            z-index: 6;
-            width: 80%;
-            max-width: 320px;
-        }
-
-        #game-over h2 {
-            margin: 0 0 20px 0;
-            color: #e74c3c;
-            font-size: clamp(24px, 6vw, 36px);
-        }
-
-        button {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            font-size: 18px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background 0.2s;
-            touch-action: manipulation;
-        }
-
-        button:hover {
-            background-color: #2980b9;
-        }
-
-        .controls-info {
-            margin-top: 16px;
-            color: #bdc3c7;
-            font-size: 13px;
-            text-align: center;
-            max-width: 800px;
-            padding: 0 10px;
-        }
-
-        /* CONTROLES TÁCTILES: solo en pantallas táctiles sin ratón */
-        #touch-controls {
-            display: none;
-            position: absolute;
-            bottom: 4%;
-            left: 3%;
-            right: 3%;
-            justify-content: space-between;
-            align-items: flex-end;
-            z-index: 4;
-            pointer-events: none;
-        }
-
-        .touch-btn {
-            pointer-events: auto;
-            width: 64px;
-            height: 64px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.25);
-            border: 2px solid rgba(255,255,255,0.6);
-            color: white;
-            font-size: 26px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            user-select: none;
-            -webkit-user-select: none;
-            -webkit-touch-callout: none;
-            touch-action: none;
-        }
-
-        .touch-btn:active { background: rgba(255,255,255,0.45); }
-
-        .move-group { display: flex; gap: 12px; }
-
-        @media (hover: none) and (pointer: coarse) {
-            #touch-controls { display: flex; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Alber.Games — Hop Hop</title>
+<link rel="stylesheet" href="style.css">
+<style>
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;overscroll-behavior:none}body{padding:14px;background:#111827;color:#fff;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;display:flex;flex-direction:column;align-items:center;overflow-x:hidden}
+nav{width:100%;display:flex;align-items:center;justify-content:space-between;padding:10px clamp(12px,5vw,60px);margin-bottom:12px;position:relative;z-index:20}.brand{color:#fff;text-decoration:none;font-weight:900;font-size:1.35rem}.brand-dot{display:inline-block;width:11px;height:11px;border-radius:50%;background:#5eead4;margin-right:9px;box-shadow:0 0 16px #5eead4}.nav-links-container{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}.nav-link,.nav-cta{color:#d1d5db;text-decoration:none;padding:8px 13px;border-radius:999px;background:#1f2937;border:1px solid #374151;font-size:.88rem;font-weight:700}.nav-link:hover,.nav-cta:hover{color:#fff;border-color:#5eead4}.nav-cta{background:#5eead4;color:#06201d;border-color:#5eead4}
+#game-container{position:relative;width:min(100%,960px);border:1px solid #374151;border-radius:20px;overflow:hidden;background:#0b1020;box-shadow:0 22px 70px #0008}.game-top{position:absolute;z-index:5;top:12px;left:12px;right:12px;display:flex;gap:8px;justify-content:space-between;pointer-events:none}.hud-group{display:flex;gap:7px;flex-wrap:wrap}.hud-pill{background:#111827d9;border:1px solid #ffffff22;border-radius:12px;padding:7px 10px;backdrop-filter:blur(8px);font-size:12px;font-weight:800}.hud-pill strong{display:block;font-size:16px;color:#fff}.hud-pill small{color:#9ca3af}.hud-pill.combo strong{color:#fbbf24}.hud-pill.best strong{color:#5eead4}
+canvas{display:block;width:100%;height:auto;aspect-ratio:16/10;background:#101827;touch-action:none}.center-panel{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;z-index:10;background:#05091499;backdrop-filter:blur(5px)}.panel{width:min(88%,390px);padding:28px;border:1px solid #ffffff24;border-radius:24px;background:#111827f2;box-shadow:0 25px 60px #0008}.panel h1{margin:0 0 7px;font-size:clamp(30px,7vw,48px);letter-spacing:-2px}.panel p{color:#aeb8c9;line-height:1.5;margin:8px 0 20px}.primary{border:0;border-radius:14px;padding:14px 22px;background:#5eead4;color:#06201d;font-size:16px;font-weight:900;cursor:pointer;box-shadow:0 6px 0 #2aa89b;touch-action:manipulation}.primary:active{transform:translateY(3px);box-shadow:0 3px 0 #2aa89b}.hidden{display:none!important}.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:18px 0}.stat{padding:10px;border-radius:12px;background:#0b1220;border:1px solid #ffffff12}.stat b{display:block;font-size:20px}.stat span{font-size:11px;color:#8d99aa}
+#touch-controls{position:absolute;z-index:8;left:14px;right:14px;bottom:14px;display:none;justify-content:space-between;align-items:flex-end;pointer-events:none}.touch-group{display:flex;gap:9px}.touch-btn{width:62px;height:62px;border-radius:18px;background:#11182799;border:1px solid #ffffff33;color:#fff;display:grid;place-items:center;font-size:25px;font-weight:900;pointer-events:auto;user-select:none;touch-action:none}.touch-btn:active{background:#5eead488}.touch-btn.jump{width:76px;height:76px;border-radius:50%;background:#5eead4cc;color:#06201d}.tip{width:min(100%,960px);padding:10px 12px;text-align:center;color:#8f9bad;font-size:12px}.event{position:absolute;z-index:6;top:68px;left:50%;transform:translateX(-50%);background:#fbbf24;color:#241500;border-radius:999px;padding:7px 13px;font-weight:900;font-size:12px;box-shadow:0 8px 30px #fbbf2444;pointer-events:none}.flash{animation:flash .35s ease}.shake{animation:shake .28s ease}@keyframes flash{50%{filter:brightness(1.7)}}@keyframes shake{25%{transform:translateX(5px)}50%{transform:translateX(-5px)}75%{transform:translateX(3px)}}
+@media(max-width:720px){body{padding:7px}nav{margin-bottom:5px}.nav-links-container{display:none}.hud-pill{padding:5px 7px}.hud-pill strong{font-size:14px}.hud-pill small{font-size:9px}.game-top{top:8px;left:8px;right:8px}.event{top:62px}#touch-controls{display:flex}.tip{padding-bottom:3px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+</style>
 </head>
 <body>
-    <nav>
-        <a href="#" class="brand">
-        <span class="brand-dot"></span>Alber.Games
-        </a>
-        
-        <div class="nav-links-container">
-        <a href="https://albersoftworks.github.io/alber.games/bubble-clicker" class="nav-link">Bubble Clicker</a>
-        <a href="https://albersoftworks.github.io/alber.games/tech-startup" class="nav-link">Tech Startup</a>
-        <a href="https://albersoftworks.github.io/alber.games/hop-hop" class="nav-link">Hop Hop</a>
-        <a href="https://albersoftworks.github.io" target="_blank" rel="noopener" class="nav-cta">Contacto</a>
-        </div>
-    </nav>
-
-    <div id="game-container" tabindex="0">
-        <canvas id="gameCanvas" width="800" height="500"></canvas>
-        <div class="ui-layer">
-            <div>Puntos: <span id="scoreDisplay">0</span></div>
-            <div>Récord: <span id="highScoreDisplay">0</span></div>
-        </div>
-
-        <div id="touch-controls">
-            <div class="move-group">
-                <div class="touch-btn" id="btn-left">◀</div>
-                <div class="touch-btn" id="btn-right">▶</div>
-            </div>
-            <div class="touch-btn" id="btn-jump">⤒</div>
-        </div>
-
-        <div id="start-overlay">
-            <p>Toca o haz clic para empezar</p>
-        </div>
-
-        <div id="game-over">
-            <h2>¡Te caíste!</h2>
-            <p>Puntuación: <span id="finalScore">0</span></p>
-            <button onclick="reiniciarJuego()">Volver a Jugar</button>
-        </div>
-    </div>
-    
-    <div class="controls-info">
-        Moverse: <b>A / D</b> (o Flechas) &nbsp;|&nbsp; Saltar: <b>W</b> o <b>ESPACIO</b> &nbsp;|&nbsp; En móvil, usa los botones en pantalla<br>
-        Esquiva los bloques rojos y no te caigas por los agujeros.
-    </div>
-
-    <script>
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        const scoreDisplay = document.getElementById('scoreDisplay');
-        const highScoreDisplay = document.getElementById('highScoreDisplay');
-        const gameOverScreen = document.getElementById('game-over');
-        const finalScore = document.getElementById('finalScore');
-        const gameContainer = document.getElementById('game-container');
-        const startOverlay = document.getElementById('start-overlay');
-
-        // ---------- ALMACENAMIENTO SEGURO ----------
-        // En Google Sites el código se ejecuta dentro de un iframe aislado, y en algunos
-        // navegadores/configuraciones localStorage lanza un error ahí dentro. Si eso no
-        // se controla, el script se detiene por completo y el juego no llega a cargar.
-        function leerRecord() {
-            try {
-                return parseInt(localStorage.getItem('plataformasHighScore'), 10) || 0;
-            } catch (e) {
-                return 0;
-            }
-        }
-        function guardarRecord(valor) {
-            try {
-                localStorage.setItem('plataformasHighScore', valor);
-            } catch (e) {
-                // Almacenamiento no disponible en este contexto: el récord no persistirá,
-                // pero el juego sigue funcionando con normalidad.
-            }
-        }
-
-        // Configuración y variables globales
-        let frames = 0;
-        let score = 0;
-        let highScore = leerRecord();
-        highScoreDisplay.innerText = highScore;
-        let gameSpeed = 4;
-        let isGameOver = false;
-        let hasStarted = false;
-        let animationId;
-
-        // Entradas del teclado
-        const keys = { w: false, a: false, s: false, d: false, space: false };
-        const teclasDeJuego = ['a', 'd', 'w', 'arrowleft', 'arrowright', 'arrowup', ' '];
-
-        document.addEventListener('keydown', (e) => {
-            const key = e.key.toLowerCase();
-            // Evita que espacio/flechas desplacen la página en la que está incrustado el juego
-            if (teclasDeJuego.includes(key)) e.preventDefault();
-
-            if (key === 'a' || key === 'arrowleft') keys.a = true;
-            if (key === 'd' || key === 'arrowright') keys.d = true;
-            if (key === 'w' || key === 'arrowup') keys.w = true;
-            if (key === ' ') keys.space = true;
-
-            iniciarSiHaceFalta();
-        });
-
-        document.addEventListener('keyup', (e) => {
-            const key = e.key.toLowerCase();
-            if (key === 'a' || key === 'arrowleft') keys.a = false;
-            if (key === 'd' || key === 'arrowright') keys.d = false;
-            if (key === 'w' || key === 'arrowup') keys.w = false;
-            if (key === ' ') keys.space = false;
-        });
-
-        // ---------- CONTROLES TÁCTILES ----------
-        function ligarBotonTactil(id, tecla) {
-            const btn = document.getElementById(id);
-            const activar = (e) => { e.preventDefault(); keys[tecla] = true; iniciarSiHaceFalta(); };
-            const desactivar = (e) => { e.preventDefault(); keys[tecla] = false; };
-            btn.addEventListener('pointerdown', activar);
-            btn.addEventListener('pointerup', desactivar);
-            btn.addEventListener('pointerleave', desactivar);
-            btn.addEventListener('pointercancel', desactivar);
-        }
-        ligarBotonTactil('btn-left', 'a');
-        ligarBotonTactil('btn-right', 'd');
-        ligarBotonTactil('btn-jump', 'w');
-
-        // ---------- FOCO ----------
-        // Al insertarse en un iframe (Google Sites), el teclado solo responde tras un
-        // primer clic/toque dentro del propio juego.
-        function iniciarSiHaceFalta() {
-            if (!hasStarted) {
-                hasStarted = true;
-                startOverlay.style.display = 'none';
-            }
-        }
-        startOverlay.addEventListener('click', () => {
-            iniciarSiHaceFalta();
-            gameContainer.focus();
-        });
-        gameContainer.addEventListener('click', () => gameContainer.focus());
-
-        // Objeto Jugador
-        const player = {
-            x: 100,
-            y: 200,
-            width: 30,
-            height: 30,
-            vy: 0,
-            vx: 0,
-            speed: 5,
-            jumpPower: -15,
-            gravity: 0.6,
-            grounded: false,
-            color: '#f1c40f',
-            
-            update() {
-                // Movimiento horizontal (WASD)
-                if (keys.a) this.vx = -this.speed;
-                else if (keys.d) this.vx = this.speed;
-                else this.vx = 0;
-
-                // Salto (W o Espacio)
-                if ((keys.w || keys.space) && this.grounded) {
-                    this.vy = this.jumpPower;
-                    this.grounded = false;
-                }
-
-                // Aplicar física
-                this.vy += this.gravity;
-                this.x += this.vx;
-                this.y += this.vy;
-
-                // Límites de la pantalla (paredes invisibles)
-                if (this.x < 0) this.x = 0;
-                if (this.x + this.width > canvas.width) this.x = canvas.width - this.width;
-
-                // Comprobar muerte por caída
-                if (this.y > canvas.height) {
-                    terminarJuego();
-                }
-            },
-            
-            draw() {
-                ctx.fillStyle = this.color;
-                ctx.fillRect(this.x, this.y, this.width, this.height);
-                
-                // Detalles del personaje (ojos)
-                ctx.fillStyle = '#333';
-                ctx.fillRect(this.x + 20, this.y + 5, 5, 5);
-                ctx.fillRect(this.x + 10, this.y + 5, 5, 5);
-            }
-        };
-
-        // Arrays para almacenar el entorno
-        let platforms = [];
-        let obstacles = [];
-
-        class Platform {
-            constructor(x, y, width) {
-                this.x = x;
-                this.y = y;
-                this.width = width;
-                this.height = 20;
-                this.color = '#27ae60';
-            }
-            update() {
-                this.x -= gameSpeed;
-            }
-            draw() {
-                ctx.fillStyle = this.color;
-                ctx.fillRect(this.x, this.y, this.width, this.height);
-                // Césped decorativo
-                ctx.fillStyle = '#2ecc71';
-                ctx.fillRect(this.x, this.y, this.width, 5);
-            }
-        }
-
-        class Obstacle {
-            constructor(x, y) {
-                this.x = x;
-                this.y = y;
-                this.width = 30;
-                this.height = 30;
-                this.color = '#e74c3c';
-            }
-            update() {
-                this.x -= gameSpeed;
-            }
-            draw() {
-                ctx.fillStyle = this.color;
-                ctx.fillRect(this.x, this.y, this.width, this.height);
-                
-                // Efecto de pinchos
-                ctx.fillStyle = '#c0392b';
-                ctx.beginPath();
-                ctx.moveTo(this.x, this.y);
-                ctx.lineTo(this.x + 15, this.y - 15);
-                ctx.lineTo(this.x + 30, this.y);
-                ctx.fill();
-            }
-        }
-
-        function generarEntorno() {
-            // Plataforma inicial. Se comprueba por cantidad de plataformas existentes,
-            // no por número de frame: "frames === 0" nunca se cumplía al reiniciar tras
-            // perder (frames ya valía 1 en el momento de esta comprobación), por eso no
-            // volvían a aparecer plataformas después de la primera partida.
-            if (platforms.length === 0) {
-                platforms.push(new Platform(0, 400, 800));
-            }
-
-            // Generar nuevas plataformas
-            if (frames % 90 === 0) {
-                const gapX = Math.random() * 150 + 50; // Hueco horizontal entre plataformas
-                const lastPlatform = platforms[platforms.length - 1];
-                let startX = lastPlatform ? lastPlatform.x + lastPlatform.width + gapX : canvas.width;
-                
-                if (startX < canvas.width) startX = canvas.width;
-
-                const y = Math.random() * 150 + 250; // Altura aleatoria
-                const width = Math.random() * 300 + 150; // Ancho aleatorio
-                
-                platforms.push(new Platform(startX, y, width));
-
-                // Probabilidad de generar un obstáculo rojo encima de la nueva plataforma
-                if (Math.random() < 0.4) {
-                    const obsX = startX + Math.random() * (width - 40) + 20;
-                    obstacles.push(new Obstacle(obsX, y - 30));
-                }
-            }
-
-            // Limpiar memoria de elementos que ya salieron de la pantalla
-            platforms = platforms.filter(p => p.x + p.width > 0);
-            obstacles = obstacles.filter(o => o.x + o.width > 0);
-        }
-
-        function detectarColisiones() {
-            player.grounded = false;
-
-            // Colisiones con plataformas
-            for (let i = 0; i < platforms.length; i++) {
-                let p = platforms[i];
-                
-                // Detección Axis-Aligned Bounding Box (AABB)
-                if (player.x < p.x + p.width && 
-                    player.x + player.width > p.x && 
-                    player.y + player.height > p.y && 
-                    player.y < p.y + p.height) {
-                    
-                    // Colisión por arriba (el jugador cae sobre la plataforma)
-                    // Permitimos cierto margen de velocidad para no atravesarlas si cae muy rápido
-                    if (player.vy >= 0 && (player.y + player.height - player.vy) <= p.y + 5) {
-                        player.y = p.y - player.height;
-                        player.vy = 0;
-                        player.grounded = true;
-                    } 
-                    // Colisión lateral o inferior
-                    else {
-                        // Choca por la izquierda
-                        if (player.vx > 0 && player.x + player.width - player.vx <= p.x) {
-                            player.x = p.x - player.width;
-                            player.vx = 0;
-                        }
-                        // Choca por la derecha
-                        else if (player.vx < 0 && player.x - player.vx >= p.x + p.width) {
-                            player.x = p.x + p.width;
-                            player.vx = 0;
-                        }
-                        // Choca por debajo (golpea la cabeza)
-                        else if (player.vy < 0 && player.y - player.vy >= p.y + p.height) {
-                            player.y = p.y + p.height;
-                            player.vy *= -0.5; // Rebote leve
-                        }
-                    }
-                }
-            }
-
-            // Colisiones con obstáculos mortales
-            for (let i = 0; i < obstacles.length; i++) {
-                let o = obstacles[i];
-                // Hitbox ligeramente más pequeña para ser justos con el jugador
-                const margin = 5; 
-                if (player.x + margin < o.x + o.width && 
-                    player.x + player.width - margin > o.x && 
-                    player.y + margin < o.y + o.height && 
-                    player.y + player.height - margin > o.y - 10) { // -10 por los pinchos
-                    terminarJuego();
-                }
-            }
-        }
-
-        function terminarJuego() {
-            if (isGameOver) return;
-            isGameOver = true;
-            cancelAnimationFrame(animationId);
-            gameOverScreen.style.display = 'block';
-            finalScore.innerText = score;
-
-            // Registrar récord en almacenamiento local (si el navegador lo permite)
-            if (score > highScore) {
-                highScore = score;
-                guardarRecord(highScore);
-                highScoreDisplay.innerText = highScore;
-            }
-        }
-
-        function reiniciarJuego() {
-            isGameOver = false;
-            gameOverScreen.style.display = 'none';
-            player.x = 100;
-            player.y = 200;
-            player.vy = 0;
-            platforms = [];
-            obstacles = [];
-            frames = 0;
-            score = 0;
-            gameSpeed = 4;
-            scoreDisplay.innerText = score;
-            loop();
-        }
-
-        function loop() {
-            if (isGameOver) return;
-
-            // Limpiar lienzo
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            if (hasStarted) {
-                // Aumentar dificultad progresivamente
-                frames++;
-                if (frames % 60 === 0) {
-                    score++;
-                    scoreDisplay.innerText = score;
-                    // Cada 100 puntos aumenta la velocidad del juego para hacerlo más difícil
-                    if (score % 100 === 0 && gameSpeed < 10) {
-                        gameSpeed += 0.5;
-                    }
-                }
-
-                generarEntorno();
-
-                // Actualizar y dibujar entorno
-                platforms.forEach(p => { p.update(); p.draw(); });
-                obstacles.forEach(o => { o.update(); o.draw(); });
-
-                player.update();
-                detectarColisiones();
-            } else {
-                // Antes del primer toque/clic, la plataforma inicial ya se muestra
-                // pero el juego permanece en pausa para no penalizar al jugador
-                if (platforms.length === 0) platforms.push(new Platform(0, 400, 800));
-                platforms.forEach(p => p.draw());
-            }
-
-            player.draw();
-
-            animationId = requestAnimationFrame(loop);
-        }
-
-        // Iniciar
-        reiniciarJuego();
-    </script>
+<nav><a href="index.html" class="brand"><span class="brand-dot"></span>Alber.Games</a><div class="nav-links-container"><a href="bubble-clicker.html" class="nav-link">Bubble Clicker</a><a href="tech-startup.html" class="nav-link">Tech Startup</a><a href="hop-hop.html" class="nav-link">Hop Hop</a><a href="https://albersoftworks.github.io" target="_blank" rel="noopener" class="nav-cta">Contacto</a></div></nav>
+<div id="game-container">
+<canvas id="gameCanvas" width="960" height="600" aria-label="Juego Hop Hop"></canvas>
+<div class="game-top"><div class="hud-group"><div class="hud-pill"><small>PUNTOS</small><strong id="score">0</strong></div><div class="hud-pill combo"><small>COMBO</small><strong id="combo">x1</strong></div></div><div class="hud-group"><div class="hud-pill"><small>MONEDAS</small><strong id="coins">0</strong></div><div class="hud-pill best"><small>RÉCORD</small><strong id="best">0</strong></div></div></div>
+<div id="event" class="event hidden"></div>
+<div id="touch-controls"><div class="touch-group"><div class="touch-btn" id="left">◀</div><div class="touch-btn" id="right">▶</div></div><div class="touch-btn jump" id="jump">↑</div></div>
+<div id="start" class="center-panel"><div class="panel"><h1>HOP HOP</h1><p>Corre, salta, recoge monedas y encadena combos. Cada salto perfecto te hace más rápido.</p><div class="stats"><div class="stat"><b>🪙</b><span>Recoge monedas</span></div><div class="stat"><b>🔥</b><span>Sube el combo</span></div><div class="stat"><b>⚡</b><span>Usa poderes</span></div><div class="stat"><b>🛡️</b><span>Sobrevive</span></div></div><button class="primary" id="startBtn">Empezar partida</button></div></div>
+<div id="gameover" class="center-panel hidden"><div class="panel"><h1 id="overTitle">¡CAÍSTE!</h1><p id="overMessage">La siguiente partida será más larga.</p><div class="stats"><div class="stat"><b id="finalScore">0</b><span>Puntos</span></div><div class="stat"><b id="finalCoins">0</b><span>Monedas</span></div><div class="stat"><b id="finalCombo">x1</b><span>Combo máx.</span></div><div class="stat"><b id="finalBest">0</b><span>Récord</span></div></div><button class="primary" id="restartBtn">Jugar otra vez</button></div></div>
+</div>
+<div class="tip">A/D o ←/→ para moverte · W/↑/ESPACIO para saltar · doble salto disponible · móvil: controles táctiles</div>
+<script>
+'use strict';
+const canvas=document.getElementById('gameCanvas'),ctx=canvas.getContext('2d'),W=canvas.width,H=canvas.height;
+const $=id=>document.getElementById(id);
+const scoreEl=$('score'),comboEl=$('combo'),coinsEl=$('coins'),bestEl=$('best'),start=$('start'),gameover=$('gameover'),eventEl=$('event'),container=$('game-container');
+const KEY='alberGames.hopHop.v3';
+let best=0;try{best=Number(localStorage.getItem(KEY))||0}catch(e){}
+bestEl.textContent=best;
+const input={left:false,right:false,jump:false};
+let state='menu',score=0,coins=0,combo=1,maxCombo=1,time=0,speed=4.2,spawn=0,shake=0,flash=0,last=0,animation=0;
+let platforms=[],hazards=[],pickups=[],particles=[],clouds=[];
+const player={x:130,y:330,w:30,h:38,vx:0,vy:0,ground:false,jumps:0,shield:0,magnet:0,boost:0,coyote:0};
+function loadBest(){try{best=Number(localStorage.getItem(KEY))||best}catch(e){}}
+function saveBest(){try{localStorage.setItem(KEY,String(best))}catch(e){}}
+function rand(a,b){return a+Math.random()*(b-a)}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
+function rects(a,b){return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y}
+function reset(){state='playing';score=0;coins=0;combo=1;maxCombo=1;time=0;speed=4.2;spawn=0;shake=0;flash=0;platforms=[];hazards=[];pickups=[];particles=[];clouds=[];player.x=130;player.y=330;player.vx=0;player.vy=0;player.ground=false;player.jumps=0;player.shield=0;player.magnet=0;player.boost=0;player.coyote=0;start.classList.add('hidden');gameover.classList.add('hidden');seedWorld();updateHUD()}
+function seedWorld(){platforms.push({x:-50,y:470,w:430,h:30,type:'normal'});platforms.push({x:470,y:430,w:210,h:24,type:'normal'});platforms.push({x:760,y:370,w:260,h:24,type:'normal'});for(let i=0;i<8;i++)clouds.push({x:rand(0,W),y:rand(40,240),s:rand(.35,1.05),w:rand(50,120)})}
+function makePlatform(){const lastP=platforms[platforms.length-1];const gap=rand(65,135+Math.min(time*.7,80));const y=clamp(lastP.y+rand(-95,85),285,480);const w=rand(130,270-Math.min(time,100));const p={x:lastP.x+lastP.w+gap,y,w,h:22,type:Math.random()<.12?'bounce':'normal'};platforms.push(p);
+const roll=Math.random();if(roll<.24)hazards.push({x:p.x+rand(25,Math.max(26,p.w-45)),y:p.y-28,w:30,h:28,type:Math.random()<.5?'spike':'enemy',phase:rand(0,6)});if(roll>.28&&roll<.72)placeCoins(p);if(roll>.84)pickups.push({x:p.x+p.w*.55,y:p.y-55,w:24,h:24,type:Math.random()<.5?'shield':'magnet',spin:0});}
+function placeCoins(p){const n=Math.floor(rand(3,Math.min(8,p.w/25)));for(let i=0;i<n;i++)pickups.push({x:p.x+25+i*((p.w-50)/Math.max(1,n-1)),y:p.y-rand(28,65),w:18,h:18,type:'coin',spin:rand(0,6)})}
+function spawnWorld(){spawn-=1;if(spawn<=0){makePlatform();spawn=Math.max(42,78-time*.25)}platforms=platforms.filter(p=>p.x+p.w>-80);hazards=hazards.filter(o=>o.x+o.w>-80);pickups=pickups.filter(p=>p.x+p.w>-80)}
+function jump(){if(state!=='playing')return;if(player.ground||player.coyote>0){player.vy=-13.5;player.ground=false;player.coyote=0;player.jumps=1;burst(player.x+15,player.y+38,'jump');return}if(player.jumps<2){player.vy=-12;player.jumps=2;burst(player.x+15,player.y+38,'double');}}
+function inputDown(){jump()}
+function update(dt){time+=dt;speed=4.2+Math.min(4.6,time*.055)+(player.boost>0?3:0);spawnWorld();
+player.coyote=Math.max(0,player.coyote-dt);player.shield=Math.max(0,player.shield-dt);player.magnet=Math.max(0,player.magnet-dt);player.boost=Math.max(0,player.boost-dt);
+const dir=(input.right?1:0)-(input.left?1:0);player.vx+=(dir*7-player.vx)*Math.min(1,dt*12);player.vy+=.65;player.x+=player.vx;player.y+=player.vy;player.x=clamp(player.x,0,W-player.w);
+let landed=false;for(const p of platforms){p.x-=speed;if(player.vy>=0&&player.x+player.w>p.x&&player.x<p.x+p.w&&player.y+player.h>=p.y&&player.y+player.h-player.vy<=p.y+8){player.y=p.y-player.h;player.vy=0;if(!player.ground){landed=true;score+=Math.floor(10*combo);combo=Math.min(20,combo+1);maxCombo=Math.max(maxCombo,combo);burst(player.x+15,player.y+38,'land')}player.ground=true;player.jumps=0;player.coyote=.09}}
+if(!landed&&!player.ground)player.coyote=Math.max(0,player.coyote-dt);if(player.y>H+70){die('¡Agujero!');return}
+for(const o of hazards){o.x-=speed;if(o.type==='enemy')o.y+=Math.sin(time*5+o.phase)*.5;if(rects(player,o)){if(player.shield>0){player.shield=0;o.x=-200;score+=75;combo=Math.min(20,combo+2);burst(o.x,o.y,'shield');flash=.25;shake=.2}else{die(o.type==='enemy'?'¡Te pilló!':'¡Pinchazo!');return}}}
+for(const p of pickups){p.x-=speed;p.spin+=dt*7;let px=p.x,py=p.y;if(player.magnet>0&&p.type==='coin'){const dx=player.x+15-px,dy=player.y+18-py,d=Math.hypot(dx,dy);if(d<150){p.x+=dx*.08;p.y+=dy*.08}}if(rects(player,{x:px,y:py,w:p.w,h:p.h})){if(p.type==='coin'){coins++;score+=25*combo;combo=Math.min(20,combo+1);burst(px,py,'coin')}else if(p.type==='shield'){player.shield=8;score+=100;event('🛡️ ESCUDO · 8s');burst(px,py,'power')}else{player.magnet=8;score+=100;event('🧲 IMÁN · 8s');burst(px,py,'power')}p.x=-500}}
+if(player.ground)combo=Math.max(1,combo-dt*.12);if(Math.floor(time)%20===0&&Math.floor(time)!==Math.floor(time-dt)){event('⚡ VELOCIDAD +');flash=.15}score+=dt*4;updateParticles(dt);shake=Math.max(0,shake-dt);flash=Math.max(0,flash-dt);updateHUD()}
+function die(msg){state='over';best=Math.max(best,Math.floor(score));saveBest();$('finalScore').textContent=Math.floor(score);$('finalCoins').textContent=coins;$('finalCombo').textContent='x'+maxCombo;$('finalBest').textContent=best;$('overTitle').textContent=msg;$('overMessage').textContent=score>1000?'Gran carrera. Ya tienes un objetivo nuevo.':'Salta antes de que termine la plataforma.';gameover.classList.remove('hidden');shake=.45;updateHUD()}
+function event(text){eventEl.textContent=text;eventEl.classList.remove('hidden');clearTimeout(event._t);event._t=setTimeout(()=>eventEl.classList.add('hidden'),1600)}
+function updateHUD(){scoreEl.textContent=Math.floor(score);coinsEl.textContent=coins;comboEl.textContent='x'+Math.max(1,Math.floor(combo));bestEl.textContent=best}
+function burst(x,y,type){const count=type==='coin'?9:14;for(let i=0;i<count;i++)particles.push({x,y,vx:rand(-3,3),vy:rand(-4,-1),life:rand(.3,.7),type})}
+function updateParticles(dt){for(const p of particles){p.x+=p.vx;p.y+=p.vy;p.vy+=.12;p.life-=dt}particles=particles.filter(p=>p.life>0)}
+function circle(x,y,r){ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill()}
+function draw(){ctx.save();if(shake>0)ctx.translate(rand(-5,5),rand(-4,4));const sky=ctx.createLinearGradient(0,0,0,H);sky.addColorStop(0,'#172554');sky.addColorStop(.55,'#0f766e');sky.addColorStop(1,'#111827');ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);
+// Fondo parallax
+ctx.fillStyle='#ffffff12';for(const c of clouds){c.x-=.15;if(c.x+c.w<0)c.x=W+20;ctx.beginPath();ctx.ellipse(c.x, c.y,c.w,c.w*.22,0,0,Math.PI*2);ctx.fill()}
+ctx.fillStyle='#0b1325';for(let x=0;x<W;x+=90){const h=80+((x*17)%100);ctx.fillRect(x,H-130-h,65,h)}
+for(const p of platforms){ctx.fillStyle=p.type==='bounce'?'#a78bfa':'#14b8a6';ctx.fillRect(p.x,p.y,p.w,p.h);ctx.fillStyle=p.type==='bounce'?'#c4b5fd':'#5eead4';ctx.fillRect(p.x,p.y,p.w,5);if(p.type==='bounce'){ctx.fillStyle='#fff8';for(let x=p.x+12;x<p.x+p.w-5;x+=28)ctx.fillRect(x,p.y+9,14,3)}}
+for(const o of hazards){if(o.type==='spike'){ctx.fillStyle='#fb7185';ctx.beginPath();ctx.moveTo(o.x,o.y+o.h);ctx.lineTo(o.x+15,o.y);ctx.lineTo(o.x+30,o.y+o.h);ctx.closePath();ctx.fill();ctx.fillStyle='#fecdd3';ctx.fillRect(o.x+13,o.y+7,4,12)}else{ctx.fillStyle='#f97316';circle(o.x+15,o.y+14,15);ctx.fillStyle='#111827';circle(o.x+10,o.y+11,3);circle(o.x+20,o.y+11,3);ctx.fillStyle='#fff';ctx.fillRect(o.x+9,o.y+20,12,3)}}
+for(const p of pickups){if(p.x<-50)continue;ctx.save();ctx.translate(p.x+p.w/2,p.y+p.h/2);ctx.rotate(Math.sin(p.spin)*.15);if(p.type==='coin'){ctx.fillStyle='#fbbf24';circle(0,0,9);ctx.fillStyle='#78350f';ctx.font='bold 11px sans-serif';ctx.textAlign='center';ctx.fillText('C',0,4)}else{ctx.fillStyle=p.type==='shield'?'#60a5fa':'#c084fc';circle(0,0,12);ctx.fillStyle='#fff';ctx.font='bold 14px sans-serif';ctx.textAlign='center';ctx.fillText(p.type==='shield'?'S':'M',0,5)}ctx.restore()}
+// Player
+ctx.save();ctx.translate(player.x+15,player.y+19);if(player.shield>0){ctx.strokeStyle='#60a5fa';ctx.lineWidth=3;ctx.globalAlpha=.5+.5*Math.sin(time*8);circle(0,0,27);ctx.globalAlpha=1}ctx.rotate(player.vx*.025);ctx.fillStyle='#fbbf24';ctx.fillRect(-15,-19,30,38);ctx.fillStyle='#111827';ctx.fillRect(-8,-9,5,5);ctx.fillRect(5,-9,5,5);ctx.fillStyle='#f59e0b';ctx.fillRect(-11,12,22,5);ctx.restore();
+for(const p of particles){ctx.globalAlpha=Math.max(0,p.life/.7);ctx.fillStyle=p.type==='coin'?'#fbbf24':p.type==='power'?'#c084fc':'#5eead4';circle(p.x,p.y,3+p.life*3)}ctx.globalAlpha=1;ctx.restore();if(flash>0){ctx.fillStyle='#fff';ctx.globalAlpha=flash*2;ctx.fillRect(0,0,W,H);ctx.globalAlpha=1}}
+function loop(t){const dt=Math.min(.035,(t-last)/1000||.016);last=t;if(state==='playing')update(dt);draw();animation=requestAnimationFrame(loop)}
+function startGame(){reset();container.classList.remove('shake');container.focus()}
+$('startBtn').addEventListener('click',startGame);$('restartBtn').addEventListener('click',startGame);
+window.reiniciarJuego=startGame;
+document.addEventListener('keydown',e=>{const k=e.key.toLowerCase();if(['arrowleft','arrowright','arrowup',' ','a','d','w'].includes(k))e.preventDefault();if(k==='a'||k==='arrowleft')input.left=true;if(k==='d'||k==='arrowright')input.right=true;if(k==='w'||k==='arrowup'||k===' '){if(!e.repeat)inputDown();input.jump=true}if((state==='menu'||state==='over')&&(k==='enter'||k===' ')){e.preventDefault();startGame()}});document.addEventListener('keyup',e=>{const k=e.key.toLowerCase();if(k==='a'||k==='arrowleft')input.left=false;if(k==='d'||k==='arrowright')input.right=false;if(k==='w'||k==='arrowup'||k===' ')input.jump=false});
+function bindTouch(id,key){const b=$(id);const on=e=>{e.preventDefault();input[key]=true;if(key==='jump')inputDown()};const off=e=>{e.preventDefault();input[key]=false};b.addEventListener('pointerdown',on);b.addEventListener('pointerup',off);b.addEventListener('pointercancel',off);b.addEventListener('pointerleave',off)}bindTouch('left','left');bindTouch('right','right');bindTouch('jump','jump');canvas.addEventListener('pointerdown',()=>{if(state==='menu'||state==='over')startGame()});
+loadBest();seedWorld();animation=requestAnimationFrame(loop);
+</script>
 </body>
 </html>
