@@ -55,7 +55,18 @@ function distanceToPath(x,y){let min=Infinity;for(let i=0;i<WAYPOINTS.length-1;i
 function isValidPlacement(x,y){if(x<20||x>canvas.width-20||y<20||y>canvas.height-20)return false;if(distanceToPath(x,y)<PATH_CLEARANCE)return false;return !state.towers.some(t=>Math.hypot(t.x-x,t.y-y)<TOWER_MIN_GAP)}
 function tierIndexByName(name){return BALLOON_TIERS.findIndex(t=>t.name===name)}
 function buildWaveQueue(n){const q=[];const add=(type,count)=>{for(let i=0;i<count;i++)q.push(type)};add('red',Math.round(14+n*2));if(n>=2)add('blue',Math.round(6+n*1.5));if(n>=4)add('green',Math.round(5+n*1.1));if(n>=6)add('yellow',Math.round(4+n));if(n>=8)add('pink',Math.round(3+n*.8));if(n>=10)add('purple',Math.round(3+n*.65));if(n>=12)add('black',Math.round(2+n*.55));if(n>=15)add('rainbow',Math.round(1+n*.4));if(n>=18)add('ceramic',Math.round(1+n*.25));if(n%5===0)q.push('MOAB');for(let i=q.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[q[i],q[j]]=[q[j],q[i]]}return q}
-function spawnBalloon(type){if(type==='MOAB'){state.balloons.push({kind:'moab',name:'MOAB',x:WAYPOINTS[0].x,y:WAYPOINTS[0].y,wpIndex:1,segProgress:0,hp:MOAB.hp,maxHp:MOAB.hp,reward:MOAB.reward,leak:MOAB.leak,slowMult:1,slowResist:MOAB.slowResist});return}const idx=tierIndexByName(type);state.balloons.push({kind:'layered',tierIndex:idx,x:WAYPOINTS[0].x,y:WAYPOINTS[0].y,wpIndex:1,segProgress:0,slowMult:1})}
+function spawnBalloon(type){if(type==='MOAB'){
+    state.balloons.push({
+        kind:'layered',
+        tierIndex:idx,
+        x:WAYPOINTS[0].x,
+        y:WAYPOINTS[0].y,
+        wpIndex:1,
+        segProgress:0,
+        slowMult:1,
+        leak:BALLOON_TIERS[idx].leak
+        })
+}
 function startWave(){if(state.waveActive||state.gameOver||state.victory)return;state.wave++;state.spawnQueue=buildWaveQueue(state.wave);state.spawnTimer=0;state.waveActive=true;updateHUD()}
 function findTarget(t){let best=null,bestProgress=-1;for(const b of state.balloons){if(b.dead)continue;const dx=b.x-t.x,dy=b.y-t.y;if(Math.hypot(dx,dy)>t.range)continue;const progress=b.wpIndex+(b.segProgress||0);if(progress>bestProgress){bestProgress=progress;best=b}}return best}
 function fireTower(t,target){state.projectiles.push({x:t.x,y:t.y,target,speed:t.projectileSpeed,damage:t.damage,splash:t.splash,colorVar:t.colorVar,slowFactor:t.slowFactor||0})}
@@ -63,7 +74,14 @@ function fireTower(t,target){state.projectiles.push({x:t.x,y:t.y,target,speed:t.
 function damageBalloon(b,amount,slowFactor=0){if(!b||b.dead)return;if(b.kind==='moab'){b.hp-=amount;state.money+=amount;if(b.hp<=0){b.dead=true;state.money+=b.reward;toast('💥 ¡MOAB destruido! +'+b.reward+'💰')}return}let hits=Math.max(1,Math.floor(amount));while(hits>0&&!b.dead){const tier=BALLOON_TIERS[b.tierIndex];state.money+=tier.reward;hits--;if(b.tierIndex>=BALLOON_TIERS.length-1){b.dead=true}else{b.tierIndex++;b.slowMult=1-(1-(slowFactor||1))*(1-BALLOON_TIERS[b.tierIndex].slowResist)}}}
 function applySplash(x,y,radius,amount,slowFactor=0){state.balloons.forEach(b=>{if(!b.dead&&Math.hypot(b.x-x,b.y-y)<=radius)damageBalloon(b,amount,slowFactor)})}
 function updateBalloonSlows(){state.balloons.forEach(b=>{if(b.dead)return;let slow=1;for(const t of state.towers){const d=Math.hypot(b.x-t.x,b.y-t.y);if((t.type==='support'||t.type==='ice')&&d<=t.range)slow=Math.min(slow,t.slowFactor||1)}const resist=b.kind==='moab'?b.slowResist:BALLOON_TIERS[b.tierIndex].slowResist;b.slowMult=1-(1-slow)*(1-resist)})}
-function moveBalloons(dt){for(const b of state.balloons){if(b.dead||b.wpIndex>=WAYPOINTS.length)continue;const target=WAYPOINTS[b.wpIndex],prev=WAYPOINTS[b.wpIndex-1],dx=target.x-b.x,dy=target.y-b.y,dist=Math.hypot(dx,dy)||.0001,tier=b.kind==='moab'?MOAB:BALLOON_TIERS[b.tierIndex],move=tier.speed*b.slowMult*dt;if(move>=dist){b.x=target.x;b.y=target.y;b.wpIndex++;if(b.wpIndex>=WAYPOINTS.length){state.lives-=b.leak;b.dead=true}}else{b.x+=(dx/dist)*move;b.y+=(dy/dist)*move}const segLen=Math.hypot(target.x-prev.x,target.y-prev.y)||1;b.segProgress=1-(dist/segLen)}if(state.lives<=0&&!state.gameOver)endGame(false)}
+function moveBalloons(dt){for(const b of state.balloons){if(b.dead||b.wpIndex>=WAYPOINTS.length)continue;const target=WAYPOINTS[b.wpIndex],prev=WAYPOINTS[b.wpIndex-1],dx=target.x-b.x,dy=target.y-b.y,dist=Math.hypot(dx,dy)||.0001,tier=b.kind==='moab'?MOAB:BALLOON_TIERS[b.tierIndex],move=tier.speed*b.slowMult*dt;if(move>=dist){b.x=target.x;b.y=target.y;b.wpIndex++;if(b.wpIndex>=WAYPOINTS.length){
+  const leak = b.kind === 'moab'
+    ? MOAB.leak
+    : BALLOON_TIERS[b.tierIndex].leak;
+
+  state.lives -= leak;
+  b.dead = true;
+}}else{b.x+=(dx/dist)*move;b.y+=(dy/dist)*move}const segLen=Math.hypot(target.x-prev.x,target.y-prev.y)||1;b.segProgress=1-(dist/segLen)}if(state.lives<=0&&!state.gameOver)endGame(false)}
 
 document.querySelectorAll('.td-tower-option').forEach(el=>el.addEventListener('click',()=>{const type=el.dataset.type;if(state.money<TOWER_TYPES[type].cost)return;state.armedType=state.armedType===type?null:type;state.selectedTower=null;refreshTowerOptionUI();renderSelectedPanel()}));
 function refreshTowerOptionUI(){document.querySelectorAll('.td-tower-option').forEach(el=>{const type=el.dataset.type;el.classList.toggle('armed',state.armedType===type);el.classList.toggle('disabled',state.money<TOWER_TYPES[type].cost)})}
