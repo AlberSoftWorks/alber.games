@@ -8,9 +8,6 @@
   <title>Alber.Games — Bubble Clicker</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    /* La navegación comparte estructura con Alber.Games, pero se integra
-       con la paleta de laboratorio de Bubble Clicker en vez de parecer
-       una tarjeta independiente sobre el juego. */
     body.bubble-clicker{padding:0}
     .bubble-clicker nav{width:100%;align-self:stretch;margin:0;background:rgba(11,12,16,.55);border-bottom:1px solid rgba(102,252,241,.14);box-shadow:0 4px 20px rgba(0,0,0,.12)}
     .bubble-clicker .nav-link{background:rgba(31,40,51,.72);color:var(--bc-muted);border-color:transparent}
@@ -28,53 +25,20 @@
     #gameArea{touch-action:manipulation;min-height:420px}
     #shop{max-height:550px}
     .save-status{font-size:.72rem;color:var(--bc-muted);text-align:center;margin-top:7px;min-height:1em}
-    @media(max-width:720px){.bubble-clicker nav{margin:0}.game-header{padding:20px 16px 12px}.layout{grid-template-columns:1fr}.layout{padding:0 12px}.bubble-clicker .nav-links-container{display:none}#shop{max-height:none}}
+    @media(max-width:720px){.bubble-clicker nav{margin:0}.game-header{padding:20px 16px 12px}.layout{grid-template-columns:1fr;padding:0 12px}.bubble-clicker .nav-links-container{display:none}#shop{max-height:none}}
     @media(prefers-reduced-motion:reduce){.music-btn{transition:none}}
   </style>
 </head>
 <body class="bubble-clicker">
-
 <nav aria-label="Navegación principal">
   <a href="index.html" class="brand" aria-label="Alber.Games — inicio"><span class="brand-dot" aria-hidden="true"></span>Alber.Games</a>
   <div class="nav-links-container">
-    <a href="bubble-clicker.html" class="nav-link" aria-current="page">Bubble Clicker</a>
-    <a href="bloons-siege.html" class="nav-link">Bloons Siege</a>
-    <a href="tech-startup.html" class="nav-link">Tech Startup</a>
-    <a href="brawl-arena.html" class="nav-link">Brawl Arena</a>
-    <a href="hop-hop.html" class="nav-link">Hop Hop</a>
-    <a href="https://albersoftworks.github.io" target="_blank" rel="noopener noreferrer" class="nav-cta">Contacto</a>
+    <a href="bubble-clicker.html" class="nav-link" aria-current="page">Bubble Clicker</a><a href="bloons-siege.html" class="nav-link">Bloons Siege</a><a href="tech-startup.html" class="nav-link">Tech Startup</a><a href="brawl-arena.html" class="nav-link">Brawl Arena</a><a href="hop-hop.html" class="nav-link">Hop Hop</a><a href="https://albersoftworks.github.io" target="_blank" rel="noopener noreferrer" class="nav-cta">Contacto</a>
   </div>
 </nav>
-
-<header class="game-header">
-  <h1>🫧 Bubble Clicker</h1>
-  <p class="subtitle">Haz clic, mejora, trasciende la espuma</p>
-  <div class="game-actions"><button id="bgm-toggle" class="music-btn" type="button">🎵 Música: OFF</button></div>
-</header>
-
-<div id="score">Pops: 0</div>
-<div id="stats">Total reventadas: 0 · Valor base: 1 · Bonus global: x1</div>
-
-<div class="layout">
-  <div id="gameArea" aria-label="Zona de juego de Bubble Clicker"></div>
-  <div id="shop">
-    <h2>🛒 Mejoras</h2>
-    <div class="prestige-zone"><p>Esencia de Jabón: <span id="token-display">0</span></p><p id="prestige-bonus-desc">Bonus actual: +0% de Pops a todo</p><button id="btn-prestige" disabled>✨ Ascender (Requiere 20.000 pts)</button></div>
-    <div class="upgrade"><h3>👆 Dedos rápidos</h3><p id="desc-click">+1 punto base por burbuja</p><button id="buy-click">Comprar (10 pts)</button></div>
-    <div class="upgrade"><h3>🌀 Fábrica de burbujas</h3><p id="desc-spawn">Aparecen más burbujas</p><button id="buy-spawn">Comprar (15 pts)</button></div>
-    <div class="upgrade"><h3>🤖 Auto-Pop</h3><p id="desc-autopop">Revienta burbujas automáticamente</p><button id="buy-autopop">Comprar (60 pts)</button></div>
-    <div class="upgrade tier-high"><h3>🧪 Jabón Concentrado</h3><p id="desc-jabon">+15 Pops base por burbuja</p><button id="buy-jabon">Comprar (800 pts)</button></div>
-    <div class="upgrade tier-high"><h3>⚙️ Compresor Industrial</h3><p id="desc-maquina">+5 auto-pops por segundo</p><button id="buy-maquina">Comprar (3.500 pts)</button></div>
-    <div class="upgrade tier-high"><h3>⚛️ Espuma Termonuclear</h3><p id="desc-termonuclear">+200 Pops base por burbuja</p><button id="buy-termonuclear">Comprar (40.000 pts)</button></div>
-    <div class="upgrade tier-ultra"><h3>☀️ Espuma Solar</h3><p id="desc-solar">+500 Pops base por burbuja</p><button id="buy-solar">Comprar (100.000 pts)</button></div>
-    <div class="upgrade tier-ultra"><h3>🪐 Espuma Infernal</h3><p id="desc-infernal">+800 Pops base por burbuja</p><button id="buy-infernal">Comprar (500.000 pts)</button></div>
-    <div class="upgrade tier-ultra"><h3>🧬 Espuma Cuántica</h3><p id="desc-cuantica">+1200 Pops base por burbuja</p><button id="buy-cuantica">Comprar (2.000.000 pts)</button></div>
-    <div class="upgrade tier-ultra"><h3>🪐 Espuma Multiversal</h3><p id="desc-multiversal">+5000 Pops base por burbuja</p><button id="buy-multiversal">Comprar (20.000.000 pts)</button></div>
-    <div class="upgrade tier-maximo"><h3>👁️ Espuma Primigenia</h3><p id="desc-primigenia">+20000 Pops base por burbuja</p><button id="buy-primigenia">Comprar (50.000.000 pts)</button></div>
-    <div class="save-status" id="save-status" aria-live="polite"></div>
-  </div>
-</div>
-
+<header class="game-header"><h1>🫧 Bubble Clicker</h1><p class="subtitle">Haz clic, mejora, trasciende la espuma</p><div class="game-actions"><button id="bgm-toggle" class="music-btn" type="button">🎵 Música: OFF</button></div></header>
+<div id="score">Pops: 0</div><div id="stats">Total reventadas: 0 · Valor base: 1 · Bonus global: x1</div>
+<div class="layout"><div id="gameArea" aria-label="Zona de juego de Bubble Clicker"></div><div id="shop"><h2>🛒 Mejoras</h2><div class="prestige-zone"><p>Esencia de Jabón: <span id="token-display">0</span></p><p id="prestige-bonus-desc">Bonus actual: +0% de Pops a todo</p><button id="btn-prestige" disabled>✨ Ascender (Requiere 20.000 pts)</button></div><div class="upgrade"><h3>👆 Dedos rápidos</h3><p id="desc-click">+1 punto base por burbuja</p><button id="buy-click">Comprar (10 pts)</button></div><div class="upgrade"><h3>🌀 Fábrica de burbujas</h3><p id="desc-spawn">Aparecen más burbujas</p><button id="buy-spawn">Comprar (15 pts)</button></div><div class="upgrade"><h3>🤖 Auto-Pop</h3><p id="desc-autopop">Revienta burbujas automáticamente</p><button id="buy-autopop">Comprar (60 pts)</button></div><div class="upgrade tier-high"><h3>🧪 Jabón Concentrado</h3><p id="desc-jabon">+15 Pops base por burbuja</p><button id="buy-jabon">Comprar (800 pts)</button></div><div class="upgrade tier-high"><h3>⚙️ Compresor Industrial</h3><p id="desc-maquina">+5 auto-pops por segundo</p><button id="buy-maquina">Comprar (3.500 pts)</button></div><div class="upgrade tier-high"><h3>⚛️ Espuma Termonuclear</h3><p id="desc-termonuclear">+200 Pops base por burbuja</p><button id="buy-termonuclear">Comprar (40.000 pts)</button></div><div class="upgrade tier-ultra"><h3>☀️ Espuma Solar</h3><p id="desc-solar">+500 Pops base por burbuja</p><button id="buy-solar">Comprar (100.000 pts)</button></div><div class="upgrade tier-ultra"><h3>🪐 Espuma Infernal</h3><p id="desc-infernal">+800 Pops base por burbuja</p><button id="buy-infernal">Comprar (500.000 pts)</button></div><div class="upgrade tier-ultra"><h3>🧬 Espuma Cuántica</h3><p id="desc-cuantica">+1200 Pops base por burbuja</p><button id="buy-cuantica">Comprar (2.000.000 pts)</button></div><div class="upgrade tier-ultra"><h3>🪐 Espuma Multiversal</h3><p id="desc-multiversal">+5000 Pops base por burbuja</p><button id="buy-multiversal">Comprar (20.000.000 pts)</button></div><div class="upgrade tier-maximo"><h3>👁️ Espuma Primigenia</h3><p id="desc-primigenia">+20000 Pops base por burbuja</p><button id="buy-primigenia">Comprar (50.000.000 pts)</button></div><div class="save-status" id="save-status" aria-live="polite"></div></div></div>
 <script>
 'use strict';
 const PRESTIGE_COST=20000,SAVE_KEY='alberGames_bubbleClicker_save',fmt=n=>Math.floor(n).toLocaleString('es-ES');
@@ -82,15 +46,16 @@ const baseState={points:0,totalPops:0,clickValue:1,spawnInterval:700,minSpawnInt
 let state=JSON.parse(JSON.stringify(baseState));
 const gameArea=document.getElementById('gameArea'),scoreEl=document.getElementById('score'),statsEl=document.getElementById('stats'),tokenDisplay=document.getElementById('token-display'),prestigeBonusDesc=document.getElementById('prestige-bonus-desc'),btnPrestige=document.getElementById('btn-prestige'),saveStatus=document.getElementById('save-status');
 let audioCtx=null,musicGain=null,musicTimer=null,musicNodes=[],isMusicPlaying=false;
-function initAudio(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume();}
-function playTone(freq,duration=.08,type='sine',volume=.12){initAudio();if(!audioCtx)return;const o=audioCtx.createOscillator(),g=audioCtx.createGain(),t=audioCtx.currentTime;o.type=type;o.frequency.setValueAtTime(freq,t);o.frequency.exponentialRampToValueAtTime(freq*1.8,t+duration);g.gain.setValueAtTime(volume,t);g.gain.exponentialRampToValueAtTime(.001,t+duration);o.connect(g);g.connect(audioCtx.destination);o.start(t);o.stop(t+duration);}
+function initAudio(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume()}
+function playTone(freq,duration=.08,type='sine',volume=.12){initAudio();const o=audioCtx.createOscillator(),g=audioCtx.createGain(),t=audioCtx.currentTime;o.type=type;o.frequency.setValueAtTime(freq,t);o.frequency.exponentialRampToValueAtTime(freq*1.8,t+duration);g.gain.setValueAtTime(volume,t);g.gain.exponentialRampToValueAtTime(.001,t+duration);o.connect(g);g.connect(audioCtx.destination);o.start(t);o.stop(t+duration)}
 function playPopSound(crit=false){playTone(crit?600:300+Math.random()*150,.08,'sine',.16)}
 function playUpgradeSound(){playTone(440,.15,'triangle',.1);setTimeout(()=>playTone(660,.15,'triangle',.08),70)}
 function stopMusic(){if(musicTimer){clearInterval(musicTimer);musicTimer=null}musicNodes.forEach(n=>{try{n.stop()}catch(e){}});musicNodes=[];if(musicGain){musicGain.disconnect();musicGain=null}isMusicPlaying=false}
 function startMusic(){initAudio();if(isMusicPlaying)return;isMusicPlaying=true;const master=audioCtx.createGain();master.gain.value=.045;master.connect(audioCtx.destination);musicGain=master;const scale=[261.63,293.66,329.63,392,440,523.25,587.33];let step=0;const beat=()=>{if(!isMusicPlaying)return;const now=audioCtx.currentTime,melody=[0,2,4,2,1,3,5,3,0,4,2,5,4,2,1,3][step%16],bass=[0,0,4,4,1,1,5,5][step%8],o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='triangle';o.frequency.value=scale[melody];g.gain.setValueAtTime(.001,now);g.gain.linearRampToValueAtTime(.42,now+.025);g.gain.exponentialRampToValueAtTime(.001,now+.32);o.connect(g);g.connect(master);o.start(now);o.stop(now+.34);musicNodes.push(o);if(step%2===0){const b=audioCtx.createOscillator(),bg=audioCtx.createGain();b.type='sine';b.frequency.value=scale[bass]/2;bg.gain.setValueAtTime(.001,now);bg.gain.linearRampToValueAtTime(.16,now+.03);bg.gain.exponentialRampToValueAtTime(.001,now+.45);b.connect(bg);bg.connect(master);b.start(now);b.stop(now+.46);musicNodes.push(b)}step++};beat();musicTimer=setInterval(beat,375)}
 document.getElementById('bgm-toggle').addEventListener('click',()=>{const btn=document.getElementById('bgm-toggle');if(isMusicPlaying){stopMusic();btn.textContent='🎵 Música: OFF'}else{startMusic();btn.textContent='🎶 Música: ON'}});
 let milestones=[{pops:10,done:false,apply:()=>toast('🎉 ¡10 burbujas! Probabilidad de críticos añadida (x3 Pops).')},{pops:50,done:false,apply:()=>{state.goldenUnlocked=true;toast('🌟 ¡50 burbujas! Aparecen burbujas doradas (x5 Pops).')}},{pops:100,done:false,apply:()=>{state.bombUnlocked=true;toast('💥 ¡100 burbujas! Aparecen burbujas bomba (reacción en cadena).')}},{pops:150,done:false,apply:()=>{state.frenzyUnlocked=true;toast('🔥 ¡150 burbujas! Modo frenesí activado.')}},{pops:250,done:false,apply:()=>toast('🚀 ¡250 burbujas! Ya no hay vuelta atrás.')},{pops:500,done:false,apply:()=>toast('👑 ¡500 burbujas! La espuma te reconoce como maestro.')},{pops:1000,done:false,apply:()=>toast('🧬 ¡1.000 burbujas! Has entrado en territorio absurdo.')},{pops:2500,done:false,apply:()=>toast('🔥 ¡2.500 burbujas! Te mereces un descanso.')}];
-function initMilestones(){return milestones.map(m=>({...m))}function checkMilestones(){milestones.forEach(m=>{if(!m.done&&state.totalPops>=m.pops){m.done=true;m.apply()}})}
+function initMilestones(){return milestones.map(m=>({...m}))}
+function checkMilestones(){milestones.forEach(m=>{if(!m.done&&state.totalPops>=m.pops){m.done=true;m.apply()}})}
 let toastTimeout;function toast(msg){let el=document.querySelector('.toast');if(!el){el=document.createElement('div');el.className='toast';document.body.appendChild(el)}el.textContent=msg;requestAnimationFrame(()=>el.classList.add('show'));clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>el.classList.remove('show'),3000)}
 function randomBetween(a,b){return Math.random()*(b-a)+a}
 function createBubble(){const max=40;if(gameArea.querySelectorAll('.bubble:not(.pop)').length>=max)return;const r=Math.random();let type='normal';if(state.bombUnlocked&&r<.05)type='bomb';else if(state.goldenUnlocked&&r<.15)type='golden';const b=document.createElement('div');b.classList.add('bubble');if(type!=='normal')b.classList.add(type);b.dataset.type=type;const size=type==='golden'?randomBetween(40,60):type==='bomb'?randomBetween(45,65):randomBetween(35,75);b.style.width=b.style.height=size+'px';b.style.left=randomBetween(0,Math.max(gameArea.clientWidth-size,0))+'px';b.style.top=randomBetween(0,Math.max(gameArea.clientHeight-size,0))+'px';b.addEventListener('pointerdown',e=>{e.preventDefault();popBubble(b)});gameArea.appendChild(b);setTimeout(()=>{if(gameArea.contains(b)&&!b.classList.contains('pop')){b.style.transition='opacity .6s';b.style.opacity='0';setTimeout(()=>b.remove(),600)}},type==='golden'?3000:4500)}
