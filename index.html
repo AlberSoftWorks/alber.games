@@ -1,178 +1,125 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alber.Games — Sala de juegos</title>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Alber.Games: una colección de juegos pequeños para perder el tiempo con dignidad.">
+  <meta name="theme-color" content="#140F2B">
+  <title>Alber.Games — Sala de juegos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .home-shell{max-width:1180px;margin:0 auto}
+    .hero{min-height:72vh}
+    .hero-content{max-width:760px}
+    .hero-kicker{display:inline-flex;align-items:center;gap:8px;margin-bottom:18px;padding:7px 13px;border:1px solid var(--panel-edge);border-radius:999px;background:#1e1640cc;color:var(--sky);font:700 .78rem var(--font-body);letter-spacing:.04em;text-transform:uppercase}
+    .hero-kicker i{width:7px;height:7px;border-radius:50%;background:var(--sky);box-shadow:0 0 12px var(--sky)}
+    .hero-actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:28px}
+    .hero-actions .cta.secondary{background:transparent;color:var(--text);border:1px solid var(--panel-edge);box-shadow:none}
+    .hero-actions .cta.secondary:hover{background:var(--panel);transform:translateY(-1px);box-shadow:none}
+    .collection-bar{display:flex;justify-content:space-between;align-items:end;gap:20px;margin-bottom:24px}
+    .collection-count{color:var(--muted);font-size:.9rem;margin:0}.collection-count strong{color:var(--text)}
+    .game-grid{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:auto;gap:18px;margin-top:18px}
+    .card-featured{grid-row:auto;min-height:340px}
+    .game-grid:first-of-type .card-featured:first-child{grid-column:span 1}
+    .game-card-meta{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:15px;color:var(--muted);font-size:.76rem}
+    .play-btn::after{content:'→';transition:transform .2s ease}.card-featured:hover .play-btn::after{transform:translateX(3px)}
+    .new-badge{position:absolute;top:16px;right:16px;z-index:3;padding:5px 10px;border-radius:999px;background:var(--gold);color:var(--ink);font:800 .7rem var(--font-body);text-transform:uppercase;letter-spacing:.05em}
+    .card-soon{display:flex;flex-direction:column;justify-content:center;min-height:340px;background:linear-gradient(145deg,var(--panel),#17112f);border-style:dashed;text-align:center}
+    .soon-bubble{margin:0 auto 16px;width:62px;height:62px;display:grid;place-items:center;border-radius:50%;background:var(--sky);color:var(--ink);font:800 2rem var(--font-display);box-shadow:0 0 35px #6fe7ff44}
+    .card-soon h4{font:800 1.25rem var(--font-display);margin:0 0 7px}.card-soon p{color:var(--muted);max-width:34ch;margin:0 auto}
+    .games-note{margin:34px 0 0;padding:16px 18px;border:1px solid var(--panel-edge);border-radius:16px;background:#1e164066;color:var(--muted);font-size:.9rem}.games-note strong{color:var(--text)}
+    @media(max-width:720px){.hero{min-height:68vh;padding-top:30px}.collection-bar{align-items:start;flex-direction:column;gap:4px}.game-grid{grid-template-columns:1fr}.card-featured{min-height:330px}.card-soon{min-height:260px}.hero-actions .cta{padding:12px 22px}}
+    @media(prefers-reduced-motion:reduce){.hero-content{animation:none!important}.card-featured,.cta{transition:none!important}}
+  </style>
 </head>
 <body>
-
-<nav>
-    <a href="https://albersoftworks.github.io/alber.games" class="brand">
-        <span class="brand-dot"></span>Alber.Games
-    </a>
-    
-    <div class="nav-links-container">
-        <a href="https://albersoftworks.github.io/alber.games/bubble-clicker" class="nav-link">Bubble Clicker</a>
-        <a href="https://albersoftworks.github.io/alber.games/bloons-siege" class="nav-link">Bloons Siege</a>
-        <a href="https://albersoftworks.github.io/alber.games/tech-startup" class="nav-link">Tech Startup</a>
-        <a href="https://albersoftworks.github.io/alber.games/brawl-arena" class="nav-link">Brawl Arena</a>
-        <a href="https://albersoftworks.github.io/alber.games/hop-hop" class="nav-link">Hop Hop</a>
-        <a href="https://albersoftworks.github.io" target="_blank" rel="noopener" class="nav-cta">Contacto</a>
-    </div>
+<nav aria-label="Navegación principal">
+  <a href="index.html" class="brand" aria-label="Alber.Games — inicio"><span class="brand-dot" aria-hidden="true"></span>Alber.Games</a>
+  <div class="nav-links-container">
+    <a href="bubble-clicker.html" class="nav-link">Bubble Clicker</a>
+    <a href="bloons-siege.html" class="nav-link">Bloons Siege</a>
+    <a href="tech-startup.html" class="nav-link">Tech Startup</a>
+    <a href="brawl-arena.html" class="nav-link">Brawl Arena</a>
+    <a href="hop-hop.html" class="nav-link">Hop Hop</a>
+    <a href="https://albersoftworks.github.io" target="_blank" rel="noopener noreferrer" class="nav-cta">Contacto</a>
+  </div>
 </nav>
 
-<header class="hero">
-    <div class="hero-bubbles" aria-hidden="true">
-        <span style="left:8%;  width:26px; height:26px; --drift:20px;  background:var(--sky);   animation-duration:9s;  animation-delay:0s;"></span>
-        <span style="left:20%; width:14px; height:14px; --drift:-15px; background:var(--gold);  animation-duration:7s;  animation-delay:1.2s;"></span>
-        <span style="left:33%; width:34px; height:34px; --drift:25px;  background:var(--coral);  animation-duration:11s; animation-delay:0.4s;"></span>
-        <span style="left:47%; width:18px; height:18px; --drift:-20px; background:var(--sky);   animation-duration:8s;  animation-delay:2.1s;"></span>
-        <span style="left:60%; width:22px; height:22px; --drift:18px;  background:var(--gold);  animation-duration:10s; animation-delay:0.8s;"></span>
-        <span style="left:72%; width:30px; height:30px; --drift:-25px; background:var(--coral);  animation-duration:12s; animation-delay:1.6s;"></span>
-        <span style="left:85%; width:16px; height:16px; --drift:15px;  background:var(--sky);   animation-duration:7.5s; animation-delay:2.6s;"></span>
-        <span style="left:93%; width:20px; height:20px; --drift:-18px; background:var(--gold);  animation-duration:9.5s; animation-delay:0.2s;"></span>
-    </div>
-
-    <div class="hero-content">
+<header class="hero" id="inicio">
+  <div class="hero-bubbles" aria-hidden="true">
+    <span style="left:8%;width:26px;height:26px;--drift:20px;background:var(--sky);animation-duration:9s"></span>
+    <span style="left:20%;width:14px;height:14px;--drift:-15px;background:var(--gold);animation-duration:7s;animation-delay:1.2s"></span>
+    <span style="left:33%;width:34px;height:34px;--drift:25px;background:var(--coral);animation-duration:11s;animation-delay:.4s"></span>
+    <span style="left:47%;width:18px;height:18px;--drift:-20px;background:var(--sky);animation-duration:8s;animation-delay:2.1s"></span>
+    <span style="left:60%;width:22px;height:22px;--drift:18px;background:var(--gold);animation-duration:10s;animation-delay:.8s"></span>
+    <span style="left:72%;width:30px;height:30px;--drift:-25px;background:var(--coral);animation-duration:12s;animation-delay:1.6s"></span>
+    <span style="left:85%;width:16px;height:16px;--drift:15px;background:var(--sky);animation-duration:7.5s;animation-delay:2.6s"></span>
+  </div>
+  <div class="hero-content">
+    <div class="hero-kicker"><i></i> Alber.Games · 5 juegos y creciendo</div>
     <h1>La página que solo te hace perder el tiempo <span class="highlight">y punto</span></h1>
     <p>Jueguitos pochos, pensados para abrir cinco minutos y quedarte veinte.</p>
+    <div class="hero-actions">
+      <a class="cta" href="#games">Ver los juegos</a>
+      <a class="cta secondary" href="hop-hop.html">Jugar a Hop Hop</a>
     </div>
+  </div>
 </header>
 
-<main class="games" id="games">
-    <h2 class="games-heading">Los juegos</h2>
-    <p class="games-sub">La colección va creciendo poco a poco. Esto es lo que hay por ahora.</p>
+<main class="games home-shell" id="games">
+  <div class="collection-bar">
+    <div><h2 class="games-heading">Los juegos</h2><p class="games-sub">Cinco formas distintas de procrastinar. Elige sabiamente.</p></div>
+    <p class="collection-count"><strong>5</strong> juegos disponibles</p>
+  </div>
 
-    <div class="game-grid">
-        <a class="card card-featured" href="https://albersoftworks.github.io/alber.games/bubble-clicker" target="_blank" rel="noopener">
-            <div class="preview" aria-hidden="true">
-            <span style="left:15%; width:22px; height:22px; animation-delay:0s;"></span>
-            <span style="left:35%; width:14px; height:14px; animation-delay:1.5s;"></span>
-            <span style="left:55%; width:26px; height:26px; animation-delay:0.8s;"></span>
-            <span style="left:75%; width:18px; height:18px; animation-delay:2.2s;"></span>
-            </div>
-            <div class="card-body">
-            <span class="tag">Incremental</span>
-            <h3>Bubble Clicker</h3>
-            <p>Revienta burbujas, desbloquea mejoras y asciende con la espuma primigenia.</p>
-            <span class="play-btn">Jugar ahora</span>
-            </div>
-        </a>
+  <div class="game-grid">
+    <a class="card card-featured" href="bubble-clicker.html" aria-label="Jugar a Bubble Clicker">
+      <div class="preview" aria-hidden="true"><span style="left:15%;width:22px;height:22px"></span><span style="left:35%;width:14px;height:14px;animation-delay:1.5s"></span><span style="left:55%;width:26px;height:26px;animation-delay:.8s"></span><span style="left:75%;width:18px;height:18px;animation-delay:2.2s"></span></div>
+      <div class="card-body"><span class="tag">Incremental</span><h3>Bubble Clicker</h3><p>Revienta burbujas, desbloquea mejoras y asciende con la espuma primigenia.</p><span class="play-btn">Jugar ahora</span><div class="game-card-meta"><span>Mejoras · Prestigio</span><span>∞</span></div></div>
+    </a>
+    <a class="card card-featured" href="tech-startup.html" aria-label="Jugar a Tech Startup">
+      <div class="preview" aria-hidden="true"><span style="left:15%;width:22px;height:22px"></span><span style="left:35%;width:14px;height:14px;animation-delay:1.5s"></span><span style="left:55%;width:26px;height:26px;animation-delay:.8s"></span><span style="left:75%;width:18px;height:18px;animation-delay:2.2s"></span></div>
+      <div class="card-body"><span class="tag">Incremental</span><h3>Tech Startup</h3><p>Escribe líneas de código, contrata programadores y convierte tu proyecto en un imperio.</p><span class="play-btn">Jugar ahora</span><div class="game-card-meta"><span>Automatización · Prestige</span><span>🚀</span></div></div>
+    </a>
+  </div>
 
-        <a class="card card-featured" href="https://albersoftworks.github.io/alber.games/tech-startup" target="_blank" rel="noopener">
-            <div class="preview" aria-hidden="true">
-            <span style="left:15%; width:22px; height:22px; animation-delay:0s;"></span>
-            <span style="left:35%; width:14px; height:14px; animation-delay:1.5s;"></span>
-            <span style="left:55%; width:26px; height:26px; animation-delay:0.8s;"></span>
-            <span style="left:75%; width:18px; height:18px; animation-delay:2.2s;"></span>
-            </div>
-            <div class="card-body">
-            <span class="tag">Incremental</span>
-            <h3>Tech Startup</h3>
-            <p>Escribe líneas de código, contrata programadores y masteriza tu empresa tecnológica.</p>
-            <span class="play-btn">Jugar ahora</span>
-            </div>
-        </a>
-    </div>
+  <div class="game-grid">
+    <a class="card card-featured" href="bloons-siege.html" aria-label="Jugar a Bloons Siege">
+      <div class="preview" aria-hidden="true"><span style="left:15%;width:22px;height:22px"></span><span style="left:35%;width:14px;height:14px;animation-delay:1.5s"></span><span style="left:55%;width:26px;height:26px;animation-delay:.8s"></span><span style="left:75%;width:18px;height:18px;animation-delay:2.2s"></span></div>
+      <div class="card-body"><span class="tag">Tower Defense</span><h3>Bloons Siege</h3><p>Protege tu base de los globos enemigos con torres estratégicas.</p><span class="play-btn">Jugar ahora</span><div class="game-card-meta"><span>Estrategia · Defensa</span><span>🎈</span></div></div>
+    </a>
+    <a class="card card-featured" href="brawl-arena.html" aria-label="Jugar a Brawl Arena">
+      <div class="preview" aria-hidden="true"><span style="left:15%;width:22px;height:22px"></span><span style="left:35%;width:14px;height:14px;animation-delay:1.5s"></span><span style="left:55%;width:26px;height:26px;animation-delay:.8s"></span><span style="left:75%;width:18px;height:18px;animation-delay:2.2s"></span></div>
+      <div class="card-body"><span class="tag">Supervivencia</span><h3>Brawl Arena</h3><p>Aguanta el máximo tiempo en el campo de batalla y supera tu récord.</p><span class="play-btn">Jugar ahora</span><div class="game-card-meta"><span>Acción · Récords</span><span>⚔️</span></div></div>
+    </a>
+  </div>
 
-    <div class="game-grid">
-        <a class="card card-featured" href="https://albersoftworks.github.io/alber.games/bloons-siege" target="_blank" rel="noopener">
-            <div class="preview" aria-hidden="true">
-            <span style="left:15%; width:22px; height:22px; animation-delay:0s;"></span>
-            <span style="left:35%; width:14px; height:14px; animation-delay:1.5s;"></span>
-            <span style="left:55%; width:26px; height:26px; animation-delay:0.8s;"></span>
-            <span style="left:75%; width:18px; height:18px; animation-delay:2.2s;"></span>
-            </div>
-            <div class="card-body">
-            <span class="tag">Tower Defense</span>
-            <h3>Bloons Siege</h3>
-            <p>Protege tu base de los globos enemigos con torres estratégicas.</p>
-            <span class="play-btn">Jugar ahora</span>
-            </div>
-        </a>
+  <div class="game-grid">
+    <a class="card card-featured" href="hop-hop.html" aria-label="Jugar a Hop Hop">
+      <span class="new-badge">Nuevo</span>
+      <div class="preview" aria-hidden="true"><span style="left:15%;width:22px;height:22px"></span><span style="left:35%;width:14px;height:14px;animation-delay:1.5s"></span><span style="left:55%;width:26px;height:26px;animation-delay:.8s"></span><span style="left:75%;width:18px;height:18px;animation-delay:2.2s"></span></div>
+      <div class="card-body"><span class="tag">Arcade</span><h3>Hop Hop</h3><p>Salta, encadena combos, recoge monedas y usa poderes para llegar cada vez más lejos.</p><span class="play-btn">Jugar ahora</span><div class="game-card-meta"><span>Combos · Power-ups</span><span>🪙</span></div></div>
+    </a>
+    <div class="card card-soon"><div class="soon-bubble" aria-hidden="true">?</div><h4>Más pochojuegos en camino</h4><p>La colección seguirá creciendo. Probablemente sin ningún plan concreto.</p></div>
+  </div>
 
-        <a class="card card-featured" href="https://albersoftworks.github.io/alber.games/brawl-arena" target="_blank" rel="noopener">
-            <div class="preview" aria-hidden="true">
-            <span style="left:15%; width:22px; height:22px; animation-delay:0s;"></span>
-            <span style="left:35%; width:14px; height:14px; animation-delay:1.5s;"></span>
-            <span style="left:55%; width:26px; height:26px; animation-delay:0.8s;"></span>
-            <span style="left:75%; width:18px; height:18px; animation-delay:2.2s;"></span>
-            </div>
-            <div class="card-body">
-            <span class="tag">Plataforma</span>
-            <h3>Brawl Arena</h3>
-            <p>Aguanta el máximo tiempo en el campo de batalla.</p>
-            <span class="play-btn">Jugar ahora</span>
-            </div>
-        </a>
-    </div>
-
-    <div class="game-grid">
-        <a class="card card-featured" href="https://albersoftworks.github.io/alber.games/hop-hop" target="_blank" rel="noopener">
-            <div class="preview" aria-hidden="true">
-            <span style="left:15%; width:22px; height:22px; animation-delay:0s;"></span>
-            <span style="left:35%; width:14px; height:14px; animation-delay:1.5s;"></span>
-            <span style="left:55%; width:26px; height:26px; animation-delay:0.8s;"></span>
-            <span style="left:75%; width:18px; height:18px; animation-delay:2.2s;"></span>
-            </div>
-            <div class="card-body">
-            <span class="tag">Plataforma</span>
-            <h3>Hop Hop</h3>
-            <p>Llega lo más lejos posible sin caer.</p>
-            <span class="play-btn">Jugar ahora</span>
-            </div>
-        </a>
-
-        <div class="card card-soon">
-            <div class="soon-bubble">?</div>
-            <h4>Más pochojuegos en camino</h4>
-            <p>Si crees que vale la pena esperar, pues adelante, allá tú.</p>
-        </div>
-    </div>
-
+  <div class="games-note"><strong>Consejo:</strong> si buscas una partida rápida, prueba <strong>Hop Hop</strong>. Si quieres perder una cantidad irresponsable de tiempo, prueba cualquiera de los incrementales.</div>
 </main>
 
 <footer>
-    <div class="footer-inner">
-    <div class="footer-brand">
-        <h2>AlberSoftWorks</h2>
-        <p>Lanzarote, Islas Canarias, España</p>
-    </div>
-
+  <div class="footer-inner">
+    <div class="footer-brand"><h2>AlberSoftWorks</h2><p>Lanzarote, Islas Canarias, España</p></div>
     <div class="footer-links">
-        <a class="footer-link" href="mailto:albersoftworks@gmail.com">
-        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
-        <span class="link-text"><span>Correo electrónico</span><span class="link-label">albersoftworks@gmail.com</span></span>
-        </a>
-
-        <a class="footer-link" href="https://www.linkedin.com/in/albersoftworks" target="_blank" rel="noopener">
-        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 11v5M8 8v.01M12 16v-5M12 11c0-1.5 1-2 2-2s2 .8 2 2v5"/></svg>
-        <span class="link-text"><span>LinkedIn</span><span class="link-label">linkedin.com/in/albersoftworks</span></span>
-        </a>
-
-        <a class="footer-link" href="https://www.instagram.com/alber_skateland/" target="_blank" rel="noopener">
-        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="3.5"/><circle cx="17.2" cy="6.8" r="0.6" fill="currentColor" stroke="none"/></svg>
-        <span class="link-text"><span>Instagram</span><span class="link-label">instagram.com/alber_skateland</span></span>
-        </a>
-
-        <a class="footer-link" href="https://www.facebook.com/profile.php?id=61575299738661/" target="_blank" rel="noopener">
-        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 9h3V6h-3c-1.7 0-3 1.3-3 3v2H9v3h2v6h3v-6h3l1-3h-4v-2c0-.6.4-1 1-1z"/></svg>
-        <span class="link-text"><span>Facebook</span><span class="link-label">facebook.com/AlbertoDelgado</span></span>
-        </a>
-
-        <a class="footer-link" href="https://github.com/albersoftworks" target="_blank" rel="noopener">
-        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C6.5 2 2 6.6 2 12.2c0 4.5 2.9 8.3 6.8 9.6.5.1.7-.2.7-.5v-1.8c-2.8.6-3.4-1.4-3.4-1.4-.4-1.1-1-1.4-1-1.4-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.5 2.3 1.1 2.9.8.1-.7.4-1.1.6-1.4-2.2-.2-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.3-.5-1.3.1-2.7 0 0 .8-.3 2.7 1a9.4 9.4 0 0 1 5 0c1.9-1.3 2.7-1 2.7-1 .6 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.9-2.4 4.8-4.6 5 .4.3.7.9.7 1.9v2.8c0 .3.2.6.7.5 3.9-1.3 6.8-5.1 6.8-9.6C22 6.6 17.5 2 12 2z"/></svg>
-        <span class="link-text"><span>GitHub</span><span class="link-label">github.com/AlberSoftWorks</span></span>
-        </a>
+      <a class="footer-link" href="mailto:albersoftworks@gmail.com"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg><span class="link-text"><span>Correo electrónico</span><span class="link-label">albersoftworks@gmail.com</span></span></a>
+      <a class="footer-link" href="https://www.linkedin.com/in/albersoftworks" target="_blank" rel="noopener noreferrer"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 11v5M8 8v.01M12 16v-5M12 11c0-1.5 1-2 2-2s2 .8 2 2v5"/></svg><span class="link-text"><span>LinkedIn</span><span class="link-label">linkedin.com/in/albersoftworks</span></span></a>
+      <a class="footer-link" href="https://www.instagram.com/alber_skateland/" target="_blank" rel="noopener noreferrer"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="3.5"/><circle cx="17.2" cy="6.8" r=".6" fill="currentColor" stroke="none"/></svg><span class="link-text"><span>Instagram</span><span class="link-label">instagram.com/alber_skateland</span></span></a>
+      <a class="footer-link" href="https://www.facebook.com/profile.php?id=61575299738661/" target="_blank" rel="noopener noreferrer"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M14 9h3V6h-3c-1.7 0-3 1.3-3 3v2H9v3h2v6h3v-6h3l1-3h-4v-2c0-.6.4-1 1-1z"/></svg><span class="link-text"><span>Facebook</span><span class="link-label">facebook.com/AlbertoDelgado</span></span></a>
+      <a class="footer-link" href="https://github.com/albersoftworks" target="_blank" rel="noopener noreferrer"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 2C6.5 2 2 6.6 2 12.2c0 4.5 2.9 8.3 6.8 9.6.5.1.7-.2.7-.5v-1.8c-2.8.6-3.4-1.4-3.4-1.4-.4-1.1-1-1.4-1-1.4-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.5 2.3 1.1 2.9.8.1-.7.4-1.1.6-1.4.1-.7.4-1.1.6-1.4-2.2-.2-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.3-.5-1.3.1-2.7 0 0 .8-.3 2.7 1a9.4 9.4 0 0 1 5 0c1.9-1.3 2.7-1 2.7-1 .6 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.9-2.4 4.8-4.6 5 .4.3.7.9.7 1.9v2.8c0 .3.2.6.7.5 3.9-1.3 6.8-5.1 6.8-9.6C22 6.6 17.5 2 12 2z"/></svg><span class="link-text"><span>GitHub</span><span class="link-label">github.com/AlberSoftWorks</span></span></a>
     </div>
-    </div>
+  </div>
 </footer>
-
 </body>
 </html>
