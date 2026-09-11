@@ -3,563 +3,108 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Alber.Games - Arena Brawl</title>
+<meta name="description" content="Brawl Arena: sobrevive oleadas de enemigos en una arena de acción.">
+<meta name="theme-color" content="#140F2B">
+<title>Alber.Games — Brawl Arena</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <style>
-  /* ============================================================
-     ARENA BRAWL — variables y estilos propios del juego
-     (sigue el mismo patrón que Bubble Clicker: prefijo propio
-     "--ab-" para no chocar con otros juegos ni con la marca)
-     ============================================================ */
-  :root {
-    --ab-bg-a: #0d1321;
-    --ab-bg-b: #1d2b53;
-    --ab-floor-1: #2b3a67;
-    --ab-floor-2: #253361;
-    --ab-grid-line: rgba(255,255,255,0.06);
-    --ab-player: #6FE7FF;
-    --ab-player-dark: #2fa9c2;
-    --ab-enemy: #FF6B5B;
-    --ab-enemy-dark: #b6473b;
-    --ab-bullet-player: #FFC93C;
-    --ab-bullet-enemy: #ff4b4b;
-    --ab-rock: #4a5578;
-    --ab-hud-bg: rgba(13, 19, 33, 0.85);
-    --ab-hp-good: #4CD964;
-    --ab-hp-bad: #ff4b4b;
-  }
-
-  body.arena-brawl {
-    min-height: 100vh;
-    margin: 0;
-    background: radial-gradient(circle at top, var(--ab-bg-b), var(--ab-bg-a) 75%);
-    font-family: var(--font-body, sans-serif);
-    color: #eef1ff;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
-  }
-
-  .arena-brawl h1 {
-    font-family: var(--font-display, sans-serif);
-    color: var(--ab-player);
-    text-shadow: 0 0 15px rgba(111, 231, 255, 0.35);
-    margin: 4px 0 2px 0;
-    text-align: center;
-  }
-
-  .arena-brawl .subtitle {
-    color: #9aa4c7;
-    margin: 0 0 14px 0;
-    text-align: center;
-    font-size: 0.95rem;
-  }
-
-  #gameWrap {
-    position: relative;
-    width: 900px;
-    max-width: 100%;
-  }
-
-  #gameCanvas {
-    display: block;
-    width: 100%;
-    max-width: 900px;
-    aspect-ratio: 900 / 600;
-    background: var(--ab-bg-a);
-    border-radius: 16px;
-    border: 1px solid rgba(255,255,255,0.08);
-    box-shadow: 0 15px 40px rgba(0,0,0,0.5);
-    cursor: crosshair;
-    touch-action: none;
-  }
-
-  #hud {
-    position: absolute;
-    top: 14px;
-    left: 14px;
-    right: 14px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-    pointer-events: none;
-    font-family: var(--font-display, sans-serif);
-  }
-
-  #hpBarOuter {
-    width: 220px;
-    height: 20px;
-    background: rgba(0,0,0,0.5);
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 999px;
-    overflow: hidden;
-  }
-
-  #hpBarInner {
-    height: 100%;
-    width: 100%;
-    background: linear-gradient(90deg, var(--ab-hp-good), #8effa3);
-    transition: width 0.15s ease, background 0.3s ease;
-  }
-
-  #scoreBadge {
-    background: var(--ab-hud-bg);
-    border: 1px solid rgba(255,255,255,0.15);
-    padding: 6px 16px;
-    border-radius: 999px;
-    font-weight: 700;
-    font-size: 0.95rem;
-  }
-
-  #controlsHint {
-    margin-top: 10px;
-    color: #7d87ac;
-    font-size: 0.82rem;
-    text-align: center;
-  }
-
-  #gameOverOverlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(10, 12, 24, 0.82);
-    border-radius: 16px;
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 14px;
-    text-align: center;
-  }
-
-  #gameOverOverlay.show { display: flex; }
-
-  #gameOverOverlay h2 {
-    font-family: var(--font-display, sans-serif);
-    color: var(--ab-enemy);
-    margin: 0;
-    font-size: 1.8rem;
-  }
-
-  #gameOverOverlay p { margin: 0; color: #cfd6f5; }
-
-  #restartBtn {
-    background: var(--ab-player);
-    color: #0d1321;
-    border: none;
-    font-weight: 700;
-    padding: 10px 26px;
-    border-radius: 999px;
-    cursor: pointer;
-    font-size: 0.95rem;
-    box-shadow: 0 6px 0 var(--ab-player-dark);
-    transition: transform 0.1s;
-  }
-  #restartBtn:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--ab-player-dark); }
+:root{--ba-bg:#140f2b;--ba-panel:#211844;--ba-edge:#3b2c69;--ba-sky:#6fe7ff;--ba-gold:#ffc93c;--ba-coral:#ff6b5b;--ba-green:#64e57c;--ba-purple:#b878ff;--ba-blue:#4b9bff;--ba-floor:#29345c;--ba-floor2:#222b4d}
+*{box-sizing:border-box}body.brawl-page{margin:0;min-height:100vh;background:radial-gradient(circle at 50% -10%,#3b2467 0,#1b153b 42%,#0e0b20 100%);color:#f5f0ff;font-family:Inter,sans-serif;padding-bottom:30px}
+.brawl-shell{width:min(1120px,calc(100% - 28px));margin:0 auto}.ba-heading{text-align:center;padding:30px 0 18px}.ba-kicker{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border:1px solid var(--ba-edge);border-radius:999px;background:#211844aa;color:var(--ba-sky);font:800 .72rem 'Baloo 2';letter-spacing:.07em;text-transform:uppercase}.ba-kicker i{width:7px;height:7px;border-radius:50%;background:var(--ba-sky);box-shadow:0 0 14px var(--ba-sky)}.ba-heading h1{margin:10px 0 2px;font:800 clamp(2rem,5vw,3rem) 'Baloo 2';letter-spacing:-.03em}.ba-heading p{margin:0;color:#aaa0ce}
+#arenaWrap{position:relative;width:min(1040px,100%);margin:auto;padding:10px;border:1px solid #4a3b7a;background:linear-gradient(145deg,#211844,#17112f);border-radius:24px;box-shadow:0 25px 70px #0008,inset 0 1px #ffffff10}.canvas-frame{position:relative;overflow:hidden;border-radius:17px;background:#161d37}#gameCanvas{display:block;width:100%;height:auto;aspect-ratio:1040/650;cursor:crosshair;touch-action:none;background:#161d37}
+#hud{position:absolute;inset:16px 16px auto;display:grid;grid-template-columns:1fr auto 1fr;align-items:start;gap:12px;pointer-events:none}.hud-left,.hud-right{display:flex;gap:8px;align-items:center}.hud-right{justify-content:flex-end}.hud-chip{padding:7px 12px;border-radius:12px;background:#140f2bcc;border:1px solid #ffffff18;box-shadow:0 5px 15px #0004;font:700 .78rem 'Baloo 2';backdrop-filter:blur(6px)}#waveLabel{font:800 1rem 'Baloo 2';padding:7px 14px;border-radius:999px;background:#ffc93c;color:#24172c;box-shadow:0 5px 0 #b27d16}
+.hp-wrap{width:190px;height:18px;border-radius:999px;background:#100c21cc;border:1px solid #ffffff22;overflow:hidden;box-shadow:0 4px 12px #0005}.hp-fill{height:100%;width:100%;background:linear-gradient(90deg,#49d96b,#9bff9f);transition:width .16s}.xp-wrap{width:150px;height:8px;border-radius:99px;background:#100c21aa;overflow:hidden;border:1px solid #ffffff18}.xp-fill{height:100%;width:0;background:linear-gradient(90deg,var(--ba-purple),var(--ba-sky));transition:width .2s}
+#abilities{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);display:flex;gap:9px;pointer-events:none}.ability{min-width:62px;padding:7px 10px;border:1px solid #ffffff22;border-radius:13px;background:#140f2ddd;text-align:center;box-shadow:0 6px 15px #0005;font:800 .7rem 'Baloo 2'}.ability strong{display:block;font-size:1rem;color:var(--ba-gold)}.ability.ready{border-color:#ffc93c77;box-shadow:0 0 18px #ffc93c33}.ability.cooldown{opacity:.55}
+#banner{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;transition:opacity .2s}.banner-card{padding:14px 26px;border-radius:18px;background:#140f2ee8;border:1px solid #ffffff22;box-shadow:0 20px 50px #0008;text-align:center}.banner-card b{display:block;font:800 2rem 'Baloo 2';color:var(--ba-gold)}.banner-card span{color:#c8c0e4;font-size:.82rem}
+#overlay{position:absolute;inset:0;background:#0d0a1ae8;display:none;align-items:center;justify-content:center;text-align:center}.overlay-card{width:min(430px,90%);padding:30px;border:1px solid #4b3a7a;border-radius:22px;background:linear-gradient(145deg,#281d4d,#17112f);box-shadow:0 25px 70px #0009}.overlay-card h2{margin:0 0 4px;font:800 2.2rem 'Baloo 2';color:var(--ba-coral)}.overlay-card p{color:#bbb2d8;margin:6px 0 18px}.stat-row{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:20px}.stat{padding:8px 14px;border-radius:12px;background:#140f2b;border:1px solid #ffffff12;font:700 .8rem 'Baloo 2'}.stat b{display:block;color:var(--ba-sky);font-size:1.1rem}.main-btn{border:0;border-radius:13px;padding:11px 24px;background:var(--ba-gold);color:#26172a;font:800 .95rem 'Baloo 2';cursor:pointer;box-shadow:0 5px 0 #b27d16}.main-btn:active{transform:translateY(3px);box-shadow:0 2px 0 #b27d16}
+.ba-controls{display:flex;justify-content:space-between;gap:14px;align-items:center;margin:14px 2px 0;color:#8f86b4;font-size:.78rem}.ba-controls strong{color:#d9d1ed}.mobile-note{display:none}
+@media(max-width:700px){.brawl-shell{width:min(100% - 12px,1120px)}#arenaWrap{padding:5px;border-radius:18px}.canvas-frame{border-radius:13px}#hud{inset:8px 8px auto;grid-template-columns:1fr auto;gap:6px}.hud-right{display:none}.hp-wrap{width:125px;height:14px}.xp-wrap{width:90px}.hud-chip{padding:5px 8px}.ability{min-width:54px;padding:5px 7px}.ability strong{font-size:.9rem}.ba-controls{display:block;text-align:center}.mobile-note{display:block;margin-top:5px}.desktop-note{display:none}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
 </style>
 </head>
-<body class="arena-brawl">
-
-  <h1>⚔️ Arena Brawl</h1>
-  <p class="subtitle">WASD para moverte, ratón para apuntar, clic para disparar</p>
-
-  <div id="gameWrap">
-    <canvas id="gameCanvas" width="900" height="600"></canvas>
-
-    <div id="hud">
-      <div id="hpBarOuter"><div id="hpBarInner"></div></div>
-      <div id="scoreBadge">Puntos: 0</div>
-    </div>
-
-    <div id="gameOverOverlay">
-      <h2>💀 Has caído</h2>
-      <p id="finalScore">Puntuación final: 0</p>
-      <button id="restartBtn">Reintentar</button>
-    </div>
+<body class="brawl-page">
+<nav aria-label="Navegación principal">
+  <a href="index.html" class="brand" aria-label="Alber.Games — inicio"><span class="brand-dot" aria-hidden="true"></span>Alber.Games</a>
+  <div class="nav-links-container">
+    <a href="bubble-clicker.html" class="nav-link">Bubble Clicker</a>
+    <a href="bloons-siege.html" class="nav-link">Bloons Siege</a>
+    <a href="tech-startup.html" class="nav-link">Tech Startup</a>
+    <a href="brawl-arena.html" class="nav-link">Brawl Arena</a>
+    <a href="hop-hop.html" class="nav-link">Hop Hop</a>
+    <a href="https://albersoftworks.github.io" target="_blank" rel="noopener noreferrer" class="nav-cta">Contacto</a>
   </div>
+</nav>
 
-  <p id="controlsHint">Consejo: mantén pulsado el clic para disparar en ráfaga.</p>
+<header class="ba-heading brawl-shell"><div class="ba-kicker"><i></i> Alber.Games · Arena de combate</div><h1>⚔️ Brawl Arena</h1><p>Sobrevive a oleadas, sube de nivel y conviértete en el último brawler en pie.</p></header>
 
-  <script>
-  // ============================================================
-  // ARENA BRAWL — motor del juego
-  // ------------------------------------------------------------
-  // ÍNDICE DEL SCRIPT
-  // 1. Configuración y proyección isométrica
-  // 2. Estado del juego (jugador, enemigos, balas, obstáculos)
-  // 3. Entrada (teclado y ratón)
-  // 4. Lógica de disparo y daño
-  // 5. IA enemiga y spawn
-  // 6. Bucle principal (update + render)
-  // 7. Fin de partida / reinicio
-  // ============================================================
+<main class="brawl-shell">
+<div id="arenaWrap"><div class="canvas-frame">
+<canvas id="gameCanvas" width="1040" height="650" aria-label="Arena de combate de Brawl Arena"></canvas>
+<div id="hud"><div class="hud-left"><div class="hud-chip">❤ <span id="hpText">100 / 100</span></div><div class="hp-wrap"><div id="hpFill" class="hp-fill"></div></div><div class="xp-wrap"><div id="xpFill" class="xp-fill"></div></div></div><div id="waveLabel">OLEADA 1</div><div class="hud-right"><div class="hud-chip">★ <span id="scoreText">0</span></div><div class="hud-chip">✦ Nv. <span id="levelText">1</span></div><button id="musicBtn" class="hud-chip" style="pointer-events:auto;cursor:pointer;color:#f5f0ff">♫</button></div></div>
+<div id="abilities"><div id="dashAbility" class="ability ready"><strong>⇢</strong>DASH</div><div id="superAbility" class="ability cooldown"><strong>0%</strong>SUPER</div></div>
+<div id="banner"><div class="banner-card"><b id="bannerTitle">OLEADA 1</b><span id="bannerSub">Prepárate</span></div></div>
+<div id="overlay"><div class="overlay-card"><h2 id="overTitle">Has caído</h2><p id="overText">La arena te ha ganado esta vez.</p><div class="stat-row"><div class="stat">Oleada<b id="finalWave">1</b></div><div class="stat">Puntos<b id="finalScore">0</b></div><div class="stat">Nivel<b id="finalLevel">1</b></div></div><button id="restartBtn" class="main-btn">Volver a la arena</button></div></div>
+</div></div>
+<div class="ba-controls"><div><strong>WASD / Flechas</strong> mover · <strong>Ratón</strong> apuntar · <strong>Clic</strong> disparar · <strong>Espacio</strong> dash · <strong>Q</strong> super</div><div class="desktop-note">Cada 5 oleadas aparece un jefe.</div><div class="mobile-note">En móvil: arrastra para moverte y toca para disparar.</div></div>
+</main>
 
-  // ---------- 1. CONFIGURACIÓN Y PROYECCIÓN ISOMÉTRICA ----------
-  const canvas = document.getElementById('gameCanvas');
-  const ctx = canvas.getContext('2d');
-
-  const GRID = 12;          // tamaño de la rejilla (12x12 casillas)
-  const TILE_W = 70;        // ancho de una casilla isométrica en px
-  const TILE_H = 35;        // alto de una casilla isométrica en px
-  const ORIGIN_X = canvas.width / 2;
-  const ORIGIN_Y = 50;
-
-  // Convierte coordenadas de mundo (x,y en casillas) a coordenadas de pantalla.
-  // Esta es la proyección isométrica clásica 2:1.
-  function worldToScreen(x, y) {
-    return {
-      sx: ORIGIN_X + (x - y) * (TILE_W / 2),
-      sy: ORIGIN_Y + (x + y) * (TILE_H / 2)
-    };
-  }
-
-  // ---------- 2. ESTADO DEL JUEGO ----------
-  function freshState() {
-    return {
-      player: {
-        x: GRID / 2, y: GRID / 2,
-        hp: 100, maxHp: 100,
-        speed: 4.2,          // casillas por segundo
-        radius: 16,          // radio visual en pantalla (px)
-        fireCooldown: 0,
-        fireRate: 0.22       // segundos entre disparos
-      },
-      enemies: [],
-      bullets: [],
-      obstacles: buildObstacles(),
-      score: 0,
-      spawnTimer: 1.5,
-      maxEnemies: 5,
-      gameOver: false
-    };
-  }
-
-  // Rocas decorativas fijas (sin colisión en esta primera versión)
-  function buildObstacles() {
-    return [
-      { x: 2, y: 2 }, { x: 9, y: 2 }, { x: 2, y: 9 }, { x: 9, y: 9 },
-      { x: 6, y: 1 }, { x: 1, y: 6 }, { x: 10, y: 6 }, { x: 6, y: 10 }
-    ];
-  }
-
-  let state = freshState();
-
-  // ---------- 3. ENTRADA (TECLADO Y RATÓN) ----------
-  const keys = { w: false, a: false, s: false, d: false };
-  const mouse = { sx: 0, sy: 0, down: false };
-
-  window.addEventListener('keydown', (e) => {
-    const k = e.key.toLowerCase();
-    if (k in keys) keys[k] = true;
-  });
-  window.addEventListener('keyup', (e) => {
-    const k = e.key.toLowerCase();
-    if (k in keys) keys[k] = false;
-  });
-
-  function updateMousePos(e) {
-    const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-    mouse.sx = (e.clientX - rect.left) * scaleX;
-    mouse.sy = (e.clientY - rect.top) * scaleY;
-  }
-
-  canvas.addEventListener('mousemove', updateMousePos);
-  canvas.addEventListener('mousedown', (e) => { updateMousePos(e); mouse.down = true; });
-  window.addEventListener('mouseup', () => { mouse.down = false; });
-
-  // Soporte táctil básico: tocar para moverse hacia ahí no está incluido
-  // a propósito (el juego está pensado para ratón + teclado, como Brawl
-  // Stars de PC). Se puede añadir un joystick táctil más adelante.
-
-  // ---------- 4. LÓGICA DE DISPARO Y DAÑO ----------
-  function shoot(fromScreen, towardScreen, owner) {
-    const dx = towardScreen.sx - fromScreen.sx;
-    const dy = towardScreen.sy - fromScreen.sy;
-    const dist = Math.hypot(dx, dy) || 1;
-    const speed = owner === 'player' ? 620 : 380; // px/seg
-    state.bullets.push({
-      sx: fromScreen.sx, sy: fromScreen.sy,
-      vx: (dx / dist) * speed, vy: (dy / dist) * speed,
-      owner,
-      radius: owner === 'player' ? 5 : 6,
-      life: 1.4 // segundos antes de autodestruirse
-    });
-  }
-
-  function damagePlayer(amount) {
-    state.player.hp = Math.max(0, state.player.hp - amount);
-    updateHUD();
-    if (state.player.hp <= 0 && !state.gameOver) endGame();
-  }
-
-  // ---------- 5. IA ENEMIGA Y SPAWN ----------
-  function spawnEnemy() {
-    // Aparece en un borde aleatorio de la rejilla
-    const edge = Math.floor(Math.random() * 4);
-    let x, y;
-    if (edge === 0) { x = Math.random() * GRID; y = 0.5; }
-    else if (edge === 1) { x = Math.random() * GRID; y = GRID - 0.5; }
-    else if (edge === 2) { x = 0.5; y = Math.random() * GRID; }
-    else { x = GRID - 0.5; y = Math.random() * GRID; }
-
-    state.enemies.push({
-      x, y, hp: 30, maxHp: 30,
-      speed: 1.6 + Math.random() * 0.6,
-      radius: 15,
-      shootTimer: 1 + Math.random()
-    });
-  }
-
-  function updateEnemies(dt) {
-    const p = state.player;
-    state.enemies.forEach(en => {
-      const dx = p.x - en.x, dy = p.y - en.y;
-      const dist = Math.hypot(dx, dy) || 1;
-
-      // Persigue al jugador pero mantiene algo de distancia (no se pega encima)
-      if (dist > 2.2) {
-        en.x += (dx / dist) * en.speed * dt;
-        en.y += (dy / dist) * en.speed * dt;
-      }
-
-      // Dispara periódicamente hacia el jugador
-      en.shootTimer -= dt;
-      if (en.shootTimer <= 0) {
-        en.shootTimer = 1.4 + Math.random() * 1.2;
-        const from = worldToScreen(en.x, en.y);
-        const to = worldToScreen(p.x, p.y);
-        shoot(from, to, 'enemy');
-      }
-    });
-  }
-
-  // ---------- 6. BUCLE PRINCIPAL ----------
-  let lastTime = performance.now();
-
-  function update(dt) {
-    if (state.gameOver) return;
-    const p = state.player;
-
-    // Movimiento del jugador (espacio de mundo -> se ve isométrico en pantalla)
-    let mx = 0, my = 0;
-    if (keys.w) my -= 1;
-    if (keys.s) my += 1;
-    if (keys.a) mx -= 1;
-    if (keys.d) mx += 1;
-    if (mx !== 0 || my !== 0) {
-      const len = Math.hypot(mx, my);
-      p.x = Math.min(GRID - 0.3, Math.max(0.3, p.x + (mx / len) * p.speed * dt));
-      p.y = Math.min(GRID - 0.3, Math.max(0.3, p.y + (my / len) * p.speed * dt));
-    }
-
-    // Disparo del jugador (mantener pulsado = ráfaga)
-    p.fireCooldown -= dt;
-    if (mouse.down && p.fireCooldown <= 0) {
-      p.fireCooldown = p.fireRate;
-      const from = worldToScreen(p.x, p.y);
-      shoot(from, { sx: mouse.sx, sy: mouse.sy }, 'player');
-    }
-
-    // Balas
-    state.bullets.forEach(b => {
-      b.sx += b.vx * dt;
-      b.sy += b.vy * dt;
-      b.life -= dt;
-    });
-
-    // Colisión balas de jugador -> enemigos (en espacio de pantalla)
-    const playerScreen = worldToScreen(p.x, p.y);
-    state.bullets.forEach(b => {
-      if (b.owner === 'player') {
-        state.enemies.forEach(en => {
-          const es = worldToScreen(en.x, en.y);
-          const d = Math.hypot(b.sx - es.sx, b.sy - es.sy);
-          if (d < b.radius + en.radius) {
-            en.hp -= 10;
-            b.life = 0;
-          }
-        });
-      } else {
-        const d = Math.hypot(b.sx - playerScreen.sx, b.sy - playerScreen.sy);
-        if (d < b.radius + p.radius) {
-          damagePlayer(6);
-          b.life = 0;
-        }
-      }
-    });
-
-    // Limpiar balas muertas y enemigos derrotados
-    state.bullets = state.bullets.filter(b => b.life > 0);
-    const before = state.enemies.length;
-    state.enemies = state.enemies.filter(en => en.hp > 0);
-    const killed = before - state.enemies.length;
-    if (killed > 0) {
-      state.score += killed * 10;
-      updateHUD();
-    }
-
-    // Spawns
-    updateEnemies(dt);
-    state.spawnTimer -= dt;
-    if (state.spawnTimer <= 0 && state.enemies.length < state.maxEnemies) {
-      state.spawnTimer = 2.2;
-      spawnEnemy();
-    }
-  }
-
-  function render() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // --- Suelo: rejilla de rombos ---
-    for (let y = 0; y < GRID; y++) {
-      for (let x = 0; x < GRID; x++) {
-        const top = worldToScreen(x, y);
-        const right = worldToScreen(x + 1, y);
-        const bottom = worldToScreen(x + 1, y + 1);
-        const left = worldToScreen(x, y + 1);
-        ctx.beginPath();
-        ctx.moveTo(top.sx, top.sy);
-        ctx.lineTo(right.sx, right.sy);
-        ctx.lineTo(bottom.sx, bottom.sy);
-        ctx.lineTo(left.sx, left.sy);
-        ctx.closePath();
-        ctx.fillStyle = (x + y) % 2 === 0 ? getVar('--ab-floor-1') : getVar('--ab-floor-2');
-        ctx.fill();
-        ctx.strokeStyle = getVar('--ab-grid-line');
-        ctx.stroke();
-      }
-    }
-
-    // --- Entidades ordenadas por profundidad (x+y) para que se tapen bien ---
-    const drawables = [];
-    state.obstacles.forEach(o => drawables.push({ type: 'rock', x: o.x, y: o.y }));
-    state.enemies.forEach(en => drawables.push({ type: 'enemy', ref: en, x: en.x, y: en.y }));
-    drawables.push({ type: 'player', x: state.player.x, y: state.player.y });
-    drawables.sort((a, b) => (a.x + a.y) - (b.x + b.y));
-
-    drawables.forEach(d => {
-      const s = worldToScreen(d.x, d.y);
-      if (d.type === 'rock') drawRock(s);
-      else if (d.type === 'enemy') drawEnemy(s, d.ref);
-      else if (d.type === 'player') drawPlayer(s);
-    });
-
-    // --- Balas (encima de todo) ---
-    state.bullets.forEach(b => {
-      ctx.beginPath();
-      ctx.arc(b.sx, b.sy, b.radius, 0, Math.PI * 2);
-      ctx.fillStyle = b.owner === 'player' ? getVar('--ab-bullet-player') : getVar('--ab-bullet-enemy');
-      ctx.shadowColor = ctx.fillStyle;
-      ctx.shadowBlur = 8;
-      ctx.fill();
-      ctx.shadowBlur = 0;
-    });
-  }
-
-  function drawRock(s) {
-    ctx.beginPath();
-    ctx.ellipse(s.sx, s.sy, 26, 14, 0, 0, Math.PI * 2);
-    ctx.fillStyle = getVar('--ab-rock');
-    ctx.fill();
-  }
-
-  function drawEnemy(s, en) {
-    // Sombra
-    ctx.beginPath();
-    ctx.ellipse(s.sx, s.sy + 10, en.radius, en.radius * 0.4, 0, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(0,0,0,0.35)';
-    ctx.fill();
-
-    // Cuerpo
-    ctx.beginPath();
-    ctx.arc(s.sx, s.sy, en.radius, 0, Math.PI * 2);
-    ctx.fillStyle = getVar('--ab-enemy');
-    ctx.fill();
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = getVar('--ab-enemy-dark');
-    ctx.stroke();
-
-    // Barra de vida
-    const w = en.radius * 2;
-    ctx.fillStyle = 'rgba(0,0,0,0.5)';
-    ctx.fillRect(s.sx - w / 2, s.sy - en.radius - 12, w, 5);
-    ctx.fillStyle = getVar('--ab-hp-good');
-    ctx.fillRect(s.sx - w / 2, s.sy - en.radius - 12, w * (en.hp / en.maxHp), 5);
-  }
-
-  function drawPlayer(s) {
-    const p = state.player;
-
-    // Sombra
-    ctx.beginPath();
-    ctx.ellipse(s.sx, s.sy + 10, p.radius, p.radius * 0.4, 0, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(0,0,0,0.35)';
-    ctx.fill();
-
-    // Cañón apuntando al ratón (puramente visual, en espacio de pantalla)
-    const angle = Math.atan2(mouse.sy - s.sy, mouse.sx - s.sx);
-    ctx.strokeStyle = getVar('--ab-player-dark');
-    ctx.lineWidth = 5;
-    ctx.beginPath();
-    ctx.moveTo(s.sx, s.sy);
-    ctx.lineTo(s.sx + Math.cos(angle) * (p.radius + 14), s.sy + Math.sin(angle) * (p.radius + 14));
-    ctx.stroke();
-
-    // Cuerpo
-    ctx.beginPath();
-    ctx.arc(s.sx, s.sy, p.radius, 0, Math.PI * 2);
-    ctx.fillStyle = getVar('--ab-player');
-    ctx.fill();
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = getVar('--ab-player-dark');
-    ctx.stroke();
-  }
-
-  // Pequeña ayuda para leer variables CSS desde el canvas
-  const rootStyles = getComputedStyle(document.documentElement);
-  function getVar(name) { return rootStyles.getPropertyValue(name).trim(); }
-
-  function loop(now) {
-    const dt = Math.min(0.05, (now - lastTime) / 1000); // clamp para evitar saltos si la pestaña pierde foco
-    lastTime = now;
-    update(dt);
-    render();
-    requestAnimationFrame(loop);
-  }
-  requestAnimationFrame(loop);
-
-  // ---------- 7. FIN DE PARTIDA / REINICIO ----------
-  const hpBarInner = document.getElementById('hpBarInner');
-  const scoreBadge = document.getElementById('scoreBadge');
-  const gameOverOverlay = document.getElementById('gameOverOverlay');
-  const finalScore = document.getElementById('finalScore');
-  const restartBtn = document.getElementById('restartBtn');
-
-  function updateHUD() {
-    const pct = Math.max(0, state.player.hp / state.player.maxHp) * 100;
-    hpBarInner.style.width = pct + '%';
-    hpBarInner.style.background = pct > 30
-      ? 'linear-gradient(90deg, var(--ab-hp-good), #8effa3)'
-      : 'linear-gradient(90deg, var(--ab-hp-bad), #ff8a8a)';
-    scoreBadge.textContent = 'Puntos: ' + state.score;
-  }
-
-  function endGame() {
-    state.gameOver = true;
-    finalScore.textContent = 'Puntuación final: ' + state.score;
-    gameOverOverlay.classList.add('show');
-  }
-
-  restartBtn.addEventListener('click', () => {
-    state = freshState();
-    gameOverOverlay.classList.remove('show');
-    updateHUD();
-  });
-
-  updateHUD();
-  </script>
+<script>
+'use strict';
+const canvas=document.getElementById('gameCanvas'),ctx=canvas.getContext('2d');
+const W=canvas.width,H=canvas.height;
+const mouse={x:W/2,y:H/2,down:false};
+const keys={};
+let audioCtx=null,musicOn=true,musicTimer=null;
+const rand=(a,b)=>a+Math.random()*(b-a),clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+function audio(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume();return audioCtx}
+function tone(freq,dur=.08,type='sine',vol=.035,delay=0){if(!musicOn&&type==='music')return;const a=audio(),o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.setValueAtTime(freq,a.currentTime+delay);g.gain.setValueAtTime(.0001,a.currentTime+delay);g.gain.exponentialRampToValueAtTime(vol,a.currentTime+delay+.01);g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+delay+dur);o.connect(g).connect(a.destination);o.start(a.currentTime+delay);o.stop(a.currentTime+delay+dur+.02)}
+function sfx(kind){if(!musicOn)return;const map={shot:[220,.045,'square',.018],hit:[110,.05,'sawtooth',.022],dash:[480,.11,'triangle',.035],level:[520,.18,'sine',.04],boss:[90,.35,'sawtooth',.045],super:[260,.25,'triangle',.05],pickup:[700,.1,'sine',.035]};const x=map[kind];if(x)tone(...x)}
+function startMusic(){if(musicTimer||!musicOn)return;const notes=[220,277,330,277,247,294,370,294];let i=0;musicTimer=setInterval(()=>{if(musicOn)tone(notes[i++%notes.length],.18,'triangle',.009,0)},420)}
+function stopMusic(){clearInterval(musicTimer);musicTimer=null}
+const state={wave:1,score:0,level:1,xp:0,nextXp:100,gameOver:false,between:true,waveTimer:1.8,spawnLeft:0,spawnTimer:0,enemies:[],bullets:[],particles:[],pickups:[],texts:[],shake:0,super:0,obstacles:[],player:null};
+function makePlayer(){return{x:W/2,y:H/2,r:22,hp:100,maxHp:100,speed:245,angle:0,fireCd:0,fireRate:.18,damage:18,invuln:0,dashCd:0,dashTime:0,dashX:0,dashY:0}}
+function makeObstacles(){return[{x:190,y:160,w:115,h:70},{x:735,y:145,w:120,h:72},{x:170,y:450,w:130,h:68},{x:745,y:445,w:115,h:70},{x:450,y:145,w:120,h:55},{x:430,y:485,w:145,h:55},{x:330,y:290,w:70,h:70},{x:640,y:300,w:70,h:70}]}
+function reset(){state.wave=1;state.score=0;state.level=1;state.xp=0;state.nextXp=100;state.gameOver=false;state.between=true;state.waveTimer=1.8;state.spawnLeft=0;state.spawnTimer=0;state.enemies=[];state.bullets=[];state.particles=[];state.pickups=[];state.texts=[];state.shake=0;state.super=0;state.player=makePlayer();state.obstacles=makeObstacles();document.getElementById('overlay').style.display='none';showBanner('OLEADA 1','Prepárate');updateHud();audio();startMusic()}
+function circleRect(cx,cy,r,o){const x=clamp(cx,o.x,o.x+o.w),y=clamp(cy,o.y,o.y+o.h);return Math.hypot(cx-x,cy-y)<r}
+function movePlayer(dt){const p=state.player;let x=0,y=0;if(keys.w||keys.arrowup)y--;if(keys.s||keys.arrowdown)y++;if(keys.a||keys.arrowleft)x--;if(keys.d||keys.arrowright)x++;if(x||y){const l=Math.hypot(x,y);x/=l;y/=l;if(p.dashTime>0){p.x+=p.dashX*680*dt;p.y+=p.dashY*680*dt}else{p.x+=x*p.speed*dt;p.y+=y*p.speed*dt}}p.x=clamp(p.x,p.r+22,W-p.r-22);p.y=clamp(p.y,p.r+25,H-p.r-22);for(const o of state.obstacles)if(circleRect(p.x,p.y,p.r,o)){p.x-=x*p.speed*dt;p.y-=y*p.speed*dt}p.angle=Math.atan2(mouse.y-p.y,mouse.x-p.x);p.invuln=Math.max(0,p.invuln-dt);p.fireCd-=dt;p.dashCd=Math.max(0,p.dashCd-dt);p.dashTime=Math.max(0,p.dashTime-dt);if(mouse.down&&p.fireCd<=0)firePlayer();}
+function firePlayer(){const p=state.player;p.fireCd=p.fireRate;const a=p.angle;state.bullets.push({x:p.x+Math.cos(a)*23,y:p.y+Math.sin(a)*23,vx:Math.cos(a)*720,vy:Math.sin(a)*720,r:5,life:1,owner:'p',damage:p.damage});p.shotFlash=.08;sfx('shot')}
+function dash(){const p=state.player;if(p.dashCd>0||state.gameOver)return;let dx=Math.cos(p.angle),dy=Math.sin(p.angle);let mx=0,my=0;if(keys.w||keys.s||keys.a||keys.d){if(keys.a)mx--;if(keys.d)mx++;if(keys.w)my--;if(keys.s)my++;if(mx||my){const l=Math.hypot(mx,my);dx=mx/l;dy=my/l}}p.dashX=dx;p.dashY=dy;p.dashTime=.16;p.dashCd=2.2;p.invuln=.22;for(let i=0;i<12;i++)particle(p.x,p.y,'dash');sfx('dash')}
+function useSuper(){if(state.super<100||state.gameOver)return;state.super=0;sfx('super');for(let i=0;i<28;i++){const a=i/28*Math.PI*2;state.bullets.push({x:state.player.x,y:state.player.y,vx:Math.cos(a)*520,vy:Math.sin(a)*520,r:8,life:.7,owner:'super',damage:70})}for(let i=0;i<45;i++)particle(state.player.x,state.player.y,'super');state.shake=10}
+function enemyType(){const r=Math.random();if(state.wave>=6&&r<.12)return'charger';if(state.wave>=3&&r<.27)return'shooter';return'grunt'}
+function spawnEnemy(type=enemyType(),boss=false){let side=Math.floor(Math.random()*4),x=0,y=0;if(side===0){x=rand(35,W-35);y=35}else if(side===1){x=rand(35,W-35);y=H-35}else if(side===2){x=35;y=rand(35,H-35)}else{x=W-35;y=rand(35,H-35)}let e={x,y,type,hp:30,maxHp:30,r:18,speed:rand(55,72)+state.wave*2,fireCd:rand(.6,1.6),flash:0,dead:false};if(type==='shooter'){e.hp=42;e.maxHp=42;e.r=19;e.speed=52+state.wave*1.6}if(type==='charger'){e.hp=55;e.maxHp=55;e.r=21;e.speed=105+state.wave*2;e.chargeCd=rand(1.5,3)}if(boss){e.type='boss';e.hp=650+state.wave*120;e.maxHp=e.hp;e.r=40;e.speed=42+state.wave;e.fireCd=1.2;e.boss=true}state.enemies.push(e)}
+function startWave(){state.between=false;state.spawnLeft=7+state.wave*3+(state.wave%5===0?3:0);state.spawnTimer=.1;showBanner(state.wave%5===0?'JEFE · OLEADA '+state.wave:'OLEADA '+state.wave,state.wave%5===0?'El jefe entra en la arena':'Elimina a todos los enemigos');if(state.wave%5===0){setTimeout(()=>{if(!state.gameOver)spawnEnemy('grunt',true)},650);sfx('boss')}}
+function updateEnemies(dt){const p=state.player;for(const e of state.enemies){if(e.dead)continue;const dx=p.x-e.x,dy=p.y-e.y,d=Math.hypot(dx,dy)||1;let move=true;if(e.type==='shooter'&&d<330)move=d>235;if(e.type==='boss')move=d>190;if(move){e.x+=dx/d*e.speed*dt;e.y+=dy/d*e.speed*dt}e.x=clamp(e.x,e.r+10,W-e.r-10);e.y=clamp(e.y,e.r+10,H-e.r-10);for(const o of state.obstacles)if(circleRect(e.x,e.y,e.r,o)){e.x-=dx/d*e.speed*dt;e.y-=dy/d*e.speed*dt}e.fireCd-=dt;if((e.type==='shooter'||e.type==='boss')&&e.fireCd<=0){e.fireCd=e.type==='boss'?.75:1.7;shootEnemy(e,Math.atan2(dy,dx),e.type==='boss'?430:350)}if(e.type==='charger'){e.chargeCd-=dt;if(e.chargeCd<0){e.chargeCd=2.7;e.speed=230;setTimeout(()=>{if(e&&!e.dead)e.speed=115},420)}}if(d<e.r+p.r&&p.invuln<=0){damagePlayer(e.type==='boss'?18:e.type==='charger'?14:8);const nx=dx/d,ny=dy/d;p.x-=nx*10;p.y-=ny*10}}
+state.enemies=state.enemies.filter(e=>!e.dead)}
+function shootEnemy(e,a,speed){state.bullets.push({x:e.x+Math.cos(a)*e.r,y:e.y+Math.sin(a)*e.r,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,r:e.type==='boss'?8:6,life:2.2,owner:'e',damage:e.type==='boss'?13:9})}
+function damagePlayer(n){const p=state.player;if(p.invuln>0)return;p.hp=Math.max(0,p.hp-n);p.invuln=.28;state.shake=5;floatText(p.x,p.y-30,'-'+n,'#ff6b5b');updateHud();if(p.hp<=0)endGame()}
+function damageEnemy(e,n){e.hp-=n;e.flash=.08;state.super=clamp(state.super+n*(e.boss?1.5:.55),0,100);particle(e.x,e.y,'hit');if(e.hp<=0)killEnemy(e)}
+function killEnemy(e){e.dead=true;const gain=e.boss?500:e.type==='charger'?35:e.type==='shooter'?28:20;state.score+=gain;gainXp(e.boss?100:e.type==='charger'?34:22);for(let i=0;i<(e.boss?35:10);i++)particle(e.x,e.y,e.boss?'super':'hit');if(Math.random()<.14&&!e.boss)state.pickups.push({x:e.x,y:e.y,type:Math.random()<.5?'heal':'super',life:8,r:11});floatText(e.x,e.y-25,'+'+gain,'#ffc93c');if(e.boss){state.shake=14;sfx('boss')}else sfx('hit')}
+function gainXp(n){state.xp+=n;while(state.xp>=state.nextXp){state.xp-=state.nextXp;state.level++;state.nextXp=Math.round(state.nextXp*1.28);const p=state.player;p.maxHp+=12;p.hp=p.maxHp;p.damage+=3;p.fireRate=Math.max(.105,p.fireRate-.008);sfx('level');showBanner('NIVEL '+state.level,'Tu brawler se ha hecho más fuerte')}}
+function updateBullets(dt){for(const b of state.bullets){b.x+=b.vx*dt;b.y+=b.vy*dt;b.life-=dt;if(b.life<=0||b.x<-20||b.x>W+20||b.y<-20||b.y>H+20){b.dead=true;continue}for(const o of state.obstacles)if(b.owner!=='e'&&circleRect(b.x,b.y,b.r,o)){b.dead=true;particle(b.x,b.y,'hit');break}if(b.dead)continue;if(b.owner==='p'||b.owner==='super'){for(const e of state.enemies){if(!e.dead&&Math.hypot(b.x-e.x,b.y-e.y)<b.r+e.r){damageEnemy(e,b.damage);b.dead=true;break}}}else if(Math.hypot(b.x-state.player.x,b.y-state.player.y)<b.r+state.player.r){damagePlayer(b.damage);b.dead=true}}state.bullets=state.bullets.filter(b=>!b.dead)}
+function updateSpawns(dt){if(state.between){state.waveTimer-=dt;if(state.waveTimer<=0)startWave();return}if(state.spawnLeft>0){state.spawnTimer-=dt;if(state.spawnTimer<=0){spawnEnemy();state.spawnLeft--;state.spawnTimer=Math.max(.18,.72-state.wave*.018)}}else if(state.enemies.length===0){state.between=true;state.wave++;state.waveTimer=1.8;state.player.hp=Math.min(state.player.maxHp,state.player.hp+Math.round(state.player.maxHp*.12));showBanner('OLEADA SUPERADA','Recuperas un poco de vida')}}
+function updatePickups(dt){for(const p of state.pickups){p.life-=dt;p.y+=Math.sin(performance.now()/160+p.x)*dt*8;if(Math.hypot(p.x-state.player.x,p.y-state.player.y)<p.r+state.player.r){if(p.type==='heal'){state.player.hp=Math.min(state.player.maxHp,state.player.hp+28);floatText(p.x,p.y,'+28 HP','#64e57c')}else{state.super=clamp(state.super+30,0,100);floatText(p.x,p.y,'+30% SUPER','#b878ff')}particle(p.x,p.y,p.type);p.dead=true;sfx('pickup')}}state.pickups=state.pickups.filter(p=>!p.dead&&p.life>0)}
+function particle(x,y,type='hit'){let a=rand(0,Math.PI*2),sp=type==='dash'?rand(80,220):type==='super'?rand(80,340):rand(40,180);state.particles.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:rand(.25,.7),max:.7,size:rand(2,6),type})}
+function floatText(x,y,text,color){state.texts.push({x,y,text,color,life:.8})}
+function updateFx(dt){for(const p of state.particles){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=.94;p.vy*=.94;p.life-=dt}state.particles=state.particles.filter(p=>p.life>0);for(const t of state.texts){t.y-=24*dt;t.life-=dt}state.texts=state.texts.filter(t=>t.life>0);state.shake=Math.max(0,state.shake-dt*18)}
+function updateHud(){const p=state.player;if(!p)return;document.getElementById('hpFill').style.width=(p.hp/p.maxHp*100)+'%';document.getElementById('hpText').textContent=Math.ceil(p.hp)+' / '+p.maxHp;document.getElementById('scoreText').textContent=state.score;document.getElementById('levelText').textContent=state.level;document.getElementById('waveLabel').textContent='OLEADA '+state.wave;document.getElementById('xpFill').style.width=(state.xp/state.nextXp*100)+'%';const s=document.getElementById('superAbility');s.innerHTML='<strong>'+Math.floor(state.super)+'%</strong>SUPER';s.className='ability '+(state.super>=100?'ready':'cooldown');const d=document.getElementById('dashAbility');d.className='ability '+(state.player.dashCd<=0?'ready':'cooldown');d.innerHTML='<strong>⇢</strong>'+(state.player.dashCd<=0?'DASH':state.player.dashCd.toFixed(1)+'s')}
+function showBanner(title,sub){const b=document.getElementById('banner');document.getElementById('bannerTitle').textContent=title;document.getElementById('bannerSub').textContent=sub;b.style.opacity=1;clearTimeout(showBanner.t);showBanner.t=setTimeout(()=>b.style.opacity=0,1250)}
+function endGame(){state.gameOver=true;stopMusic();document.getElementById('finalWave').textContent=state.wave;document.getElementById('finalScore').textContent=state.score;document.getElementById('finalLevel').textContent=state.level;document.getElementById('overlay').style.display='flex';document.getElementById('overTitle').textContent='Has caído';document.getElementById('overText').textContent='La arena te ha ganado esta vez. ¿Puedes llegar más lejos?'}
+function update(dt){if(state.gameOver)return;movePlayer(dt);updateSpawns(dt);updateEnemies(dt);updateBullets(dt);updatePickups(dt);updateFx(dt);updateHud()}
+function roundedRect(x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fill()}
+function drawArena(){const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#26335b');g.addColorStop(1,'#171e39');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);ctx.fillStyle='#ffffff05';for(let x=0;x<W;x+=52)for(let y=0;y<H;y+=52)ctx.fillRect(x,y,1,1);ctx.strokeStyle='#ffffff07';ctx.lineWidth=1;for(let x=0;x<W;x+=52){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke()}for(let y=0;y<H;y+=52){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}for(const o of state.obstacles){ctx.fillStyle='#0005';roundedRect(o.x+6,o.y+9,o.w,o.h,15);ctx.fillStyle='#465276';roundedRect(o.x,o.y,o.w,o.h,15);ctx.fillStyle='#59678d';roundedRect(o.x+5,o.y+5,o.w-10,o.h*.34,10);ctx.fillStyle='#ffffff0d';roundedRect(o.x+9,o.y+8,o.w*.35,7,4)}ctx.strokeStyle='#6fe7ff12';ctx.lineWidth=3;ctx.strokeRect(18,18,W-36,H-36)}
+function drawCharacter(p,isEnemy=false){ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.angle||0);ctx.shadowColor=isEnemy?'#ff6b5b66':'#6fe7ff66';ctx.shadowBlur=18;ctx.fillStyle=isEnemy?'#ff6b5b':'#6fe7ff';ctx.beginPath();ctx.arc(0,0,p.r,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;ctx.fillStyle=isEnemy?'#b6473b':'#2fa9c2';ctx.beginPath();ctx.arc(-3,2,p.r*.72,0,Math.PI*2);ctx.fill();ctx.fillStyle='#f5f0ff';ctx.beginPath();ctx.arc(7,-7,4,0,Math.PI*2);ctx.fill();ctx.fillStyle='#140f2b';ctx.beginPath();ctx.arc(8,-7,1.8,0,Math.PI*2);ctx.fill();ctx.fillStyle=isEnemy?'#3a1d28':'#19394b';roundedRect(8,-5,26,9,4);ctx.fill();if(!isEnemy){ctx.fillStyle='#ffc93c';ctx.beginPath();ctx.arc(-8,-11,5,0,Math.PI*2);ctx.fill()}ctx.restore()}
+function drawBoss(e){ctx.save();ctx.translate(e.x,e.y);ctx.shadowColor='#b878ff88';ctx.shadowBlur=24;ctx.fillStyle='#7d4bc0';ctx.beginPath();ctx.arc(0,0,e.r,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;ctx.fillStyle='#4c2d7c';ctx.beginPath();ctx.arc(0,4,e.r*.75,0,Math.PI*2);ctx.fill();ctx.fillStyle='#ffc93c';ctx.beginPath();ctx.arc(-12,-10,6,0,Math.PI*2);ctx.arc(12,-10,6,0,Math.PI*2);ctx.fill();ctx.fillStyle='#24172f';ctx.fillRect(-19,8,38,6);ctx.fillStyle='#ff6b5b';ctx.fillRect(-e.r,-e.r-13,e.r*2*(e.hp/e.maxHp),5);ctx.fillStyle='#140f2b';ctx.fillRect(-e.r,-e.r-13,e.r*2,5);ctx.restore()}
+function draw(){ctx.save();if(state.shake){ctx.translate(rand(-state.shake,state.shake),rand(-state.shake,state.shake))}drawArena();for(const p of state.pickups){ctx.save();ctx.translate(p.x,p.y);ctx.rotate(performance.now()/700);ctx.shadowColor=p.type==='heal'?'#64e57c':'#b878ff';ctx.shadowBlur=15;ctx.fillStyle=p.type==='heal'?'#64e57c':'#b878ff';ctx.beginPath();ctx.moveTo(0,-11);ctx.lineTo(9,0);ctx.lineTo(0,11);ctx.lineTo(-9,0);ctx.closePath();ctx.fill();ctx.restore()}for(const e of state.enemies){if(e.boss)drawBoss(e);else{e.angle=Math.atan2(state.player.y-e.y,state.player.x-e.x);drawCharacter(e,true);ctx.fillStyle='#140f2bcc';ctx.fillRect(e.x-18,e.y-e.r-9,36,4);ctx.fillStyle='#ff6b5b';ctx.fillRect(e.x-18,e.y-e.r-9,36*(e.hp/e.maxHp),4)}}for(const b of state.bullets){ctx.fillStyle=b.owner==='e'?'#ff4b4b':'#ffc93c';ctx.shadowColor=ctx.fillStyle;ctx.shadowBlur=b.owner==='super'?18:9;ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0}const p=state.player;if(p){if(p.invuln>0&&Math.floor(p.invuln*30)%2===0){}else drawCharacter(p,false);if(p.shotFlash>0){ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.angle);ctx.fillStyle='#fff6c7';ctx.globalAlpha=p.shotFlash/.08;ctx.beginPath();ctx.moveTo(31,0);ctx.lineTo(50,-7);ctx.lineTo(43,0);ctx.lineTo(50,7);ctx.closePath();ctx.fill();ctx.restore();p.shotFlash-=.016}}for(const q of state.particles){ctx.globalAlpha=clamp(q.life/q.max,0,1);ctx.fillStyle=q.type==='super'?'#b878ff':q.type==='dash'?'#6fe7ff':'#ffc93c';ctx.beginPath();ctx.arc(q.x,q.y,q.size,0,Math.PI*2);ctx.fill()}ctx.globalAlpha=1;for(const t of state.texts){ctx.globalAlpha=clamp(t.life/.8,0,1);ctx.fillStyle=t.color;ctx.font='800 16px Baloo 2';ctx.textAlign='center';ctx.fillText(t.text,t.x,t.y)}ctx.globalAlpha=1;ctx.restore()}
+let last=performance.now();function loop(now){const dt=Math.min(.033,(now-last)/1000);last=now;update(dt);draw();requestAnimationFrame(loop)}
+function pos(e){const r=canvas.getBoundingClientRect();mouse.x=(e.clientX-r.left)*W/r.width;mouse.y=(e.clientY-r.top)*H/r.height}
+canvas.addEventListener('mousemove',pos);canvas.addEventListener('mousedown',e=>{pos(e);mouse.down=true;audio()});window.addEventListener('mouseup',()=>mouse.down=false);
+canvas.addEventListener('touchstart',e=>{e.preventDefault();const t=e.touches[0];pos(t);mouse.down=true;audio()}, {passive:false});canvas.addEventListener('touchmove',e=>{e.preventDefault();const t=e.touches[0];pos(t)}, {passive:false});canvas.addEventListener('touchend',()=>mouse.down=false);
+window.addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;if(e.key===' ') {e.preventDefault();dash()}if(e.key.toLowerCase()==='q')useSuper()});window.addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
+document.getElementById('restartBtn').addEventListener('click',reset);document.getElementById('musicBtn').addEventListener('click',()=>{musicOn=!musicOn;document.getElementById('musicBtn').textContent=musicOn?'♫':'×';if(musicOn){audio();startMusic()}else stopMusic()});
+reset();requestAnimationFrame(loop);
+</script>
 </body>
 </html>
