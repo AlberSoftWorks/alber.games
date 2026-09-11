@@ -33,17 +33,17 @@ const canvas=document.getElementById('tdCanvas'),ctx=canvas.getContext('2d');
 const WAYPOINTS=[{x:-30,y:80},{x:200,y:80},{x:200,y:320},{x:480,y:320},{x:480,y:90},{x:700,y:90},{x:700,y:480},{x:930,y:480}];
 // El orden va de la capa exterior más resistente a la más básica: cada golpe avanza hacia el siguiente índice.
 const BALLOON_TIERS=[
-{name:'ceramic',label:'Cerámico',color:'var(--td-ceramic)',speed:92,radius:24,reward:7,leak:14,slowResist:.75},
-{name:'rainbow',label:'Arcoíris',color:'var(--td-rainbow)',speed:280,radius:21,reward:5,leak:8,slowResist:.35},
-{name:'black',label:'Negro',color:'var(--td-black)',speed:225,radius:20,reward:4,leak:6,slowResist:.7},
+{name:'ceramic',label:'Cerámico',color:'var(--td-ceramic)',speed:68,radius:24,reward:7,leak:14,slowResist:.75},
+{name:'rainbow',label:'Arcoíris',color:'var(--td-rainbow)',speed:250,radius:21,reward:5,leak:8,slowResist:.35},
+{name:'black',label:'Negro',color:'var(--td-black)',speed:210,radius:20,reward:4,leak:6,slowResist:.7},
 {name:'purple',label:'Púrpura',color:'var(--td-purple)',speed:235,radius:20,reward:4,leak:5,slowResist:.15},
-{name:'pink',label:'Rosa',color:'var(--td-pink)',speed:260,radius:19,reward:3,leak:5,slowResist:.2},
-{name:'yellow',label:'Amarillo',color:'var(--td-yellow)',speed:220,radius:18,reward:3,leak:4,slowResist:.25},
-{name:'green',label:'Verde',color:'var(--td-green)',speed:180,radius:17,reward:2,leak:3,slowResist:.3},
-{name:'blue',label:'Azul',color:'var(--td-blue)',speed:160,radius:15,reward:2,leak:2,slowResist:.35},
-{name:'red',label:'Rojo',color:'var(--td-red)',speed:150,radius:13,reward:1,leak:1,slowResist:.4}
+{name:'pink',label:'Rosa',color:'var(--td-pink)',speed:220,radius:19,reward:3,leak:5,slowResist:.2},
+{name:'yellow',label:'Amarillo',color:'var(--td-yellow)',speed:180,radius:18,reward:3,leak:4,slowResist:.25},
+{name:'green',label:'Verde',color:'var(--td-green)',speed:150,radius:17,reward:2,leak:3,slowResist:.3},
+{name:'blue',label:'Azul',color:'var(--td-blue)',speed:140,radius:15,reward:2,leak:2,slowResist:.35},
+{name:'red',label:'Rojo',color:'var(--td-red)',speed:130,radius:13,reward:1,leak:1,slowResist:.4}
 ];
-const MOAB={name:'MOAB',speed:68,radius:32,hp:90,reward:300,leak:30,slowResist:.9};
+const MOAB={name:'MOAB',speed:44,radius:32,hp:90,reward:300,leak:30,slowResist:.9};
 const TOWER_TYPES={basic:{label:'Básica',cost:100,range:130,fireInterval:.45,damage:1,projectileSpeed:480,colorVar:'--td-basic',darkVar:'--td-basic-dark',splash:0},cannon:{label:'Cañón',cost:160,range:105,fireInterval:1.3,damage:3,projectileSpeed:300,colorVar:'--td-cannon',darkVar:'--td-cannon-dark',splash:55},sniper:{label:'Francotirador',cost:180,range:5000,fireInterval:2.4,damage:6,projectileSpeed:950,colorVar:'--td-sniper',darkVar:'--td-sniper-dark',splash:0},super:{label:'Súper',cost:350,range:250,fireInterval:.35,damage:1,projectileSpeed:1200,colorVar:'--td-super',darkVar:'--td-super-dark',splash:25},support:{label:'Soporte',cost:150,range:110,slowFactor:.5,colorVar:'--td-support',darkVar:'--td-support-dark',isSupport:true},ice:{label:'Hielo',cost:240,range:120,fireInterval:1.1,damage:1,projectileSpeed:520,colorVar:'--td-ice',darkVar:'--td-ice-dark',splash:65,slowFactor:.35,isIce:true}};
 const TOTAL_WAVES=25,PATH_CLEARANCE=34,TOWER_MIN_GAP=34;
 function freshState(){return{money:250,lives:100,wave:0,towers:[],balloons:[],projectiles:[],spawnQueue:[],spawnTimer:0,waveActive:false,gameOver:false,victory:false,speedMult:1,armedType:null,selectedTower:null}}
@@ -59,7 +59,6 @@ function spawnBalloon(type){if(type==='MOAB'){state.balloons.push({kind:'moab',n
 function startWave(){if(state.waveActive||state.gameOver||state.victory)return;state.wave++;state.spawnQueue=buildWaveQueue(state.wave);state.spawnTimer=0;state.waveActive=true;updateHUD()}
 function findTarget(t){let best=null,bestProgress=-1;for(const b of state.balloons){if(b.dead)continue;const dx=b.x-t.x,dy=b.y-t.y;if(Math.hypot(dx,dy)>t.range)continue;const progress=b.wpIndex+(b.segProgress||0);if(progress>bestProgress){bestProgress=progress;best=b}}return best}
 function fireTower(t,target){state.projectiles.push({x:t.x,y:t.y,target,speed:t.projectileSpeed,damage:t.damage,splash:t.splash,colorVar:t.colorVar,slowFactor:t.slowFactor||0})}
-// Un impacto no consume una barra de vida: elimina una capa completa y deja visible la capa inmediatamente inferior.
 function damageBalloon(b,amount,slowFactor=0){if(!b||b.dead)return;if(b.kind==='moab'){b.hp-=amount;state.money+=amount;if(b.hp<=0){b.dead=true;state.money+=b.reward;toast('💥 ¡MOAB destruido! +'+b.reward+'💰')}return}let hits=Math.max(1,Math.floor(amount));while(hits>0&&!b.dead){const tier=BALLOON_TIERS[b.tierIndex];state.money+=tier.reward;hits--;if(b.tierIndex>=BALLOON_TIERS.length-1){b.dead=true}else{b.tierIndex++;b.slowMult=1-(1-(slowFactor||1))*(1-BALLOON_TIERS[b.tierIndex].slowResist)}}}
 function applySplash(x,y,radius,amount,slowFactor=0){state.balloons.forEach(b=>{if(!b.dead&&Math.hypot(b.x-x,b.y-y)<=radius)damageBalloon(b,amount,slowFactor)})}
 function updateBalloonSlows(){state.balloons.forEach(b=>{if(b.dead)return;let slow=1;for(const t of state.towers){const d=Math.hypot(b.x-t.x,b.y-t.y);if((t.type==='support'||t.type==='ice')&&d<=t.range)slow=Math.min(slow,t.slowFactor||1)}const resist=b.kind==='moab'?b.slowResist:BALLOON_TIERS[b.tierIndex].slowResist;b.slowMult=1-(1-slow)*(1-resist)})}
